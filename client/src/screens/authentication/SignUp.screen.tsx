@@ -3,6 +3,7 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { IAccount, Props } from '../../types';
 import { Button, Text, TextInput as RNPTextInput } from 'react-native-paper';
 import { useFormik } from 'formik';
+import { AxiosError } from 'axios';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { TextInput } from '../../components/overrides';
 import useGlobalStyles from '../../styles/global.style';
@@ -45,10 +46,10 @@ const SignUp = ({ navigation }: Props) => {
 					});
 					navigation.navigate('SignIn');
 				});
-			} catch (error: any) {
+			} catch (error) {
 				resetForm();
 				openDialog({
-					content: `[Đăng ký] Đã có lỗi xảy ra: ${error?.message}`,
+					content: `[Đăng ký] Đã có lỗi xảy ra: ${(error as AxiosError).response?.data}`,
 					actions: [{ label: 'Đồng ý' }],
 				});
 			}

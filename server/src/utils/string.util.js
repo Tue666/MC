@@ -1,4 +1,8 @@
-class StringUtils {
+class StringUtil {
+  static toStringID(value) {
+    return value.replace(/ /g, "_").toUpperCase();
+  }
+
   static randomGenerate(length) {
     let result = "";
     const characters =
@@ -21,4 +25,4 @@ class StringUtils {
   }
 }
 
-module.exports = StringUtils;
+module.exports = StringUtil;

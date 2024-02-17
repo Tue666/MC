@@ -2,7 +2,7 @@ const bcrypt = require("bcrypt");
 
 const SALT_ROUNDS = 10;
 
-class BcryptUtils {
+class BcryptUtil {
   static async hash(input) {
     return bcrypt.hash(input, SALT_ROUNDS);
   }
@@ -12,4 +12,4 @@ class BcryptUtils {
   }
 }
 
-module.exports = BcryptUtils;
+module.exports = BcryptUtil;

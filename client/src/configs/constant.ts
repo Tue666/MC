@@ -8,6 +8,7 @@ export const DIALOG = {
 	ICON_SIZE: 35,
 	SCROLL_CONTENT: {
 		MAX_HEIGHT: '80%',
+		PADDING: 10,
 	},
 };
 
@@ -25,6 +26,7 @@ export const MAIN_LAYOUT = {
 		HEIGHT: 50,
 		PADDING: 10,
 		MARGIN_BOTTOM: 10,
+		BORDER_RADIUS: 5,
 		ICON_SIZE: 25,
 	},
 	BOTTOM_BAR: {

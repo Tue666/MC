@@ -46,6 +46,7 @@ const styles = StyleSheet.create({
 		height: MAIN_LAYOUT.HEADER.HEIGHT,
 		padding: MAIN_LAYOUT.HEADER.PADDING,
 		marginBottom: MAIN_LAYOUT.HEADER.MARGIN_BOTTOM,
+		borderRadius: MAIN_LAYOUT.HEADER.BORDER_RADIUS,
 	},
 });
 

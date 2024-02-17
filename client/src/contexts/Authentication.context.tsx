@@ -1,8 +1,11 @@
 import { useEffect, useReducer, createContext, PropsWithChildren } from 'react';
+import { AxiosError } from 'axios';
 import { accountAPI } from '../apis';
 import { IAccount, ICommon } from '../types';
 import { JWTUtil } from '../utils';
 import { openDialog } from '../utils/dialog.util';
+import { useAppDispatch } from '../redux/hooks';
+import { clearAccount, initAccount } from '../redux/slices/account.slice';
 
 export interface AuthenticationState {
 	isInitialized: boolean;
@@ -59,6 +62,7 @@ const AuthenticationContext = createContext(initialState);
 const AuthenticationProvider = (props: PropsWithChildren) => {
 	const { children } = props;
 	const [state, dispatch] = useReducer(reducer, initialState);
+	const appDispatch = useAppDispatch();
 
 	useEffect(() => {
 		const initialize = async () => {
@@ -67,16 +71,18 @@ const AuthenticationProvider = (props: PropsWithChildren) => {
 				const isAuthenticated = await JWTUtil.isValidToken(accessToken);
 				if (isAuthenticated) {
 					// Fetch necessary data here...
+					appDispatch(initAccount());
 				}
 
 				dispatch({
 					type: 'INITIALIZE',
 					payload: { isAuthenticated },
 				});
-			} catch (error: any) {
+			} catch (error) {
+				await JWTUtil.setToken(null);
 				openDialog({
 					closable: false,
-					content: `Đã có lỗi xảy ra: ${error?.message}`,
+					content: `Đã có lỗi xảy ra: ${(error as AxiosError).response?.data}`,
 				});
 				dispatch({
 					type: 'INITIALIZE',
@@ -86,7 +92,7 @@ const AuthenticationProvider = (props: PropsWithChildren) => {
 		};
 
 		initialize();
-	}, []);
+	}, [appDispatch]);
 
 	const signIn = async (
 		signInBody: IAccount.SignInBody,
@@ -99,7 +105,10 @@ const AuthenticationProvider = (props: PropsWithChildren) => {
 		}
 
 		await JWTUtil.setToken(accessToken);
+
 		// Fetch necessary data here...
+		appDispatch(initAccount());
+
 		dispatch({ type: 'LOGIN' });
 		callback();
 	};
@@ -119,7 +128,10 @@ const AuthenticationProvider = (props: PropsWithChildren) => {
 
 	const signOut = async (): Promise<void> => {
 		await JWTUtil.setToken(null);
+
 		// Clear necessary data here...
+		appDispatch(clearAccount());
+
 		dispatch({ type: 'LOGOUT' });
 	};
 	return (

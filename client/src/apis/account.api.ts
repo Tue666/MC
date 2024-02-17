@@ -21,6 +21,11 @@ const accountAPI = {
 		const url = `/accounts/verify-token`;
 		return APIClient.get(url);
 	},
+
+	getProfile: (): Promise<IAccount.ProfileResponse> => {
+		const url = `/accounts/profile`;
+		return APIClient.get(url);
+	},
 };
 
 export default accountAPI;

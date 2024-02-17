@@ -8,6 +8,10 @@ export interface Student extends StudentSchema {}
 
 export interface Administrator extends AdministratorSchema {}
 
+export interface ProfileResponse {
+	profile: Omit<Account, 'password'>;
+}
+
 export interface SignInBody extends Pick<Account, 'phone_number' | 'password'> {}
 
 export interface SignInResponse extends Response {

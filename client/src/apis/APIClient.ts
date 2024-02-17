@@ -4,7 +4,7 @@ import { accountAPI } from '.';
 
 const APIClient = () => {
 	const axiosClient = axios.create({
-		baseURL: 'http://192.168.1.7:5000/api',
+		baseURL: 'http://192.168.1.4:5000/api',
 	});
 
 	axiosClient.interceptors.request.use(
@@ -22,12 +22,13 @@ const APIClient = () => {
 				const accessToken = await JWTUtil.getToken();
 				// Unauthorized
 				if (accessToken === null || accessToken === undefined) {
-					return Promise.reject({ message: 'Xác thực thông tin thất bại!' });
+					return Promise.reject(error);
 				}
 				// Generate new token if the authentication is successful
 				const { accessToken: newAccessToken, error: refreshError } = await accountAPI.refreshToken();
 				if (refreshError) {
-					return Promise.reject({ message: refreshError });
+					error.response.data = refreshError;
+					return Promise.reject(error);
 				}
 
 				await JWTUtil.setToken(newAccessToken);
@@ -37,7 +38,7 @@ const APIClient = () => {
 
 			// Forbidden
 			if (error.response.status === 403) {
-				return Promise.reject({ message: 'Xác thực thông tin thất bại!' });
+				return Promise.reject(error);
 			}
 			return Promise.reject(error);
 		}

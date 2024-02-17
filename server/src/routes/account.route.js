@@ -8,5 +8,6 @@ router.post("/sign-in", accountController.signIn);
 router.post("/sign-up", accountController.signUp);
 router.get("/refresh-token", accountController.refreshToken);
 router.get("/verify-token", verifyToken, accountController.verifyToken);
+router.get("/profile", verifyToken, accountController.getProfile);
 
 module.exports = router;
