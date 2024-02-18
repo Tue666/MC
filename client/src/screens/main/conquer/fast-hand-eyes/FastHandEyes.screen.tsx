@@ -1,7 +1,7 @@
 import { Text } from 'react-native-paper';
-import { ConquerStackProps } from '../../../../types';
+import { ConquerFastHandEyesProps } from '../../../../types';
 
-const FastHandEyes = ({ navigation }: ConquerStackProps) => {
+const FastHandEyes = ({ navigation }: ConquerFastHandEyesProps) => {
 	return <Text>FastHandEyes</Text>;
 };
 

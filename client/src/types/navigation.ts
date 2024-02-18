@@ -8,23 +8,28 @@ export type MainTabList = {
 	Account: undefined;
 };
 
-export type MainTabProps = BottomTabScreenProps<MainTabList>;
+export type MainConquerStackProps = BottomTabScreenProps<MainTabList, 'ConquerStack'>;
+export type MainRankingProps = BottomTabScreenProps<MainTabList, 'Ranking'>;
+export type MainAccountProps = BottomTabScreenProps<MainTabList, 'Account'>;
 
 export type AuthenticationStackList = {
 	Start: undefined;
 	SignIn: undefined;
 	SignUp: undefined;
-	Main: undefined;
 };
 
-export type AuthenticationStackProps = StackScreenProps<AuthenticationStackList>;
+export type AuthenticationStartProps = StackScreenProps<AuthenticationStackList, 'Start'>;
+export type AuthenticationSignInProps = StackScreenProps<AuthenticationStackList, 'SignIn'>;
+export type AuthenticationSignUpProps = StackScreenProps<AuthenticationStackList, 'SignUp'>;
 
 export type ConquerStackList = {
-	Conquer: ConquerNavigateParams;
+	Conquer: undefined;
 	Waiting: ConquerNavigateParams;
-	FastHandEyes: ConquerNavigateParams;
+	FastHandEyes: undefined;
 };
 
-export type ConquerStackListKeys = keyof ConquerStackList;
+export type ConquerStackListKey = keyof ConquerStackList;
 
-export type ConquerStackProps = StackScreenProps<ConquerStackList>;
+export type ConquerProps = StackScreenProps<ConquerStackList, 'Conquer'>;
+export type ConquerWaitingProps = StackScreenProps<ConquerStackList, 'Waiting'>;
+export type ConquerFastHandEyesProps = StackScreenProps<ConquerStackList, 'FastHandEyes'>;

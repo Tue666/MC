@@ -8,12 +8,13 @@ import {
 	View,
 } from 'react-native';
 import { MD3Theme, Text, useTheme } from 'react-native-paper';
+import LinearGradient from 'react-native-linear-gradient';
 import useGlobalStyles from '../../../styles/global.style';
 import { openDialog } from '../../../utils/dialog.util';
 import { MAIN_LAYOUT } from '../../../configs/constant';
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
 import { initAccount, selectAccount } from '../../../redux/slices/account.slice';
-import { ConquerStackListKeys, ConquerStackProps, IOperation, IResource } from '../../../types';
+import { ConquerProps, ConquerStackListKey, IOperation, IResource } from '../../../types';
 import { CONQUER_RENDERER } from './renderer';
 
 export interface ConquerNavigateParams {
@@ -73,7 +74,7 @@ const getDifficultLevel = (
 	return Object.keys(resourceDifficulty)[0];
 };
 
-const Conquer = ({ navigation }: ConquerStackProps) => {
+const Conquer = ({ navigation }: ConquerProps) => {
 	let ROW_INDEX = 0;
 	let COLUMN_INDEX = 0;
 
@@ -84,12 +85,12 @@ const Conquer = ({ navigation }: ConquerStackProps) => {
 	const [refreshing, setRefreshing] = useState(false);
 	const resourceDifficulty = RESOURCE_DIFFICULTY(theme);
 
-	const onPressResource = (params: ConquerNavigateParams, destination?: ConquerStackListKeys) => {
-		if (!destination) {
+	const onPressResource = (params: ConquerNavigateParams, destination?: ConquerStackListKey) => {
+		if (!destination || destination === 'Waiting') {
 			navigation.navigate('Waiting', params);
 			return;
 		}
-		navigation.navigate(destination, params);
+		navigation.navigate(destination);
 	};
 	const onLongPressResource = (title: string, description: string) => {
 		openDialog({
@@ -131,24 +132,33 @@ const Conquer = ({ navigation }: ConquerStackProps) => {
 					}
 
 					return (
-						<TouchableOpacity
+						<LinearGradient
 							key={resourceAllowed}
-							onPress={() => onPressResource({ _id, name, operations }, startDestination)}
-							onLongPress={() => onLongPressResource(name, description)}
+							start={{ x: 0.5, y: 0 }}
+							end={{ x: 1, y: 1 }}
+							colors={[
+								bgColor || globalStyles.paper.backgroundColor,
+								bgColor || globalStyles.paper.backgroundColor,
+								globalStyles.paper.backgroundColor,
+							]}
 							style={{
 								...styles.resource,
 								...globalStyles.shadow,
-								...(bgColor ? { backgroundColor: bgColor } : globalStyles.paper),
 								width: resourceWidth,
 							}}
 						>
-							<Text style={{ ...{ color: textColor ? textColor : theme.colors.onSurface } }}>{name}</Text>
-							{label && (
-								<Text variant="labelSmall" style={{ ...{ color: textColor ? textColor : theme.colors.onSurface } }}>
-									({label})
-								</Text>
-							)}
-						</TouchableOpacity>
+							<TouchableOpacity
+								onPress={() => onPressResource({ _id, name, operations }, startDestination)}
+								onLongPress={() => onLongPressResource(name, description)}
+							>
+								<Text style={{ ...{ color: textColor ? textColor : theme.colors.onSurface } }}>{name}</Text>
+								{label && (
+									<Text variant="labelSmall" style={{ ...{ color: textColor ? textColor : theme.colors.onSurface } }}>
+										({label})
+									</Text>
+								)}
+							</TouchableOpacity>
+						</LinearGradient>
 					);
 				})}
 			</View>

@@ -4,7 +4,7 @@ import { Button, Text, TextInput as RNPTextInput } from 'react-native-paper';
 import { useFormik } from 'formik';
 import { AxiosError } from 'axios';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { IAccount, AuthenticationStackProps } from '../../types';
+import { IAccount, AuthenticationSignInProps } from '../../types';
 import { TextInput } from '../../components/overrides';
 import useGlobalStyles from '../../styles/global.style';
 import useStackStyles from '../../styles/stack.style';
@@ -14,7 +14,7 @@ import { signInValidation } from '../../configs/form-validations';
 import useAuthentication from '../../hooks/useAuthentication.hook';
 import { openDialog } from '../../utils/dialog.util';
 
-const SignIn = ({ navigation }: AuthenticationStackProps) => {
+const SignIn = ({ navigation }: AuthenticationSignInProps) => {
 	const globalStyles = useGlobalStyles();
 	const stackStyles = useStackStyles();
 	const typographyStyles = useTypographyStyles();

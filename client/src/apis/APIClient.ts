@@ -1,10 +1,11 @@
 import axios from 'axios';
 import { JWTUtil } from '../utils';
+import { appAPIs } from '../configs/api';
 import { accountAPI } from '.';
 
 const APIClient = () => {
 	const axiosClient = axios.create({
-		baseURL: 'http://192.168.1.6:5000/api',
+		baseURL: `${appAPIs.server.url}/${appAPIs.server.path}`,
 	});
 
 	axiosClient.interceptors.request.use(

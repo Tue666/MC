@@ -42,6 +42,14 @@ export const MAIN_LAYOUT = {
 	},
 	SCREENS: {
 		CONQUER: {
+			WAITING: {
+				AVATAR: {
+					ICON_SIZE: 250,
+					PADDING: 10,
+					MARGIN_VERTICAL: 50,
+					BORDER_WIDTH: 5,
+				},
+			},
 			RESOURCE: {
 				MARGIN: 5,
 				PADDING: 30,

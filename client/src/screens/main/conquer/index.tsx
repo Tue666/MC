@@ -1,7 +1,7 @@
 import { useTheme } from 'react-native-paper';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { ConquerStackList, MainTabProps } from '../../../types';
+import { ConquerStackList, MainConquerStackProps } from '../../../types';
 import { CONQUER_RENDERER } from './renderer';
 import { useLayoutEffect } from 'react';
 import useGlobalStyles from '../../../styles/global.style';
@@ -10,7 +10,7 @@ const Stack = createStackNavigator<ConquerStackList>();
 const { main, waiting, NHANH_TAY_LE_MAT } = CONQUER_RENDERER;
 const HIDDEN_TABS = [waiting.name, NHANH_TAY_LE_MAT.name];
 
-const ConquerStack = ({ navigation, route }: MainTabProps) => {
+const ConquerStack = ({ navigation, route }: MainConquerStackProps) => {
 	const theme = useTheme();
 	const globalStyles = useGlobalStyles();
 

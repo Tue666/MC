@@ -1,5 +1,6 @@
 import { DimensionValue, ScrollView } from 'react-native';
-import { Button, Portal, Dialog as RNPDialog, Text } from 'react-native-paper';
+import { Button, Portal, Dialog as RNPDialog } from 'react-native-paper';
+import RenderHTML from 'react-native-render-html';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useAppSelector } from '../../redux/hooks';
 import { selectDialog } from '../../redux/slices/dialog.slice';
@@ -23,12 +24,12 @@ const Dialog = () => {
 			>
 				{icon && <RNPDialog.Icon icon={() => <Icon name={icon} size={DIALOG.ICON_SIZE} />} />}
 				{title && <RNPDialog.Title>{title}</RNPDialog.Title>}
-				{!contentScrollable && (
+				{content && !contentScrollable && (
 					<RNPDialog.Content>
-						<Text>{content}</Text>
+						<RenderHTML source={{ html: content }} />
 					</RNPDialog.Content>
 				)}
-				{contentScrollable && (
+				{content && contentScrollable && (
 					<RNPDialog.ScrollArea
 						style={{
 							maxHeight: DIALOG.SCROLL_CONTENT.MAX_HEIGHT as DimensionValue,
@@ -36,7 +37,7 @@ const Dialog = () => {
 						}}
 					>
 						<ScrollView>
-							<Text>{content}</Text>
+							<RenderHTML source={{ html: content }} />
 						</ScrollView>
 					</RNPDialog.ScrollArea>
 				)}
