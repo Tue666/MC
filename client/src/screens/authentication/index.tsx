@@ -1,15 +1,15 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import { AuthenticationLayout } from '../../layouts';
-import { RootStackParamList } from '../../types';
+import { AuthenticationStackList } from '../../types';
 import useGlobalStyles from '../../styles/global.style';
 import SignIn from '../authentication/SignIn.screen';
 import SignUp from '../authentication/SignUp.screen';
 import Start from '../authentication/Start.screen';
 import { useTheme } from 'react-native-paper';
 
-const Stack = createStackNavigator<RootStackParamList>();
+const Stack = createStackNavigator<AuthenticationStackList>();
 
-const AuthenticationStacks = () => {
+const AuthenticationStack = () => {
 	const theme = useTheme();
 	const globalStyles = useGlobalStyles();
 
@@ -50,4 +50,4 @@ const AuthenticationStacks = () => {
 	);
 };
 
-export default AuthenticationStacks;
+export default AuthenticationStack;

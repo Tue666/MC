@@ -1,7 +1,7 @@
 import useAuthentication from '../hooks/useAuthentication.hook';
 import Loading from './Loading.screen';
-import AuthenticationStacks from './authentication';
-import MainTabs from './main';
+import AuthenticationStack from './authentication';
+import MainTab from './main';
 
 const Main = () => {
 	const { isInitialized, isAuthenticated } = useAuthentication();
@@ -11,10 +11,10 @@ const Main = () => {
 	}
 
 	if (isInitialized && !isAuthenticated) {
-		return <AuthenticationStacks />;
+		return <AuthenticationStack />;
 	}
 
-	return <MainTabs />;
+	return <MainTab />;
 };
 
 export default Main;

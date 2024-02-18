@@ -203,6 +203,17 @@ class RoleController {
       next({ status: 500, msg: error.message });
     }
   }
+
+  async test(req, res, next) {
+    try {
+      console.log("Test role");
+      res.status(201).json({
+        msg: `hahaha`,
+      });
+    } catch (error) {
+      next({ status: 500, msg: error.message });
+    }
+  }
 }
 
 module.exports = new RoleController();

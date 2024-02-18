@@ -3,8 +3,14 @@ class ValidateUtil {
     return fields.every((field) => field !== null && field !== undefined);
   }
 
-  static ensureIncludeOne(value, values) {
-    return values.indexOf(value) !== -1;
+  static ensureIncludeOne(value, targetValues) {
+    return targetValues.indexOf(value) !== -1;
+  }
+
+  static ensureIncludeAll(values, targetValues) {
+    return targetValues.every((value) =>
+      ValidateUtil.ensureIncludeOne(value, values)
+    );
   }
 }
 

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import { IAccount, Props } from '../../types';
+import { IAccount, AuthenticationStackProps } from '../../types';
 import { Button, Text, TextInput as RNPTextInput } from 'react-native-paper';
 import { useFormik } from 'formik';
 import { AxiosError } from 'axios';
@@ -14,7 +14,7 @@ import { signUpValidation } from '../../configs/form-validations';
 import useAuthentication from '../../hooks/useAuthentication.hook';
 import { openDialog } from '../../utils/dialog.util';
 
-const SignUp = ({ navigation }: Props) => {
+const SignUp = ({ navigation }: AuthenticationStackProps) => {
 	const globalStyles = useGlobalStyles();
 	const stackStyles = useStackStyles();
 	const typographyStyles = useTypographyStyles();

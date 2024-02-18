@@ -5,14 +5,15 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import useGlobalStyles from '../../styles/global.style';
 import useStackStyles from '../../styles/stack.style';
 import { MainLayout } from '../../layouts';
+import { MainTabList } from '../../types';
 import { MAIN_LAYOUT } from '../../configs/constant';
-import Conquer from './Conquer.screen';
+import ConquerStack from './conquer';
 import Ranking from './Raking.screen';
 import Account from './Account.screen';
 
-const Tab = createBottomTabNavigator();
+const Tab = createBottomTabNavigator<MainTabList>();
 
-const MainTabs = () => {
+const MainTab = () => {
 	const theme = useTheme();
 	const globalStyles = useGlobalStyles();
 	const stackStyles = useStackStyles();
@@ -21,8 +22,23 @@ const MainTabs = () => {
 		<Tab.Navigator
 			screenOptions={{ headerShown: false }}
 			tabBar={({ state, descriptors, navigation }) => {
+				const childrenStyles = state.routes.reduce((styles, route) => {
+					const { options } = descriptors[route.key];
+					const { tabBarStyle } = options;
+					if (!tabBarStyle) return styles;
+
+					return { ...styles, ...(tabBarStyle as Object) };
+				}, {});
 				return (
-					<View style={{ ...styles.bar, ...stackStyles.row, ...globalStyles.paper, ...globalStyles.shadow }}>
+					<View
+						style={{
+							...styles.bar,
+							...stackStyles.row,
+							...globalStyles.paper,
+							...globalStyles.shadow,
+							...childrenStyles,
+						}}
+					>
 						{state.routes.map((route, index) => {
 							const { options } = descriptors[route.key];
 							const icon = options.tabBarIcon;
@@ -67,12 +83,12 @@ const MainTabs = () => {
 			}}
 		>
 			<Tab.Screen
-				name="Conquer"
+				name="ConquerStack"
 				options={{ tabBarIcon: ({ color, size }) => <Icon name="token" color={color} size={size} /> }}
 			>
-				{() => (
+				{(props) => (
 					<MainLayout>
-						<Conquer />
+						<ConquerStack {...props} />
 					</MainLayout>
 				)}
 			</Tab.Screen>
@@ -116,4 +132,4 @@ const styles = StyleSheet.create({
 	},
 });
 
-export default MainTabs;
+export default MainTab;

@@ -8,11 +8,19 @@ import {
 	View,
 } from 'react-native';
 import { MD3Theme, Text, useTheme } from 'react-native-paper';
-import useGlobalStyles from '../../styles/global.style';
-import { openDialog } from '../../utils/dialog.util';
-import { MAIN_LAYOUT } from '../../configs/constant';
-import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { initAccount, selectAccount } from '../../redux/slices/account.slice';
+import useGlobalStyles from '../../../styles/global.style';
+import { openDialog } from '../../../utils/dialog.util';
+import { MAIN_LAYOUT } from '../../../configs/constant';
+import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
+import { initAccount, selectAccount } from '../../../redux/slices/account.slice';
+import { ConquerStackListKeys, ConquerStackProps, IOperation, IResource } from '../../../types';
+import { CONQUER_RENDERER } from './renderer';
+
+export interface ConquerNavigateParams {
+	_id: IResource.Resource['_id'];
+	name: IResource.Resource['name'];
+	operations: IOperation.Operation['_id'][];
+}
 
 const WIDTH_SIZE = Dimensions.get('window').width;
 const CONTAINER_WIDTH = WIDTH_SIZE - MAIN_LAYOUT.PADDING * 2;
@@ -65,32 +73,23 @@ const getDifficultLevel = (
 	return Object.keys(resourceDifficulty)[0];
 };
 
-const Conquer = () => {
+const Conquer = ({ navigation }: ConquerStackProps) => {
 	let ROW_INDEX = 0;
 	let COLUMN_INDEX = 0;
 
 	const theme = useTheme();
 	const globalStyles = useGlobalStyles();
-	const { permissions } = useAppSelector(selectAccount);
+	const { resources } = useAppSelector(selectAccount);
 	const dispatch = useAppDispatch();
 	const [refreshing, setRefreshing] = useState(false);
 	const resourceDifficulty = RESOURCE_DIFFICULTY(theme);
 
-	const onPressResource = (title: string, operations: string[]) => {
-		if (operations.indexOf('ENTER') === -1) {
-			openDialog({
-				title,
-				content: 'Tài khoản chưa được cấp quyền tham gia tính năng này!',
-				actions: [{ label: 'Đồng ý' }],
-			});
+	const onPressResource = (params: ConquerNavigateParams, destination?: ConquerStackListKeys) => {
+		if (!destination) {
+			navigation.navigate('Waiting', params);
 			return;
 		}
-
-		openDialog({
-			title,
-			content: 'Chiến thôi!',
-			actions: [{ label: 'Ghép' }],
-		});
+		navigation.navigate(destination, params);
 	};
 	const onLongPressResource = (title: string, description: string) => {
 		openDialog({
@@ -108,11 +107,12 @@ const Conquer = () => {
 	return (
 		<ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefreshScreen} />}>
 			<View style={{ ...styles.container }}>
-				{Object.entries(permissions).map(([resourceAllowed, permissionAllowed]) => {
+				{Object.entries(resources).map(([resourceAllowed, permissionAllowed]) => {
 					// Stop render out of arrangement
 					if (ROW_INDEX >= RESOURCE_ARRANGEMENT.length) return;
 
-					const { name, description, difficulty, operations } = permissionAllowed;
+					const { _id, name, description, difficulty, operations } = permissionAllowed;
+					const startDestination = CONQUER_RENDERER[_id]?.startDestination || undefined;
 					const difficultLevel = getDifficultLevel(difficulty, resourceDifficulty);
 					const { label, bgColor, textColor } =
 						resourceDifficulty[difficultLevel as keyof typeof resourceDifficulty];
@@ -133,7 +133,7 @@ const Conquer = () => {
 					return (
 						<TouchableOpacity
 							key={resourceAllowed}
-							onPress={() => onPressResource(name, operations)}
+							onPress={() => onPressResource({ _id, name, operations }, startDestination)}
 							onLongPress={() => onLongPressResource(name, description)}
 							style={{
 								...styles.resource,
