@@ -1,9 +1,9 @@
 import { StackNavigationOptions } from '@react-navigation/stack';
 import { PreventHardwareBackGuard } from '../../guards';
 import { Conquer, Prepare, Statistic, Waiting } from '../../screens/main/conquer';
-import { FastHandEyes } from '../../screens/main/conquer/fast-hand-eyes';
+import { QuickMatch } from '../../screens/main/conquer/quick-match';
 import {
-	ConquerFastHandEyesProps,
+	ConquerQuickMatchProps,
 	ConquerIdleMode,
 	ConquerPrepareProps,
 	ConquerProps,
@@ -70,15 +70,15 @@ export const CONQUER_RENDERER: ConquerRenderer = {
 		},
 	},
 	RESOURCES: {
-		NHANH_TAY_LE_MAT: {
-			name: 'FastHandEyes',
+		DAU_NHANH: {
+			name: 'QuickMatch',
 			options: {
 				headerShown: false,
 			},
 			idleMode: 'SINGLE',
-			onRender: (props: ConquerFastHandEyesProps) => (
+			onRender: (props: ConquerQuickMatchProps) => (
 				<PreventHardwareBackGuard>
-					<FastHandEyes {...props} />
+					<QuickMatch {...props} />
 				</PreventHardwareBackGuard>
 			),
 		},

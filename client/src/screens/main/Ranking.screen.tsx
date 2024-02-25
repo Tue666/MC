@@ -1,14 +1,11 @@
 import { ScrollView } from 'react-native';
 import { Chip, useTheme } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { SoundManager } from '../../audios';
 
 const Ranking = () => {
 	const theme = useTheme();
 
-	const onPressChip = () => {
-		SoundManager.playSound('victory.mp3');
-	};
+	const onPressChip = () => {};
 	return (
 		<ScrollView>
 			{[...Array(2)].map((_, index) => {
@@ -20,7 +17,7 @@ const Ranking = () => {
 						style={{ margin: 10, padding: 10, backgroundColor: theme.colors.primary }}
 						textStyle={{ color: theme.colors.onPrimary }}
 					>
-						Example Chip
+						Example chip
 					</Chip>
 				);
 			})}

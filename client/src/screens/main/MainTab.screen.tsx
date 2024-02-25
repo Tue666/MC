@@ -2,6 +2,7 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { SoundManager } from '../../audios';
 import { ConstantConfig } from '../../configs';
 import { MainLayout } from '../../layouts';
 import { useGlobalStyles, useStackStyles } from '../../styles';
@@ -27,7 +28,7 @@ const MainTab = () => {
 					const { tabBarStyle } = options;
 					if (!tabBarStyle) return styles;
 
-					return { ...styles, ...(tabBarStyle as Object) };
+					return Object.assign({ ...styles }, tabBarStyle);
 				}, {});
 				return (
 					<View
@@ -52,6 +53,7 @@ const MainTab = () => {
 								});
 
 								if (!isFocused && !event.defaultPrevented) {
+									SoundManager.playSound('button_click.mp3');
 									navigation.navigate(route.name, route.params);
 								}
 							};

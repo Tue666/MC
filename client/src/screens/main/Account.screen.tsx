@@ -8,7 +8,7 @@ const Account = () => {
 	return (
 		<View>
 			<Button mode="contained" onPress={signOut}>
-				Đăng Xuất
+				Đăng xuất
 			</Button>
 		</View>
 	);

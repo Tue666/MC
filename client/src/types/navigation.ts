@@ -40,7 +40,7 @@ export type ConquerStackList = {
 		client: IRoom.Room['clients'][number];
 		isWinner: boolean;
 	};
-	FastHandEyes: {
+	QuickMatch: {
 		room: IRoom.Room;
 		_id: IResource.Resource['_id'];
 	};
@@ -51,4 +51,4 @@ export type ConquerProps = StackScreenProps<ConquerStackList, 'Conquer'>;
 export type ConquerWaitingProps = StackScreenProps<ConquerStackList, 'Waiting'>;
 export type ConquerPrepareProps = StackScreenProps<ConquerStackList, 'Prepare'>;
 export type ConquerStatisticProps = StackScreenProps<ConquerStackList, 'Statistic'>;
-export type ConquerFastHandEyesProps = StackScreenProps<ConquerStackList, 'FastHandEyes'>;
+export type ConquerQuickMatchProps = StackScreenProps<ConquerStackList, 'QuickMatch'>;

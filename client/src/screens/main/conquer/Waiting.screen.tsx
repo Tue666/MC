@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Text, useTheme } from 'react-native-paper';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useIsFocused } from '@react-navigation/native';
 import { SoundManager } from '../../../audios';
 import { Button, SingleWaiting } from '../../../components';
 import { ConstantConfig } from '../../../configs';
@@ -19,6 +19,7 @@ const MAX_CAPACITY = 2;
 const Waiting = (props: ConquerWaitingProps) => {
 	const { navigation, route } = props;
 	const { _id, name, idleMode } = route.params;
+	const isFocused = useIsFocused();
 	const theme = useTheme();
 	const [isParticipating, setIsParticipating] = useState(false);
 	const [joinedRoomId, setJoinedRoomId] = useState<string | null>(null);
@@ -27,6 +28,11 @@ const Waiting = (props: ConquerWaitingProps) => {
 	const stackStyles = useStackStyles();
 	const socketClient = useSocketClient();
 
+	useEffect(() => {
+		if (isFocused) {
+			SoundManager.playSound('join.mp3');
+		}
+	}, [isFocused]);
 	useEffect(() => {
 		socketClient?.on('conquer:server-client(participating)', (room: IRoom.Room) => {
 			const { _id, clients } = room;
@@ -60,6 +66,8 @@ const Waiting = (props: ConquerWaitingProps) => {
 		};
 
 		if (isParticipating) {
+			SoundManager.stopSound('waiting_bg.mp3');
+
 			socketClient?.emit('conquer:client-server(cancel-participating)', {
 				room: {
 					...room,
@@ -73,6 +81,7 @@ const Waiting = (props: ConquerWaitingProps) => {
 			return;
 		}
 
+		SoundManager.playSound('waiting_bg.mp3', { repeat: true });
 		SoundManager.playSound('participate.mp3');
 		socketClient?.emit('conquer:client-server(participating)', {
 			room,
@@ -89,33 +98,25 @@ const Waiting = (props: ConquerWaitingProps) => {
 			<Text variant="titleLarge">{name}</Text>
 			{idleMode === 'SINGLE' && <SingleWaiting />}
 			<Button
-				loading={isParticipating}
 				mode="contained"
+				loading={isParticipating}
 				buttonColor={isParticipating ? theme.colors.error : theme.colors.primary}
-				icon={() => (
-					<Icon
-						name={isParticipating ? 'cancel' : 'person-search'}
-						size={20}
-						color={isParticipating ? theme.colors.onError : theme.colors.onPrimary}
-					/>
-				)}
+				onPress={onPressParticipate}
+				style={{ width: MAIN_LAYOUT.SCREENS.CONQUER.WAITING.AVATAR.ICON_SIZE }}
 				soundName="button_click.mp3"
-				outerProps={{
-					onPress: onPressParticipate,
-					style: { ...styles.gap, width: MAIN_LAYOUT.SCREENS.CONQUER.WAITING.AVATAR.ICON_SIZE },
-				}}
+				icon={isParticipating ? 'cancel' : 'person-search'}
+				iconColor={isParticipating ? theme.colors.onError : theme.colors.onPrimary}
 			>
-				{isParticipating ? `Hủy (${clientCount}/${MAX_CAPACITY})` : 'Ghép Ngẫu Nhiên'}
+				{isParticipating ? `Hủy (${clientCount}/${MAX_CAPACITY})` : 'Ghép ngẫu nhiên'}
 			</Button>
 			<Button
 				mode="outlined"
-				icon={() => <Icon name="search" size={20} color={theme.colors.primary} />}
+				style={{ width: MAIN_LAYOUT.SCREENS.CONQUER.WAITING.AVATAR.ICON_SIZE }}
 				soundName="button_click.mp3"
-				outerProps={{
-					style: { ...styles.gap, width: MAIN_LAYOUT.SCREENS.CONQUER.WAITING.AVATAR.ICON_SIZE },
-				}}
+				icon="search"
+				iconColor={theme.colors.primary}
 			>
-				Tìm Phòng
+				Tìm phòng
 			</Button>
 		</View>
 	);

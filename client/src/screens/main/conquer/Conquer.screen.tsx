@@ -8,6 +8,7 @@ import {
 	View,
 } from 'react-native';
 import { Text, useTheme } from 'react-native-paper';
+import { Box } from '../../../components';
 import { ConstantConfig, ResourceConfig } from '../../../configs';
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
 import { initAccount, selectAccount } from '../../../redux/slices/account.slice';
@@ -79,16 +80,16 @@ const Conquer = (props: ConquerProps) => {
 					}
 
 					return (
-						<TouchableOpacity
+						<Box
 							key={resourceAllowed}
 							onPress={() => onPressResource({ _id, name, operations, idleMode })}
 							onLongPress={() => onLongPressResource(name, description)}
 							style={{
 								...styles.resource,
-								...globalStyles.shadow,
 								backgroundColor: bgColor || globalStyles.paper.backgroundColor,
 								width: resourceWidth,
 							}}
+							soundName="button_click.mp3"
 						>
 							<Text style={{ ...{ color: textColor || theme.colors.onSurface } }}>{name}</Text>
 							{label && (
@@ -96,7 +97,7 @@ const Conquer = (props: ConquerProps) => {
 									({label})
 								</Text>
 							)}
-						</TouchableOpacity>
+						</Box>
 					);
 				})}
 			</View>
@@ -109,7 +110,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		margin: MAIN_LAYOUT.SCREENS.CONQUER.RESOURCE.MARGIN,
 		padding: MAIN_LAYOUT.SCREENS.CONQUER.RESOURCE.PADDING,
-		borderRadius: MAIN_LAYOUT.SCREENS.CONQUER.RESOURCE.BORDER_RADIUS,
 	},
 });
 

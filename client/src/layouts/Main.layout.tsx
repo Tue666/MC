@@ -13,8 +13,8 @@ const { CONQUER_RENDERER } = ResourceConfig;
 
 const { COMMON, RESOURCES } = CONQUER_RENDERER;
 const { WAITING } = COMMON;
-const { NHANH_TAY_LE_MAT } = RESOURCES;
-const HIDDEN_BAR_TABS: string[] = [WAITING.name, NHANH_TAY_LE_MAT.name];
+const { DAU_NHANH } = RESOURCES;
+const HIDDEN_BAR_TABS: string[] = [WAITING.name, DAU_NHANH.name];
 
 const MainLayout = (props: PropsWithChildren & Partial<MainLayoutProps>) => {
 	const { children, route } = props;

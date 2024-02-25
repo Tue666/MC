@@ -1,6 +1,6 @@
 const RoomController = require("../../../app/controllers/room.controller");
 const testingHandler = require("./testing.handler");
-const fastHandEyesHandler = require("./fast-hand-eyes.handler");
+const quickMatchHandler = require("./quick-match.handler");
 
 const onClientParticipating = (io, socket) => {
   socket.on("conquer:client-server(participating)", (data) => {
@@ -84,5 +84,5 @@ module.exports = (io, socket) => {
 
   testingHandler(io, socket);
 
-  fastHandEyesHandler(io, socket);
+  quickMatchHandler(io, socket);
 };

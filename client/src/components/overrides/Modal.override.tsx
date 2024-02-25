@@ -1,12 +1,15 @@
-import { TouchableOpacity, View } from 'react-native';
-import { Avatar, Button, Modal as RNPModal, Text } from 'react-native-paper';
+import { View } from 'react-native';
+import { Avatar, Modal as RNPModal, Text } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
+import { ConstantConfig } from '../../configs';
 import { useModal } from '../../hooks';
 import { useAppSelector } from '../../redux/hooks';
 import { selectModal } from '../../redux/slices/modal.slice';
 import { useGlobalStyles, useStackStyles } from '../../styles';
 import { IRoom } from '../../types';
-import { CircleBorder } from '..';
+import { Button, CircleBorder } from '..';
+
+const { MODAL } = ConstantConfig;
 
 export interface ModalProps {
 	navigation: any;
@@ -35,19 +38,26 @@ const components = {
 			<View
 				style={{
 					...globalStyles.paper,
+					...globalStyles.shadow,
 					...stackStyles.center,
-					width: 280,
-					padding: 10,
-					borderRadius: 15,
+					width: MODAL.WINNER.WIDTH,
+					padding: MODAL.WINNER.PADDING,
+					borderRadius: MODAL.WINNER.BORDER_RADIUS,
 				}}
 			>
-				<CircleBorder label={client?.name ?? ''}>
-					<Avatar.Image size={130} source={require('../../assets/images/avatar.png')} />
+				<CircleBorder
+					style={{ marginVertical: MODAL.WINNER.AVATAR.MARGIN_VERTICAL }}
+					label={client?.name ?? ''}
+				>
+					<Avatar.Image
+						size={MODAL.WINNER.AVATAR.ICON_SIZE}
+						source={require('../../assets/images/avatar.png')}
+					/>
 				</CircleBorder>
 				<Text variant="headlineMedium">Chiến Thắng</Text>
-				<TouchableOpacity onPress={onPressContinue} style={{ marginVertical: 10 }}>
-					<Button mode="contained">Tiếp Tục</Button>
-				</TouchableOpacity>
+				<Button mode="contained" onPress={onPressContinue} soundName="button_click.mp3" icon="skip-next">
+					Tiếp tục
+				</Button>
 			</View>
 		);
 	},

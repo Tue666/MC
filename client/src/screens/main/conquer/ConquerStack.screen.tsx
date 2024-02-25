@@ -10,8 +10,8 @@ const { CONQUER_RENDERER } = ResourceConfig;
 
 const { COMMON, RESOURCES } = CONQUER_RENDERER;
 const { WAITING, PREPARE, STATISTIC } = COMMON;
-const { NHANH_TAY_LE_MAT } = RESOURCES;
-const HIDDEN_TABS = [WAITING.name, PREPARE.name, STATISTIC.name, NHANH_TAY_LE_MAT.name];
+const { DAU_NHANH } = RESOURCES;
+const HIDDEN_TABS = [WAITING.name, PREPARE.name, STATISTIC.name, DAU_NHANH.name];
 
 const Stack = createStackNavigator<ConquerStackList>();
 
@@ -37,6 +37,7 @@ const ConquerStack = (props: MainConquerStackProps) => {
 					...globalStyles.paper,
 				},
 				headerTitleStyle: {
+					...globalStyles.text,
 					color: theme.colors.onSurface,
 				},
 				headerTintColor: theme.colors.onSurface,

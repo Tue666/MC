@@ -1,19 +1,17 @@
 import { useEffect, useState } from 'react';
-import { Dimensions, StyleSheet, TouchableOpacity, Vibration, View } from 'react-native';
-import { Button, Text, useTheme } from 'react-native-paper';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { Dimensions, StyleSheet, Vibration, View } from 'react-native';
+import { Text, useTheme } from 'react-native-paper';
 import { SoundManager } from '../../audios';
 import { ConstantConfig } from '../../configs';
 import { useSocketClient } from '../../hooks';
 import { useGlobalStyles, useStackStyles } from '../../styles';
-import { ConquerFastHandEyesProps, IAccount, IQuestion, IRoom } from '../../types';
+import { ConquerQuickMatchProps, IQuestion, IRoom } from '../../types';
 import { HelperUtil, openDialog, openModal } from '../../utils';
-import { CountdownProgress } from '..';
+import { Box, Button, CountdownProgress } from '..';
 
-const { MAIN_LAYOUT, SPACE_GAP, VIBRATIONS } = ConstantConfig;
+const { MAIN_LAYOUT, VIBRATIONS } = ConstantConfig;
 
-const TIMER = 600;
-const CALCULATING_DELAY_TIME = 3000;
+const CALCULATING_DELAY_TIME = 2500;
 const WIDTH_SIZE = Dimensions.get('window').width;
 const CONTAINER_WIDTH = WIDTH_SIZE - MAIN_LAYOUT.PADDING * 2;
 
@@ -33,23 +31,34 @@ const calculateAnswered = (
 	return correctAnswers;
 };
 
-export type State = 'ANSWERING' | 'CALCULATING_RESULTS';
+export type State = 'IDLE' | 'CALCULATING_RESULTS';
 
 interface AnswerProps {
-	navigation: ConquerFastHandEyesProps['navigation'];
-	route: ConquerFastHandEyesProps['route'];
-	allowedAnswer: boolean;
+	navigation: ConquerQuickMatchProps['navigation'];
+	route: ConquerQuickMatchProps['route'];
+	isInAnswerTime: boolean;
+	answerTime: number;
+	isAllowedAnswer: boolean;
 	firstRaisedHand: IRoom.Room['clients'][number] | null;
 	question: Pick<IQuestion.Question, 'type' | 'values' | 'answers'>;
 }
 
-const Answer = (props: AnswerProps) => {
-	const { navigation, route, allowedAnswer, firstRaisedHand, question } = props;
+const SingleModeAnswer = (props: AnswerProps) => {
+	const {
+		navigation,
+		route,
+		isInAnswerTime,
+		answerTime,
+		isAllowedAnswer,
+		firstRaisedHand,
+		question,
+	} = props;
 	const { room, _id } = route.params;
 	const { type, values, answers } = question;
 	const theme = useTheme();
-	const [state, setState] = useState<State>('ANSWERING');
+	const [state, setState] = useState<State>('IDLE');
 	const [answered, setAnswered] = useState<number[]>([]);
+	const [isConfirmedAnswer, setIsConfirmedAnswer] = useState(false);
 	const socketClient = useSocketClient();
 	const globalStyles = useGlobalStyles();
 	const stackStyles = useStackStyles();
@@ -81,31 +90,33 @@ const Answer = (props: AnswerProps) => {
 	};
 
 	useEffect(() => {
-		socketClient?.on('conquer[fast-hand-eyes]:server-client(selected-answer)', (data) => {
+		socketClient?.on('conquer[quick-match]:server-client(selected-answer)', (data) => {
 			const { question } = data;
 			const { type, value } = question;
 
 			const selectedAnswers = buildAnswered(type, value);
 			setAnswered(selectedAnswers);
 		});
-		socketClient?.on('[ERROR]conquer[fast-hand-eyes]:server-client(selected-answer)', (error) => {
+		socketClient?.on('[ERROR]conquer[quick-match]:server-client(selected-answer)', (error) => {
 			openDialog({
 				title: 'Lỗi',
 				content: error,
 			});
 		});
 
-		socketClient?.on('conquer[fast-hand-eyes]:server-client(submit-answers)', async (data) => {
+		socketClient?.on('conquer[quick-match]:server-client(submit-answers)', async (data) => {
 			const { answered, client } = data;
 			const { correctAnswers } = answered;
 
 			const isWinner = correctAnswers.length === values.length;
+			SoundManager.stopSound('quick_match_bg.mp3');
 			SoundManager.playSound(isWinner ? 'correct.mp3' : 'incorrect.mp3');
 			Vibration.vibrate(VIBRATIONS[1]);
 			setState('CALCULATING_RESULTS');
 			await HelperUtil.sleep(CALCULATING_DELAY_TIME);
 
 			if (isWinner) {
+				SoundManager.playSound('won.mp3');
 				openModal({
 					closable: false,
 					component: 'WINNER',
@@ -120,7 +131,7 @@ const Answer = (props: AnswerProps) => {
 			// Everyone loses
 			navigation.navigate('Statistic', { client, isWinner });
 		});
-		socketClient?.on('[ERROR]conquer[fast-hand-eyes]:server-client(submit-answers)', (error) => {
+		socketClient?.on('[ERROR]conquer[quick-match]:server-client(submit-answers)', (error) => {
 			openDialog({
 				title: 'Lỗi',
 				content: error,
@@ -128,7 +139,7 @@ const Answer = (props: AnswerProps) => {
 		});
 	}, []);
 	const onPressAnswer = (value: number) => {
-		socketClient?.emit('conquer[fast-hand-eyes]:client-server(selected-answer)', {
+		socketClient?.emit('conquer[quick-match]:client-server(selected-answer)', {
 			room: {
 				_id: room._id,
 			},
@@ -139,9 +150,12 @@ const Answer = (props: AnswerProps) => {
 		});
 	};
 	const onProcessResults = async () => {
+		setIsConfirmedAnswer(true);
+		if (!isAllowedAnswer) return;
+
 		const correctAnswers = calculateAnswered(answered, values);
 
-		socketClient?.emit('conquer[fast-hand-eyes]:client-server(submit-answers)', {
+		socketClient?.emit('conquer[quick-match]:client-server(submit-answers)', {
 			room: {
 				resource: _id,
 				_id: room._id,
@@ -154,12 +168,14 @@ const Answer = (props: AnswerProps) => {
 	};
 	return (
 		<View>
-			{allowedAnswer && <CountdownProgress timer={TIMER} onExpired={onProcessResults} />}
+			{isInAnswerTime && !isConfirmedAnswer && (
+				<CountdownProgress timer={answerTime} onExpired={onProcessResults} />
+			)}
 			<View
-				pointerEvents={allowedAnswer ? 'auto' : 'none'}
+				pointerEvents={isAllowedAnswer ? 'auto' : 'none'}
 				style={{
 					...stackStyles.rowWrap,
-					opacity: allowedAnswer ? 1 : 0.5,
+					// opacity: isAllowedAnswer ? 1 : 0.5,
 				}}
 			>
 				{answers.map((answer) => {
@@ -174,7 +190,7 @@ const Answer = (props: AnswerProps) => {
 					let bgColor = globalStyles.paper.backgroundColor;
 					let textColor = theme.colors.onSurface;
 					const choseAnswer = answered.indexOf(value) !== -1;
-					if (choseAnswer && state === 'ANSWERING') {
+					if (choseAnswer && state === 'IDLE') {
 						bgColor = theme.colors.primary;
 						textColor = theme.colors.onPrimary;
 					}
@@ -190,7 +206,7 @@ const Answer = (props: AnswerProps) => {
 					}
 
 					return (
-						<TouchableOpacity
+						<Box
 							key={_id}
 							onPress={() => onPressAnswer(value)}
 							style={{
@@ -199,23 +215,24 @@ const Answer = (props: AnswerProps) => {
 								backgroundColor: bgColor,
 								width: answerWidth,
 							}}
+							soundName="button_click.mp3"
 						>
 							<Text style={{ color: textColor }}>{content}</Text>
-						</TouchableOpacity>
+						</Box>
 					);
 				})}
 			</View>
-			{allowedAnswer && (
-				<TouchableOpacity onPress={onProcessResults} style={{ ...styles.gap }}>
-					<Button
-						disabled={answered.length <= 0 || state === 'CALCULATING_RESULTS'}
-						mode="contained"
-						buttonColor={theme.colors.primary}
-						icon={() => <Icon name="done-all" size={20} color={theme.colors.onPrimary} />}
-					>
-						{`Kiểm Tra`}
-					</Button>
-				</TouchableOpacity>
+			{isAllowedAnswer && (
+				<Button
+					mode="contained"
+					disabled={answered.length <= 0 || state === 'CALCULATING_RESULTS'}
+					buttonColor={theme.colors.primary}
+					onPress={onProcessResults}
+					soundName="button_click.mp3"
+					icon="done-all"
+				>
+					Kiểm tra
+				</Button>
 			)}
 		</View>
 	);
@@ -224,12 +241,8 @@ const Answer = (props: AnswerProps) => {
 const styles = StyleSheet.create({
 	answer: {
 		padding: MAIN_LAYOUT.SCREENS.CONQUER.ANSWER_BOX.PADDING,
-		borderRadius: MAIN_LAYOUT.SCREENS.CONQUER.ANSWER_BOX.BORDER_RADIUS,
 		margin: MAIN_LAYOUT.SCREENS.CONQUER.ANSWER_BOX.MARGIN,
-	},
-	gap: {
-		marginVertical: SPACE_GAP,
 	},
 });
 
-export default Answer;
+export default SingleModeAnswer;

@@ -1,7 +1,9 @@
+import { Dimensions } from 'react-native';
+
 export const SPACE_GAP = 8;
 
-export const LOGO = {
-	SIZE: 150,
+export const BUTTON = {
+	ICON_SIZE: 20,
 };
 
 export const DIALOG = {
@@ -12,13 +14,33 @@ export const DIALOG = {
 	},
 };
 
+export const MODAL = {
+	WINNER: {
+		WIDTH: Dimensions.get('window').width - 100,
+		PADDING: 25,
+		BORDER_RADIUS: 15,
+		AVATAR: {
+			ICON_SIZE: 130,
+			MARGIN_VERTICAL: 10,
+		},
+	},
+};
+
+export const LOGO = {
+	SIZE: 150,
+};
+
+export const BOX = {
+	BORDER_RADIUS: 10,
+};
+
 export const SNACKBAR = {
 	ICON_SIZE: 25,
 };
 
 export const CIRCLE_BORDER = {
 	PADDING: 10,
-	MARGIN_VERTICAL: 30,
+	MARGIN_VERTICAL: 25,
 	BORDER_WIDTH: 5,
 };
 

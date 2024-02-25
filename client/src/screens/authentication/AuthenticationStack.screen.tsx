@@ -18,6 +18,7 @@ const AuthenticationStack = () => {
 					...globalStyles.paper,
 				},
 				headerTitleStyle: {
+					...globalStyles.text,
 					color: theme.colors.onSurface,
 				},
 				headerTintColor: theme.colors.onSurface,

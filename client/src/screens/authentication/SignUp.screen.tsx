@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import { Button, Text, TextInput as RNPTextInput, useTheme } from 'react-native-paper';
+import { Text, TextInput as RNPTextInput, useTheme } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { AxiosError } from 'axios';
 import { useFormik } from 'formik';
-import { TextInput } from '../../components';
+import { Button, TextInput } from '../../components';
 import { ConstantConfig, FormValidationConfig } from '../../configs';
 import { useAuthentication } from '../../hooks';
-import { useGlobalStyles, useStackStyles, useTypographyStyles } from '../../styles';
+import { useStackStyles, useTypographyStyles } from '../../styles';
 import { IAccount, AuthenticationSignUpProps } from '../../types';
 import { openDialog, openSnackbar } from '../../utils';
 
@@ -20,7 +20,6 @@ const SignUp = (props: AuthenticationSignUpProps) => {
 	const [hiddenPassword, setHiddenPassword] = useState(true);
 	const [hiddenPasswordConfirm, setHiddenPasswordConfirm] = useState(true);
 	const { signUp } = useAuthentication();
-	const globalStyles = useGlobalStyles();
 	const stackStyles = useStackStyles();
 	const typographyStyles = useTypographyStyles();
 	const formik = useFormik<IAccount.SignUpBody>({
@@ -89,7 +88,7 @@ const SignUp = (props: AuthenticationSignUpProps) => {
 						icon={() => <Icon name="person" size={AUTHENTICATION_LAYOUT.TEXT_INPUT.ICON_SIZE} />}
 					/>
 				}
-				outerStyle={{ ...styles.gap }}
+				style={{ ...styles.gap }}
 			/>
 			<TextInput
 				label="Mật khẩu"
@@ -107,11 +106,16 @@ const SignUp = (props: AuthenticationSignUpProps) => {
 				}
 				right={
 					<RNPTextInput.Icon
-						icon={() => <Icon name="visibility" size={AUTHENTICATION_LAYOUT.TEXT_INPUT.ICON_SIZE} />}
+						icon={() => (
+							<Icon
+								name={hiddenPassword ? 'visibility' : 'visibility-off'}
+								size={AUTHENTICATION_LAYOUT.TEXT_INPUT.ICON_SIZE}
+							/>
+						)}
 						onPress={onTogglePasswordVisibility}
 					/>
 				}
-				outerStyle={{ ...styles.gap }}
+				style={{ ...styles.gap }}
 			/>
 			<TextInput
 				label="Nhập lại mật khẩu"
@@ -129,11 +133,16 @@ const SignUp = (props: AuthenticationSignUpProps) => {
 				}
 				right={
 					<RNPTextInput.Icon
-						icon={() => <Icon name="visibility" size={AUTHENTICATION_LAYOUT.TEXT_INPUT.ICON_SIZE} />}
+						icon={() => (
+							<Icon
+								name={hiddenPasswordConfirm ? 'visibility' : 'visibility-off'}
+								size={AUTHENTICATION_LAYOUT.TEXT_INPUT.ICON_SIZE}
+							/>
+						)}
 						onPress={onTogglePasswordConfirmVisibility}
 					/>
 				}
-				outerStyle={{ ...styles.gap }}
+				style={{ ...styles.gap }}
 			/>
 			<View style={{ ...styles.gap }} />
 			<Button
@@ -141,15 +150,15 @@ const SignUp = (props: AuthenticationSignUpProps) => {
 				loading={isSubmitting}
 				disabled={isSubmitting}
 				onPress={onPressSignUp}
-				style={{ ...globalStyles.fw, ...styles.gap }}
+				soundName="button_click.mp3"
 			>
-				Đăng Ký
+				Đăng ký
 			</Button>
 			<View style={{ ...stackStyles.row }}>
 				<Text variant="labelSmall">Đã có tài khoản? </Text>
 				<TouchableOpacity onPress={onPressSignIn}>
 					<Text variant="labelMedium" style={{ ...typographyStyles.highlight }}>
-						Đăng Nhập
+						Đăng nhập
 					</Text>
 				</TouchableOpacity>
 			</View>

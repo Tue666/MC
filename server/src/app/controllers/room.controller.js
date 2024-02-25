@@ -2,7 +2,7 @@ const ValidateUtil = require("../../utils/validate.util");
 
 /*
   Room example
-  NHANH_TAY_LE_MAT: {
+  DAU_NHANH: {
     666: {
       _id: "666",
       mode: "PUBLIC",
@@ -24,6 +24,10 @@ class RoomController {
   }
 
   // Testing
+  findAllRoom() {
+    return this.rooms;
+  }
+
   findRoomsByResource(resource) {
     return this.rooms[resource];
   }

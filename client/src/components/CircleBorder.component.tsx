@@ -1,20 +1,19 @@
-import { PropsWithChildren } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, ViewProps } from 'react-native';
 import { Text, useTheme } from 'react-native-paper';
 import { ConstantConfig } from '../configs';
 
 const { CIRCLE_BORDER } = ConstantConfig;
 
-export interface CircleBorderProps extends PropsWithChildren {
+export interface CircleBorderProps extends ViewProps {
 	label?: string;
 }
 
 const CircleBorder = (props: CircleBorderProps) => {
-	const { children, label } = props;
+	const { children, style, label } = props;
 	const theme = useTheme();
 
 	return (
-		<View style={{ ...styles.container }}>
+		<View style={Object.assign({ ...styles.container }, style)}>
 			<View style={{ ...styles.border, borderColor: theme.colors.primary }}>{children}</View>
 			{label && <Text style={{ ...styles.label }}>{label}</Text>}
 		</View>

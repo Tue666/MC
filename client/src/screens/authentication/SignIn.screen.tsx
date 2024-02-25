@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import { Button, Text, TextInput as RNPTextInput } from 'react-native-paper';
+import { Text, TextInput as RNPTextInput } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { AxiosError } from 'axios';
 import { useFormik } from 'formik';
-import { TextInput } from '../../components';
+import { Button, TextInput } from '../../components';
 import { ConstantConfig, FormValidationConfig } from '../../configs';
 import { useAuthentication } from '../../hooks';
 import { useGlobalStyles, useStackStyles, useTypographyStyles } from '../../styles';
@@ -77,7 +77,7 @@ const SignIn = (props: AuthenticationSignInProps) => {
 						icon={() => <Icon name="person" size={AUTHENTICATION_LAYOUT.TEXT_INPUT.ICON_SIZE} />}
 					/>
 				}
-				outerStyle={{ ...styles.gap }}
+				style={{ ...styles.gap }}
 			/>
 			<TextInput
 				label="Mật khẩu"
@@ -104,7 +104,7 @@ const SignIn = (props: AuthenticationSignInProps) => {
 						onPress={onTogglePasswordVisibility}
 					/>
 				}
-				outerStyle={{ ...styles.gap }}
+				style={{ ...styles.gap }}
 			/>
 			<View style={{ alignItems: 'flex-end', ...globalStyles.fw, ...styles.gap }}>
 				<TouchableOpacity>
@@ -118,15 +118,15 @@ const SignIn = (props: AuthenticationSignInProps) => {
 				loading={isSubmitting}
 				disabled={isSubmitting}
 				onPress={onPressSignIn}
-				style={{ ...globalStyles.fw, ...styles.gap }}
+				soundName="button_click.mp3"
 			>
-				Đăng Nhập
+				Đăng nhập
 			</Button>
 			<View style={{ ...stackStyles.row }}>
 				<Text variant="labelSmall">Chưa có tài khoản? </Text>
 				<TouchableOpacity onPress={onPressSignUp}>
 					<Text variant="labelMedium" style={{ ...typographyStyles.highlight }}>
-						Đăng Ký
+						Đăng ký
 					</Text>
 				</TouchableOpacity>
 			</View>

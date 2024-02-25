@@ -7,17 +7,17 @@ import {
 import { useGlobalStyles } from '../../styles';
 
 interface TextInputProps extends RNPTextInputProps {
-	outerStyle?: Object;
+	innerStyle?: RNPTextInputProps['style'];
 	helperText?: string | boolean;
 }
 
 const TextInput = (props: TextInputProps) => {
-	const { outerStyle = {}, helperText, ...rest } = props;
+	const { innerStyle, helperText, style, ...rest } = props;
 	const globalStyles = useGlobalStyles();
 
 	return (
-		<View style={{ ...globalStyles.fw, ...outerStyle }}>
-			<RNPTextInput {...rest} />
+		<View style={Object.assign({ ...globalStyles.fw }, style)}>
+			<RNPTextInput style={innerStyle} {...rest} />
 			{helperText && <HelperText type="error">{helperText}</HelperText>}
 		</View>
 	);

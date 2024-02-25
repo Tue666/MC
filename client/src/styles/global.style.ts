@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { StyleSheet } from 'react-native';
 import { MD3Theme, useTheme } from 'react-native-paper';
 import { scheme } from '../theme/scheme';
+import { FONT_NAME } from '../theme/font';
 
 const getGlobalStyles = (theme: MD3Theme) =>
 	StyleSheet.create({
@@ -23,6 +24,9 @@ const getGlobalStyles = (theme: MD3Theme) =>
 		},
 		fw: {
 			width: '100%',
+		},
+		text: {
+			fontFamily: FONT_NAME,
 		},
 	});
 

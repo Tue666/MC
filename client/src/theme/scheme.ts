@@ -1,4 +1,9 @@
-import { MD3LightTheme, MD3DarkTheme } from 'react-native-paper';
+import { MD3LightTheme, MD3DarkTheme, configureFonts } from 'react-native-paper';
+import { fontConfig } from './font';
+
+const COMMON_CONFIG = {
+	fonts: configureFonts({ config: fontConfig }),
+};
 
 const COMMON_COLORS = {
 	// Main color
@@ -23,6 +28,7 @@ const COMMON_COLORS = {
 export const scheme = {
 	light: {
 		...MD3LightTheme,
+		...COMMON_CONFIG,
 		colors: {
 			...MD3LightTheme.colors,
 			...COMMON_COLORS,
@@ -33,6 +39,7 @@ export const scheme = {
 	},
 	dark: {
 		...MD3DarkTheme,
+		...COMMON_CONFIG,
 		colors: {
 			...MD3DarkTheme.colors,
 			...COMMON_COLORS,

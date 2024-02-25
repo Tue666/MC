@@ -2,18 +2,20 @@ import { useEffect, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Avatar, Text, useTheme } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { Answer, CircleBorder, CountdownTimer } from '../../../../components';
+import { SoundManager } from '../../../../audios';
+import { CircleBorder, CountdownTimer, SingleModeAnswer } from '../../../../components';
 import { ConstantConfig } from '../../../../configs';
 import { useSocketClient } from '../../../../hooks';
 import { useAppSelector } from '../../../../redux/hooks';
 import { selectAccount } from '../../../../redux/slices/account.slice';
 import { useGlobalStyles, useStackStyles } from '../../../../styles';
-import { ConquerFastHandEyesProps, IQuestion, IRoom } from '../../../../types';
+import { ConquerQuickMatchProps, IQuestion, IRoom } from '../../../../types';
 import { openDialog } from '../../../../utils';
 
 const { MAIN_LAYOUT } = ConstantConfig;
 
-const TIMER = 10;
+const COUNT_DOWN_TIME = 10;
+const ANSWER_TIME = 10;
 const QUESTION: IQuestion.Question = {
 	_id: '123',
 	content: `Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
@@ -45,7 +47,7 @@ const QUESTION: IQuestion.Question = {
 
 export type State = 'IN_COUNTDOWN_TIME' | 'IN_RAISE_HAND_TIME' | 'IN_ANSWER_TIME';
 
-const FastHandEyes = (props: ConquerFastHandEyesProps) => {
+const QuickMatch = (props: ConquerQuickMatchProps) => {
 	const { navigation, route } = props;
 	const { content, type, values, answers } = QUESTION;
 	const { room: joinedRoom, _id } = route.params;
@@ -60,15 +62,19 @@ const FastHandEyes = (props: ConquerFastHandEyesProps) => {
 	const stackStyles = useStackStyles();
 
 	useEffect(() => {
+		SoundManager.playSound('quick_match_bg.mp3', { repeat: true });
+	}, []);
+	useEffect(() => {
 		socketClient?.on(
-			'conquer[fast-hand-eyes]:server-client(raise-hand)',
+			'conquer[quick-match]:server-client(raise-hand)',
 			(client: IRoom.Room['clients'][number]) => {
+				SoundManager.playSound('bell.mp3');
 				setFirstRaisedHand(client);
 				setState('IN_ANSWER_TIME');
 				scrollViewRef.current?.scrollToEnd();
 			}
 		);
-		socketClient?.on('[ERROR]conquer[fast-hand-eyes]:server-client(raise-hand)', (error) => {
+		socketClient?.on('[ERROR]conquer[quick-match]:server-client(raise-hand)', (error) => {
 			openDialog({
 				title: 'Lỗi',
 				content: error,
@@ -86,7 +92,7 @@ const FastHandEyes = (props: ConquerFastHandEyesProps) => {
 			_id: joinedRoom._id,
 		};
 
-		socketClient?.emit('conquer[fast-hand-eyes]:client-server(raise-hand)', {
+		socketClient?.emit('conquer[quick-match]:client-server(raise-hand)', {
 			room,
 			client: {
 				_id: profile._id,
@@ -107,7 +113,7 @@ const FastHandEyes = (props: ConquerFastHandEyesProps) => {
 					{state !== 'IN_ANSWER_TIME' && (
 						<CircleBorder>
 							{state === 'IN_COUNTDOWN_TIME' && (
-								<CountdownTimer timer={TIMER} timerSelected={['M']} onExpired={onCountdownExpired} />
+								<CountdownTimer timer={COUNT_DOWN_TIME} timerSelected={['M']} onExpired={onCountdownExpired} />
 							)}
 							{state === 'IN_RAISE_HAND_TIME' && (
 								<Icon
@@ -127,14 +133,16 @@ const FastHandEyes = (props: ConquerFastHandEyesProps) => {
 									label={firstRaisedHand?.name ?? ''}
 								/>
 							</CircleBorder>
-							<Text variant="labelSmall">Đang Trả Lời...</Text>
+							<Text variant="labelSmall">Đang trả lời...</Text>
 						</View>
 					)}
 				</TouchableOpacity>
-				<Answer
+				<SingleModeAnswer
 					navigation={navigation}
 					route={route}
-					allowedAnswer={firstRaisedHand?._id === profile._id}
+					isInAnswerTime={state === 'IN_ANSWER_TIME'}
+					answerTime={ANSWER_TIME}
+					isAllowedAnswer={firstRaisedHand?._id === profile._id}
 					firstRaisedHand={firstRaisedHand}
 					question={{ type, values, answers }}
 				/>
@@ -151,4 +159,4 @@ const styles = StyleSheet.create({
 	},
 });
 
-export default FastHandEyes;
+export default QuickMatch;
