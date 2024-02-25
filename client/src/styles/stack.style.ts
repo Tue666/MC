@@ -8,6 +8,15 @@ const getStackStyles = (theme: MD3Theme) =>
 			flexDirection: 'row',
 			alignItems: 'center',
 		},
+		rowWrap: {
+			flexDirection: 'row',
+			flexWrap: 'wrap',
+			justifyContent: 'center',
+		},
+		center: {
+			justifyContent: 'center',
+			alignItems: 'center',
+		},
 	});
 
 const useStackStyles = () => {

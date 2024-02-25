@@ -1,16 +1,18 @@
 import { StyleSheet, View } from 'react-native';
-import useGlobalStyles from '../styles/global.style';
-import { Logo } from '../components';
 import { Text } from 'react-native-paper';
-import useTypographyStyles from '../styles/typography.style';
-import { SPACE_GAP } from '../configs/constant';
+import { Logo } from '../components';
+import { ConstantConfig } from '../configs';
+import { useGlobalStyles, useStackStyles, useTypographyStyles } from '../styles';
+
+const { SPACE_GAP } = ConstantConfig;
 
 const Loading = () => {
 	const globalStyles = useGlobalStyles();
+	const stackStyles = useStackStyles();
 	const typographyStyles = useTypographyStyles();
 
 	return (
-		<View style={{ ...styles.container, ...globalStyles.paper }}>
+		<View style={{ ...styles.container, ...globalStyles.paper, ...stackStyles.center }}>
 			<Logo />
 			<Text variant="headlineMedium" style={{ ...typographyStyles.highlight, ...styles.text }}>
 				Conquer Math
@@ -22,8 +24,6 @@ const Loading = () => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
 	},
 	text: {
 		marginBottom: SPACE_GAP,

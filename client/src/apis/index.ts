@@ -1,3 +1,3 @@
 export { default as APIClient } from './APIClient';
-export { default as accountAPI } from './account.api';
-export { default as roleAPI } from './role.api';
+export { default as AccountAPI } from './account.api';
+export { default as RoleAPI } from './role.api';

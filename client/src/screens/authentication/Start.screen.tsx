@@ -1,11 +1,13 @@
 import { StyleSheet, View } from 'react-native';
 import { Button, Paragraph, Text } from 'react-native-paper';
+import { ConstantConfig } from '../../configs';
+import { useGlobalStyles, useTypographyStyles } from '../../styles';
 import { AuthenticationStartProps } from '../../types';
-import useGlobalStyles from '../../styles/global.style';
-import useTypographyStyles from '../../styles/typography.style';
-import { SPACE_GAP } from '../../configs/constant';
 
-const Start = ({ navigation }: AuthenticationStartProps) => {
+const { SPACE_GAP } = ConstantConfig;
+
+const Start = (props: AuthenticationStartProps) => {
+	const { navigation } = props;
 	const globalStyles = useGlobalStyles();
 	const typographyStyles = useTypographyStyles();
 

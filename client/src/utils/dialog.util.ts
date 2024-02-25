@@ -1,9 +1,10 @@
-import useDialog from '../hooks/useDialog.hook';
+import { useDialog } from '../hooks';
 import { DialogState } from '../redux/slices/dialog.slice';
 
 let dialogRef: any;
 const DialogUtilConfiguration = () => {
 	dialogRef = useDialog();
+
 	return null;
 };
 

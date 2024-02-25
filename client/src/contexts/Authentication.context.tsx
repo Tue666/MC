@@ -1,11 +1,11 @@
 import { useEffect, useReducer, createContext, PropsWithChildren } from 'react';
 import { AxiosError } from 'axios';
-import { accountAPI } from '../apis';
-import { IAccount, ICommon } from '../types';
-import { JWTUtil } from '../utils';
-import { openDialog } from '../utils/dialog.util';
+import { AccountAPI } from '../apis';
+import { SoundManager } from '../audios';
 import { useAppDispatch } from '../redux/hooks';
 import { clearAccount, initAccount } from '../redux/slices/account.slice';
+import { IAccount, ICommon } from '../types';
+import { JWTUtil, openDialog } from '../utils';
 
 export interface AuthenticationState {
 	isInitialized: boolean;
@@ -13,8 +13,14 @@ export interface AuthenticationState {
 }
 
 export interface AuthenticationMethod {
-	signIn: (signInBody: IAccount.SignInBody, callback: ICommon.Callback<void>) => Promise<void>;
-	signUp: (signUpBody: IAccount.SignUpBody, callback: ICommon.Callback<void>) => Promise<void>;
+	signIn: (
+		signInBody: IAccount.SignInBody,
+		callback: ICommon.Callback<undefined, void>
+	) => Promise<void>;
+	signUp: (
+		signUpBody: IAccount.SignUpBody,
+		callback: ICommon.Callback<undefined, void>
+	) => Promise<void>;
 	signOut: () => Promise<void>;
 }
 
@@ -74,11 +80,14 @@ const AuthenticationProvider = (props: PropsWithChildren) => {
 					appDispatch(initAccount());
 				}
 
+				SoundManager.initSounds();
+
 				dispatch({
 					type: 'INITIALIZE',
 					payload: { isAuthenticated },
 				});
 			} catch (error) {
+				console.log(error);
 				await JWTUtil.setToken(null);
 				openDialog({
 					closable: false,
@@ -96,11 +105,11 @@ const AuthenticationProvider = (props: PropsWithChildren) => {
 
 	const signIn = async (
 		signInBody: IAccount.SignInBody,
-		callback: ICommon.Callback<void>
+		callback: ICommon.Callback<undefined, void>
 	): Promise<void> => {
-		const { accessToken, error } = await accountAPI.signIn(signInBody);
+		const { accessToken, error } = await AccountAPI.signIn(signInBody);
 		if (error) {
-			callback(error);
+			callback(undefined, error);
 			return;
 		}
 
@@ -115,11 +124,11 @@ const AuthenticationProvider = (props: PropsWithChildren) => {
 
 	const signUp = async (
 		signUpBody: IAccount.SignUpBody,
-		callback: ICommon.Callback<void>
+		callback: ICommon.Callback<undefined, void>
 	): Promise<void> => {
-		const { error } = await accountAPI.signUp(signUpBody);
+		const { error } = await AccountAPI.signUp(signUpBody);
 		if (error) {
-			callback(error);
+			callback(undefined, error);
 			return;
 		}
 

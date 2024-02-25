@@ -1,21 +1,38 @@
 import { PropsWithChildren } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Text, useTheme } from 'react-native-paper';
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import useSetting from '../hooks/useSetting.hook';
-import useGlobalStyles from '../styles/global.style';
-import useStackStyles from '../styles/stack.style';
-import { MAIN_LAYOUT } from '../configs/constant';
+import { ConstantConfig, ResourceConfig } from '../configs';
+import { useSetting } from '../hooks';
+import { useGlobalStyles, useStackStyles } from '../styles';
+import { MainLayoutProps } from '../types';
 
-const MainLayout = (props: PropsWithChildren) => {
-	const { children } = props;
+const { MAIN_LAYOUT } = ConstantConfig;
+const { CONQUER_RENDERER } = ResourceConfig;
+
+const { COMMON, RESOURCES } = CONQUER_RENDERER;
+const { WAITING } = COMMON;
+const { NHANH_TAY_LE_MAT } = RESOURCES;
+const HIDDEN_BAR_TABS: string[] = [WAITING.name, NHANH_TAY_LE_MAT.name];
+
+const MainLayout = (props: PropsWithChildren & Partial<MainLayoutProps>) => {
+	const { children, route } = props;
+	const routeName = route && getFocusedRouteNameFromRoute(route);
+	const isHiddenBar = routeName && HIDDEN_BAR_TABS.indexOf(routeName) !== -1;
 	const theme = useTheme();
 	const { themeMode, onChangeTheme } = useSetting();
 	const globalStyles = useGlobalStyles();
 	const stackStyles = useStackStyles();
 
 	return (
-		<View style={{ ...styles.container, ...globalStyles.bg }}>
+		<View
+			style={{
+				...styles.container,
+				...globalStyles.bg,
+				paddingBottom: isHiddenBar ? 0 : MAIN_LAYOUT.PADDING_BOTTOM,
+			}}
+		>
 			<View
 				style={{ ...styles.header, ...globalStyles.paper, ...globalStyles.shadow, ...stackStyles.row }}
 			>
@@ -39,7 +56,6 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		padding: MAIN_LAYOUT.PADDING,
-		paddingBottom: MAIN_LAYOUT.PADDING_BOTTOM,
 	},
 	header: {
 		justifyContent: 'space-between',

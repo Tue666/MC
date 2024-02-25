@@ -1,6 +1,6 @@
 import { View } from 'react-native';
 import { Button } from 'react-native-paper';
-import useAuthentication from '../../hooks/useAuthentication.hook';
+import { useAuthentication } from '../../hooks';
 
 const Account = () => {
 	const { signOut } = useAuthentication();

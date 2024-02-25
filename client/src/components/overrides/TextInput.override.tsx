@@ -4,7 +4,7 @@ import {
 	TextInput as RNPTextInput,
 	TextInputProps as RNPTextInputProps,
 } from 'react-native-paper';
-import useGlobalStyles from '../../styles/global.style';
+import { useGlobalStyles } from '../../styles';
 
 interface TextInputProps extends RNPTextInputProps {
 	outerStyle?: Object;

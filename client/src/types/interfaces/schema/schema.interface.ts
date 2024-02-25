@@ -1,6 +1,6 @@
 import { SoftDeleteSchema, TimestampsSchema } from './common.interface';
 
-// ================================== ACCOUNT =====================================
+// ================================== ACCOUNT SCHEMA =======================================
 
 export type AccountType = {
 	[T in Lowercase<'student' | 'administrator'>]: Uppercase<T>;
@@ -20,8 +20,47 @@ export interface StudentSchema extends AccountSchema {}
 
 export interface AdministratorSchema extends AccountSchema {}
 
-// ==================================================================================
-// ================================== OPERATION =====================================
+// =========================================================================================
+// ===================================== QUESTION SCHEMA ===================================
+
+export type QuestionType = 'SINGLE' | 'MULTIPLE';
+
+export interface Answer {
+	_id: string;
+	value: number;
+	content: string;
+}
+
+export interface QuestionSchema extends TimestampsSchema, SoftDeleteSchema {
+	_id: string;
+	content: string;
+	type: QuestionType;
+	description: string;
+	values: Answer['value'][];
+	answers: Answer[];
+}
+
+// =========================================================================================
+// ===================================== ROOM SCHEMA =======================================
+
+export type RoomMode = 'PUBLIC' | 'MULTIPLE';
+
+export interface ClientSchema {
+	_id: string;
+	name: string;
+	prepared: boolean;
+}
+
+export interface RoomSchema {
+	_id: string;
+	mode: RoomMode;
+	owner: string | null;
+	maxCapacity: number;
+	clients: ClientSchema[];
+}
+
+// =========================================================================================
+// ================================== OPERATION SCHEMA =====================================
 
 export type OperationStatus = 'ACTIVE' | 'LOCKED';
 
@@ -32,8 +71,8 @@ export interface OperationSchema extends TimestampsSchema {
 	status: RoleStatus;
 }
 
-// ==================================================================================
-// =================================== RESOURCE =====================================
+// =========================================================================================
+// =================================== RESOURCE SCHEMA =====================================
 
 export type ResourceStatus = 'ACTIVE' | 'LOCKED';
 
@@ -47,8 +86,8 @@ export interface ResourceSchema extends TimestampsSchema {
 	status: RoleStatus;
 }
 
-// ==================================================================================
-// ===================================== ROLE =======================================
+// =========================================================================================
+// ===================================== ROLE SCHEMA =======================================
 
 export type RoleStatus = 'ACTIVE' | 'LOCKED';
 
@@ -64,5 +103,3 @@ export interface RoleSchema extends TimestampsSchema {
 	permissions: RolePermission[];
 	status: RoleStatus;
 }
-
-// ==================================================================================

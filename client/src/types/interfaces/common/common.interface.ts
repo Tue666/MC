@@ -13,4 +13,4 @@ export interface Response {
 	msg?: string;
 }
 
-export type Callback<T> = (error?: string) => T;
+export type Callback<D, R> = (data?: D, error?: string) => R;

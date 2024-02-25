@@ -1,11 +1,10 @@
 import base64 from 'react-native-base64';
 import { AxiosError } from 'axios';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { AccountAPI, RoleAPI } from '../../apis';
 import { AppDispatch, RootState } from '../store';
 import { IAccount, IOperation, IResource, IRole } from '../../types';
-import { accountAPI, roleAPI } from '../../apis';
-import { openDialog } from '../../utils/dialog.util';
-import { JWTUtil } from '../../utils';
+import { JWTUtil, openDialog } from '../../utils';
 
 const mergeRoles = (
 	roles: IRole.Role[]
@@ -81,8 +80,8 @@ export default reducer;
 
 export const initAccount = () => async (dispatch: AppDispatch) => {
 	try {
-		const { profile } = await accountAPI.getProfile();
-		const { roles } = await roleAPI.findByIds({ _ids: profile?.roles || [] });
+		const { profile } = await AccountAPI.getProfile();
+		const { roles } = await RoleAPI.findByIds({ _ids: profile?.roles || [] });
 		const { mergedPermissions, mergedResources } = mergeRoles(roles);
 		const encodePermissions = base64.encode(JSON.stringify(mergedPermissions));
 		JWTUtil.setHeader(JWTUtil.ACCESS_RESOURCES_HEADER, encodePermissions);

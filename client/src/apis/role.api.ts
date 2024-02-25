@@ -1,11 +1,11 @@
-import APIClient from './APIClient';
 import { IRole } from '../types';
+import APIClient from './APIClient';
 
-const roleAPI = {
-	findByIds: (findByIdsBody: IRole.FindByIdsBody): Promise<IRole.FindByIdsResponse> => {
+class RoleAPI {
+	static findByIds(findByIdsBody: IRole.FindByIdsBody): Promise<IRole.FindByIdsResponse> {
 		const url = `/roles/_ids`;
 		return APIClient.post(url, findByIdsBody);
-	},
-};
+	}
+}
 
-export default roleAPI;
+export default RoleAPI;

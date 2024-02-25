@@ -1,31 +1,31 @@
-import APIClient from './APIClient';
 import { IAccount } from '../types';
+import APIClient from './APIClient';
 
-const accountAPI = {
-	signIn: (signInBody: IAccount.SignInBody): Promise<IAccount.SignInResponse> => {
+class AccountAPI {
+	static signIn(signInBody: IAccount.SignInBody): Promise<IAccount.SignInResponse> {
 		const url = `/accounts/sign-in`;
 		return APIClient.post(url, signInBody);
-	},
+	}
 
-	signUp: (signUpBody: IAccount.SignUpBody): Promise<IAccount.SignUpResponse> => {
+	static signUp(signUpBody: IAccount.SignUpBody): Promise<IAccount.SignUpResponse> {
 		const url = `/accounts/sign-up`;
 		return APIClient.post(url, signUpBody);
-	},
+	}
 
-	refreshToken: (): Promise<IAccount.SignInResponse> => {
+	static refreshToken(): Promise<IAccount.SignInResponse> {
 		const url = `/accounts/refresh-token`;
 		return APIClient.get(url);
-	},
+	}
 
-	verifyToken: (): Promise<boolean> => {
+	static verifyToken(): Promise<boolean> {
 		const url = `/accounts/verify-token`;
 		return APIClient.get(url);
-	},
+	}
 
-	getProfile: (): Promise<IAccount.ProfileResponse> => {
+	static getProfile(): Promise<IAccount.ProfileResponse> {
 		const url = `/accounts/profile`;
 		return APIClient.get(url);
-	},
-};
+	}
+}
 
-export default accountAPI;
+export default AccountAPI;

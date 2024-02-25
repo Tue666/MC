@@ -1,8 +1,10 @@
 import { Image, StyleSheet } from 'react-native';
-import { LOGO } from '../configs/constant';
+import { ConstantConfig } from '../configs';
+
+const { LOGO } = ConstantConfig;
 
 const Logo = () => {
-	return <Image style={styles.container} source={require('../assets/logo.png')} />;
+	return <Image style={styles.container} source={require('../assets/images/logo.png')} />;
 };
 
 const styles = StyleSheet.create({

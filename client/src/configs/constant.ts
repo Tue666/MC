@@ -12,6 +12,21 @@ export const DIALOG = {
 	},
 };
 
+export const SNACKBAR = {
+	ICON_SIZE: 25,
+};
+
+export const CIRCLE_BORDER = {
+	PADDING: 10,
+	MARGIN_VERTICAL: 30,
+	BORDER_WIDTH: 5,
+};
+
+export const COUNT_DOWN_TIMER = {
+	PADDING_VERTICAL: 35,
+	PADDING_HORIZONTAL: 10,
+};
+
 export const AUTHENTICATION_LAYOUT = {
 	PADDING: 50,
 	TEXT_INPUT: {
@@ -42,19 +57,44 @@ export const MAIN_LAYOUT = {
 	},
 	SCREENS: {
 		CONQUER: {
-			WAITING: {
-				AVATAR: {
-					ICON_SIZE: 250,
-					PADDING: 10,
-					MARGIN_VERTICAL: 50,
-					BORDER_WIDTH: 5,
-				},
-			},
 			RESOURCE: {
 				MARGIN: 5,
 				PADDING: 30,
 				BORDER_RADIUS: 10,
 			},
+			QUESTION_BOX: {
+				PADDING: 20,
+				BORDER_RADIUS: 15,
+				MARGIN_BOTTOM: 10,
+			},
+			ANSWER_BOX: {
+				PADDING: 20,
+				MARGIN: 4,
+				BORDER_RADIUS: 15,
+				NUMBER_IN_ROW: 2,
+			},
+			RAISE_HAND: {
+				ICON_SIZE: 100,
+			},
+			WAITING: {
+				AVATAR: {
+					ICON_SIZE: 250,
+				},
+			},
 		},
 	},
+};
+
+export const VIBRATIONS = {
+	0: 200,
+	1: 1000,
+	2: 2000,
+	3: 3000,
+	4: 4000,
+	5: 5000,
+	6: 6000,
+	7: 7000,
+	8: 8000,
+	9: 9000,
+	10: 10000,
 };

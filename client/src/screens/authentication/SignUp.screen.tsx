@@ -1,26 +1,28 @@
 import { useState } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import { IAccount, AuthenticationSignUpProps } from '../../types';
-import { Button, Text, TextInput as RNPTextInput } from 'react-native-paper';
-import { useFormik } from 'formik';
-import { AxiosError } from 'axios';
+import { Button, Text, TextInput as RNPTextInput, useTheme } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { TextInput } from '../../components/overrides';
-import useGlobalStyles from '../../styles/global.style';
-import useStackStyles from '../../styles/stack.style';
-import useTypographyStyles from '../../styles/typography.style';
-import { AUTHENTICATION_LAYOUT, SPACE_GAP } from '../../configs/constant';
-import { signUpValidation } from '../../configs/form-validations';
-import useAuthentication from '../../hooks/useAuthentication.hook';
-import { openDialog } from '../../utils/dialog.util';
+import { AxiosError } from 'axios';
+import { useFormik } from 'formik';
+import { TextInput } from '../../components';
+import { ConstantConfig, FormValidationConfig } from '../../configs';
+import { useAuthentication } from '../../hooks';
+import { useGlobalStyles, useStackStyles, useTypographyStyles } from '../../styles';
+import { IAccount, AuthenticationSignUpProps } from '../../types';
+import { openDialog, openSnackbar } from '../../utils';
 
-const SignUp = ({ navigation }: AuthenticationSignUpProps) => {
+const { AUTHENTICATION_LAYOUT, SPACE_GAP } = ConstantConfig;
+const { signUpValidation } = FormValidationConfig;
+
+const SignUp = (props: AuthenticationSignUpProps) => {
+	const { navigation } = props;
+	const theme = useTheme();
+	const [hiddenPassword, setHiddenPassword] = useState(true);
+	const [hiddenPasswordConfirm, setHiddenPasswordConfirm] = useState(true);
+	const { signUp } = useAuthentication();
 	const globalStyles = useGlobalStyles();
 	const stackStyles = useStackStyles();
 	const typographyStyles = useTypographyStyles();
-	const { signUp } = useAuthentication();
-	const [hiddenPassword, setHiddenPassword] = useState(true);
-	const [hiddenPasswordConfirm, setHiddenPasswordConfirm] = useState(true);
 	const formik = useFormik<IAccount.SignUpBody>({
 		initialValues: {
 			phone_number: '',
@@ -30,7 +32,7 @@ const SignUp = ({ navigation }: AuthenticationSignUpProps) => {
 		validationSchema: signUpValidation,
 		onSubmit: async (values, { resetForm }) => {
 			try {
-				await signUp(values, (error) => {
+				await signUp(values, (_, error) => {
 					if (error) {
 						resetForm();
 						openDialog({
@@ -40,9 +42,9 @@ const SignUp = ({ navigation }: AuthenticationSignUpProps) => {
 						return;
 					}
 
-					openDialog({
+					openSnackbar({
 						content: 'Đăng ký tài khoản thành công',
-						actions: [{ label: 'Đồng ý' }],
+						color: theme.colors.secondary,
 					});
 					navigation.navigate('SignIn');
 				});

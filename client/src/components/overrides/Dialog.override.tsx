@@ -1,17 +1,20 @@
-import { DimensionValue, ScrollView } from 'react-native';
+import { DimensionValue, ScrollView, useWindowDimensions } from 'react-native';
 import { Button, Portal, Dialog as RNPDialog } from 'react-native-paper';
-import RenderHTML from 'react-native-render-html';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import RenderHTML from 'react-native-render-html';
+import { ConstantConfig } from '../../configs';
 import { useAppSelector } from '../../redux/hooks';
 import { selectDialog } from '../../redux/slices/dialog.slice';
-import { closeDialog } from '../../utils/dialog.util';
-import { DIALOG } from '../../configs/constant';
-import useGlobalStyles from '../../styles/global.style';
+import { useGlobalStyles } from '../../styles';
+import { closeDialog } from '../../utils';
+
+const { DIALOG } = ConstantConfig;
 
 const Dialog = () => {
-	const globalStyles = useGlobalStyles();
+	const { width } = useWindowDimensions();
 	const { isOpen, closable, icon, title, content, contentScrollable, actions } =
 		useAppSelector(selectDialog);
+	const globalStyles = useGlobalStyles();
 
 	return (
 		<Portal>
@@ -26,7 +29,7 @@ const Dialog = () => {
 				{title && <RNPDialog.Title>{title}</RNPDialog.Title>}
 				{content && !contentScrollable && (
 					<RNPDialog.Content>
-						<RenderHTML source={{ html: content }} />
+						<RenderHTML contentWidth={width} source={{ html: content }} />
 					</RNPDialog.Content>
 				)}
 				{content && contentScrollable && (
@@ -37,7 +40,7 @@ const Dialog = () => {
 						}}
 					>
 						<ScrollView>
-							<RenderHTML source={{ html: content }} />
+							<RenderHTML contentWidth={width} source={{ html: content }} />
 						</ScrollView>
 					</RNPDialog.ScrollArea>
 				)}

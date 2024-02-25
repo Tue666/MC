@@ -16,7 +16,7 @@ export interface DialogState {
 	actions?: DialogAction[];
 }
 
-const initialState: DialogState = {
+export const initialState: DialogState = {
 	isOpen: false,
 	closable: true,
 	content: '',

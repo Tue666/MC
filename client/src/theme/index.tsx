@@ -1,6 +1,6 @@
 import { PropsWithChildren } from 'react';
 import { PaperProvider } from 'react-native-paper';
-import useSetting from '../hooks/useSetting.hook';
+import { useSetting } from '../hooks';
 import { scheme } from './scheme';
 
 const ThemeProvider = (props: PropsWithChildren) => {

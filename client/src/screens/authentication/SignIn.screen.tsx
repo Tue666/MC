@@ -1,25 +1,26 @@
 import { useState } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Button, Text, TextInput as RNPTextInput } from 'react-native-paper';
-import { useFormik } from 'formik';
-import { AxiosError } from 'axios';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { AxiosError } from 'axios';
+import { useFormik } from 'formik';
+import { TextInput } from '../../components';
+import { ConstantConfig, FormValidationConfig } from '../../configs';
+import { useAuthentication } from '../../hooks';
+import { useGlobalStyles, useStackStyles, useTypographyStyles } from '../../styles';
 import { IAccount, AuthenticationSignInProps } from '../../types';
-import { TextInput } from '../../components/overrides';
-import useGlobalStyles from '../../styles/global.style';
-import useStackStyles from '../../styles/stack.style';
-import useTypographyStyles from '../../styles/typography.style';
-import { AUTHENTICATION_LAYOUT, SPACE_GAP } from '../../configs/constant';
-import { signInValidation } from '../../configs/form-validations';
-import useAuthentication from '../../hooks/useAuthentication.hook';
-import { openDialog } from '../../utils/dialog.util';
+import { openDialog } from '../../utils';
 
-const SignIn = ({ navigation }: AuthenticationSignInProps) => {
+const { AUTHENTICATION_LAYOUT, SPACE_GAP } = ConstantConfig;
+const { signInValidation } = FormValidationConfig;
+
+const SignIn = (props: AuthenticationSignInProps) => {
+	const { navigation } = props;
+	const [hiddenPassword, setHiddenPassword] = useState(true);
+	const { signIn } = useAuthentication();
 	const globalStyles = useGlobalStyles();
 	const stackStyles = useStackStyles();
 	const typographyStyles = useTypographyStyles();
-	const { signIn } = useAuthentication();
-	const [hiddenPassword, setHiddenPassword] = useState(true);
 	const formik = useFormik<IAccount.SignInBody>({
 		initialValues: {
 			phone_number: '',
@@ -28,7 +29,7 @@ const SignIn = ({ navigation }: AuthenticationSignInProps) => {
 		validationSchema: signInValidation,
 		onSubmit: async (values, { resetForm }) => {
 			try {
-				await signIn(values, (error) => {
+				await signIn(values, (_, error) => {
 					if (error) {
 						resetForm();
 						openDialog({

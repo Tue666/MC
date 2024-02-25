@@ -1,13 +1,17 @@
 import { createContext, PropsWithChildren, useEffect } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { appAPIs } from '../configs/api';
+import { APIConfig } from '../configs';
 
-const URL = appAPIs.server.url;
+const { APP } = APIConfig;
+
+const URL = APP.server.url;
 const socketClient: Socket = io(URL);
 
 const SocketClientContext = createContext<Socket | null>(null);
 
-const SocketClientProvider = ({ children }: PropsWithChildren) => {
+const SocketClientProvider = (props: PropsWithChildren) => {
+	const { children } = props;
+
 	useEffect(() => {
 		const onConnect = () => {};
 

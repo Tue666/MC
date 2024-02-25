@@ -1,11 +1,13 @@
 import axios from 'axios';
+import { APIConfig } from '../configs';
 import { JWTUtil } from '../utils';
-import { appAPIs } from '../configs/api';
-import { accountAPI } from '.';
+import { AccountAPI } from '.';
+
+const { APP } = APIConfig;
 
 const APIClient = () => {
 	const axiosClient = axios.create({
-		baseURL: `${appAPIs.server.url}/${appAPIs.server.path}`,
+		baseURL: `${APP.server.url}/${APP.server.path}`,
 	});
 
 	axiosClient.interceptors.request.use(
@@ -26,7 +28,7 @@ const APIClient = () => {
 					return Promise.reject(error);
 				}
 				// Generate new token if the authentication is successful
-				const { accessToken: newAccessToken, error: refreshError } = await accountAPI.refreshToken();
+				const { accessToken: newAccessToken, error: refreshError } = await AccountAPI.refreshToken();
 				if (refreshError) {
 					error.response.data = refreshError;
 					return Promise.reject(error);
