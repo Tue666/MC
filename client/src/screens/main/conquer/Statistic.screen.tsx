@@ -7,7 +7,7 @@ import { Button, CircleBorder } from '../../../components';
 import { ConstantConfig } from '../../../configs';
 import { useAppSelector } from '../../../redux/hooks';
 import { selectAccount } from '../../../redux/slices/account.slice';
-import { useStackStyles } from '../../../styles';
+import { stackStyles } from '../../../styles';
 import { ConquerStatisticProps } from '../../../types';
 
 const { MAIN_LAYOUT } = ConstantConfig;
@@ -17,7 +17,6 @@ const Statistic = (props: ConquerStatisticProps) => {
 	const { client, isWinner } = route.params;
 	const popAction = StackActions.pop(3);
 	const { profile } = useAppSelector(selectAccount);
-	const stackStyles = useStackStyles();
 	const won = isWinner && client._id === profile._id;
 
 	useEffect(() => {
@@ -32,7 +31,7 @@ const Statistic = (props: ConquerStatisticProps) => {
 		SoundManager.playSound('defeat_voice.mp3');
 	}, []);
 	return (
-		<View style={{ ...styles.container, ...stackStyles.center }}>
+		<View style={[styles.container, stackStyles.center]}>
 			<Text variant="titleLarge">{won ? 'Tiếp tục phát huy nhé :D' : 'Cố gắng lần sau nhé :3'}</Text>
 			<CircleBorder>
 				<Avatar.Text size={MAIN_LAYOUT.SCREENS.CONQUER.WAITING.AVATAR.ICON_SIZE} label="0" />
@@ -40,7 +39,7 @@ const Statistic = (props: ConquerStatisticProps) => {
 			<Button
 				mode="contained"
 				onPress={() => navigation.dispatch(popAction)}
-				style={{ width: MAIN_LAYOUT.SCREENS.CONQUER.WAITING.AVATAR.ICON_SIZE }}
+				style={[{ width: MAIN_LAYOUT.SCREENS.CONQUER.WAITING.AVATAR.ICON_SIZE }]}
 				soundName="button_click.mp3"
 				icon="keyboard-return"
 			>

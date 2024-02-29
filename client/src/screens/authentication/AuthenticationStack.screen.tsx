@@ -1,7 +1,7 @@
 import { useTheme } from 'react-native-paper';
 import { createStackNavigator } from '@react-navigation/stack';
 import { AuthenticationLayout } from '../../layouts';
-import { useGlobalStyles } from '../../styles';
+import { globalStyles } from '../../styles';
 import { AuthenticationStackList } from '../../types';
 import { SignIn, SignUp, Start } from '.';
 
@@ -9,18 +9,12 @@ const Stack = createStackNavigator<AuthenticationStackList>();
 
 const AuthenticationStack = () => {
 	const theme = useTheme();
-	const globalStyles = useGlobalStyles();
 
 	return (
 		<Stack.Navigator
 			screenOptions={{
-				headerStyle: {
-					...globalStyles.paper,
-				},
-				headerTitleStyle: {
-					...globalStyles.text,
-					color: theme.colors.onSurface,
-				},
+				headerStyle: [globalStyles.paper],
+				headerTitleStyle: [globalStyles.text, { color: theme.colors.onSurface }],
 				headerTintColor: theme.colors.onSurface,
 			}}
 		>

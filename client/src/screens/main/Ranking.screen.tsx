@@ -14,8 +14,8 @@ const Ranking = () => {
 						key={index}
 						icon={() => <Icon name="home" size={20} color={theme.colors.onPrimary} />}
 						onPress={onPressChip}
-						style={{ margin: 10, padding: 10, backgroundColor: theme.colors.primary }}
-						textStyle={{ color: theme.colors.onPrimary }}
+						style={[{ margin: 10, padding: 10, backgroundColor: theme.colors.primary }]}
+						textStyle={[{ color: theme.colors.onPrimary }]}
 					>
 						Example chip
 					</Chip>

@@ -1,19 +1,17 @@
 import { useEffect, useState } from 'react';
-import { Dimensions, StyleSheet, Vibration, View } from 'react-native';
-import { Text, useTheme } from 'react-native-paper';
+import { StyleSheet, Vibration, View } from 'react-native';
+import { useTheme } from 'react-native-paper';
 import { SoundManager } from '../../audios';
 import { ConstantConfig } from '../../configs';
 import { useSocketClient } from '../../hooks';
-import { useGlobalStyles, useStackStyles } from '../../styles';
+import { globalStyles, stackStyles } from '../../styles';
 import { ConquerQuickMatchProps, IQuestion, IRoom } from '../../types';
 import { HelperUtil, openDialog, openModal } from '../../utils';
-import { Box, Button, CountdownProgress } from '..';
+import { Box, Button, CountdownProgress, Instruction, MathContent } from '..';
 
 const { MAIN_LAYOUT, VIBRATIONS } = ConstantConfig;
 
 const CALCULATING_DELAY_TIME = 2500;
-const WIDTH_SIZE = Dimensions.get('window').width;
-const CONTAINER_WIDTH = WIDTH_SIZE - MAIN_LAYOUT.PADDING * 2;
 
 const calculateAnswered = (
 	answered: IQuestion.Question['values'],
@@ -33,17 +31,17 @@ const calculateAnswered = (
 
 export type State = 'IDLE' | 'CALCULATING_RESULTS';
 
-interface AnswerProps {
+interface SingleModeAnswerProps {
 	navigation: ConquerQuickMatchProps['navigation'];
 	route: ConquerQuickMatchProps['route'];
 	isInAnswerTime: boolean;
 	answerTime: number;
 	isAllowedAnswer: boolean;
 	firstRaisedHand: IRoom.Room['clients'][number] | null;
-	question: Pick<IQuestion.Question, 'type' | 'values' | 'answers'>;
+	question: IQuestion.Question;
 }
 
-const SingleModeAnswer = (props: AnswerProps) => {
+const SingleModeAnswer = (props: SingleModeAnswerProps) => {
 	const {
 		navigation,
 		route,
@@ -53,15 +51,14 @@ const SingleModeAnswer = (props: AnswerProps) => {
 		firstRaisedHand,
 		question,
 	} = props;
-	const { room, _id } = route.params;
-	const { type, values, answers } = question;
+	const { resource, room } = route.params;
+	const { _id } = resource;
+	const { type, description, values, answers } = question;
 	const theme = useTheme();
 	const [state, setState] = useState<State>('IDLE');
 	const [answered, setAnswered] = useState<number[]>([]);
 	const [isConfirmedAnswer, setIsConfirmedAnswer] = useState(false);
 	const socketClient = useSocketClient();
-	const globalStyles = useGlobalStyles();
-	const stackStyles = useStackStyles();
 
 	const buildSingleAnswered = (value: IQuestion.Question['values'][number]) => {
 		return [value];
@@ -109,7 +106,6 @@ const SingleModeAnswer = (props: AnswerProps) => {
 			const { correctAnswers } = answered;
 
 			const isWinner = correctAnswers.length === values.length;
-			SoundManager.stopSound('quick_match_bg.mp3');
 			SoundManager.playSound(isWinner ? 'correct.mp3' : 'incorrect.mp3');
 			Vibration.vibrate(VIBRATIONS[1]);
 			setState('CALCULATING_RESULTS');
@@ -171,22 +167,10 @@ const SingleModeAnswer = (props: AnswerProps) => {
 			{isInAnswerTime && !isConfirmedAnswer && (
 				<CountdownProgress timer={answerTime} onExpired={onProcessResults} />
 			)}
-			<View
-				pointerEvents={isAllowedAnswer ? 'auto' : 'none'}
-				style={{
-					...stackStyles.rowWrap,
-					// opacity: isAllowedAnswer ? 1 : 0.5,
-				}}
-			>
+			<View pointerEvents={isAllowedAnswer ? 'auto' : 'none'} style={[stackStyles.rowWrap]}>
+				{description && <Instruction />}
 				{answers.map((answer) => {
 					const { _id, value, content } = answer;
-					const answerWidth =
-						(CONTAINER_WIDTH -
-							MAIN_LAYOUT.SCREENS.CONQUER.ANSWER_BOX.MARGIN *
-								2 *
-								MAIN_LAYOUT.SCREENS.CONQUER.ANSWER_BOX.NUMBER_IN_ROW) *
-						(1 / MAIN_LAYOUT.SCREENS.CONQUER.ANSWER_BOX.NUMBER_IN_ROW);
-
 					let bgColor = globalStyles.paper.backgroundColor;
 					let textColor = theme.colors.onSurface;
 					const choseAnswer = answered.indexOf(value) !== -1;
@@ -209,15 +193,10 @@ const SingleModeAnswer = (props: AnswerProps) => {
 						<Box
 							key={_id}
 							onPress={() => onPressAnswer(value)}
-							style={{
-								...styles.answer,
-								...stackStyles.center,
-								backgroundColor: bgColor,
-								width: answerWidth,
-							}}
+							style={[styles.answer, globalStyles.fw, { backgroundColor: bgColor }]}
 							soundName="button_click.mp3"
 						>
-							<Text style={{ color: textColor }}>{content}</Text>
+							<MathContent content={content} style={[{ backgroundColor: bgColor }]} textColor={textColor} />
 						</Box>
 					);
 				})}

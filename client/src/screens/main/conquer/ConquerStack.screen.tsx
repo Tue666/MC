@@ -3,7 +3,7 @@ import { useTheme } from 'react-native-paper';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { ResourceConfig } from '../../../configs';
-import { useGlobalStyles } from '../../../styles';
+import { globalStyles } from '../../../styles';
 import { ConquerStackList, MainConquerStackProps } from '../../../types';
 
 const { CONQUER_RENDERER } = ResourceConfig;
@@ -18,7 +18,6 @@ const Stack = createStackNavigator<ConquerStackList>();
 const ConquerStack = (props: MainConquerStackProps) => {
 	const { navigation, route } = props;
 	const theme = useTheme();
-	const globalStyles = useGlobalStyles();
 
 	useLayoutEffect(() => {
 		const routeName = getFocusedRouteNameFromRoute(route);
@@ -33,17 +32,14 @@ const ConquerStack = (props: MainConquerStackProps) => {
 	return (
 		<Stack.Navigator
 			screenOptions={{
-				headerStyle: {
-					...globalStyles.paper,
-				},
-				headerTitleStyle: {
-					...globalStyles.text,
-					color: theme.colors.onSurface,
-				},
+				headerStyle: [globalStyles.paper],
+				headerTitleStyle: [globalStyles.text, { color: theme.colors.onSurface }],
 				headerTintColor: theme.colors.onSurface,
-				cardStyle: {
-					backgroundColor: theme.colors.background,
-				},
+				cardStyle: [
+					{
+						backgroundColor: theme.colors.background,
+					},
+				],
 			}}
 		>
 			{Object.entries(COMMON).map(([screen, config]) => {

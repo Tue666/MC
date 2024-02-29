@@ -1,13 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Vibration, View } from 'react-native';
 import { Text, useTheme } from 'react-native-paper';
+import Animated, { FadeInUp, StretchInX } from 'react-native-reanimated';
 import { SoundManager } from '../../../audios';
 import { Button, SingleWaiting } from '../../../components';
 import { ConstantConfig } from '../../../configs';
 import { useSocketClient } from '../../../hooks';
 import { useAppSelector } from '../../../redux/hooks';
-import { selectAccount } from '../../../redux/slices/account.slice';
-import { useStackStyles } from '../../../styles';
+import { AccountState, selectAccount } from '../../../redux/slices/account.slice';
+import { stackStyles } from '../../../styles';
 import { ConquerPrepareProps, IRoom } from '../../../types';
 import { openDialog } from '../../../utils';
 
@@ -15,71 +16,91 @@ const { MAIN_LAYOUT, VIBRATIONS } = ConstantConfig;
 
 const Prepare = (props: ConquerPrepareProps) => {
 	const { navigation, route } = props;
-	const { room: joinedRoom, _id, name, idleMode } = route.params;
+	const { resource, room: joinedRoom, idleMode } = route.params;
+	const { _id, name } = resource;
 	const theme = useTheme();
 	const [isPrepared, setIsPrepared] = useState(false);
-	const [clientPreparedCount, setClientPreparedCount] = useState(0);
+	const [preparedCount, setPreparedCount] = useState(0);
+	const prepareRef = useRef<boolean | null>(false);
 	const { profile } = useAppSelector(selectAccount);
 	const socketClient = useSocketClient();
-	const stackStyles = useStackStyles();
 
 	useEffect(() => {
 		SoundManager.playSound('prepare.mp3');
 		Vibration.vibrate(VIBRATIONS[1]);
+
+		return () => {
+			prepareRef.current = null;
+		};
 	}, []);
 	useEffect(() => {
-		socketClient?.on('conquer:server-client(prepare-participate)', (room: IRoom.Room) => {
-			const { clients } = room;
+		socketClient?.on(
+			'conquer:server-client(prepare-participate)',
+			(room: IRoom.Room, client: AccountState['profile']) => {
+				const { clients } = room;
 
-			const preparedCount = clients.filter((client) => client.prepared).length;
-			setClientPreparedCount(preparedCount);
-		});
+				const preparedCount = clients.filter((client) => client.prepared).length;
+				setPreparedCount(preparedCount);
+
+				if (client._id === profile._id) {
+					prepareRef.current = false;
+				}
+			}
+		);
 		socketClient?.on('[ERROR]conquer:server-client(prepare-participate)', (error) => {
 			openDialog({
-				title: 'Lỗi',
+				title: '[Sẵn sàng] Lỗi',
 				content: error,
 			});
 		});
 
 		socketClient?.on('conquer:server-client(start-participate)', (room: IRoom.Room) => {
 			SoundManager.stopSound('waiting_bg.mp3');
-			navigation.navigate('QuickMatch', { room, _id });
+			navigation.navigate('QuickMatch', { resource, room });
 		});
 	}, []);
 	const onPressPrepare = () => {
+		if (prepareRef.current === true) return;
+
+		prepareRef.current = true;
+
 		if (!isPrepared) {
 			SoundManager.playSound('prepare.mp3');
 		}
 
-		const room = {
+		socketClient?.emit('conquer:client-server(prepare-participate)', {
 			resource: _id,
-			_id: joinedRoom._id,
-		};
-		const client = {
-			_id: profile._id,
-			prepared: !isPrepared,
-		};
-
-		socketClient?.emit('conquer:client-server(prepare-participate)', { room, client });
+			room: joinedRoom,
+			client: {
+				...profile,
+				prepared: !isPrepared,
+			},
+		});
 
 		setIsPrepared(!isPrepared);
 	};
 	return (
-		<View style={{ ...styles.container, ...stackStyles.center }}>
+		<View style={[styles.container, stackStyles.center]}>
 			<Text variant="titleLarge">{name}</Text>
-			{idleMode === 'SINGLE' && <SingleWaiting />}
-			<Button
-				mode="contained"
-				loading={isPrepared}
-				buttonColor={isPrepared ? theme.colors.error : theme.colors.primary}
-				onPress={onPressPrepare}
-				style={{ width: MAIN_LAYOUT.SCREENS.CONQUER.WAITING.AVATAR.ICON_SIZE }}
-				soundName="button_click.mp3"
-				icon={isPrepared ? 'cancel' : 'person-search'}
-				iconColor={isPrepared ? theme.colors.onError : theme.colors.onPrimary}
-			>
-				{`${isPrepared ? 'Hủy' : 'Sẵn sàng'} (${clientPreparedCount}/${joinedRoom.clients.length})`}
-			</Button>
+			{idleMode === 'SINGLE' && (
+				<Animated.View entering={FadeInUp}>
+					<SingleWaiting animated={isPrepared} />
+				</Animated.View>
+			)}
+			<Animated.View entering={StretchInX}>
+				<Button
+					mode="contained"
+					loading={isPrepared}
+					buttonColor={isPrepared ? theme.colors.error : theme.colors.primary}
+					onPress={onPressPrepare}
+					style={[{ width: MAIN_LAYOUT.SCREENS.CONQUER.WAITING.AVATAR.ICON_SIZE }]}
+					soundName="button_click.mp3"
+					icon={isPrepared ? 'cancel' : 'person-search'}
+					iconColor={isPrepared ? theme.colors.onError : theme.colors.onPrimary}
+				>
+					{`${isPrepared ? 'Hủy' : 'Sẵn sàng'} (${preparedCount}/${joinedRoom.clients.length})`}
+				</Button>
+			</Animated.View>
 		</View>
 	);
 };

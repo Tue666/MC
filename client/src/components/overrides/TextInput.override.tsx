@@ -4,7 +4,7 @@ import {
 	TextInput as RNPTextInput,
 	TextInputProps as RNPTextInputProps,
 } from 'react-native-paper';
-import { useGlobalStyles } from '../../styles';
+import { globalStyles } from '../../styles';
 
 interface TextInputProps extends RNPTextInputProps {
 	innerStyle?: RNPTextInputProps['style'];
@@ -13,10 +13,9 @@ interface TextInputProps extends RNPTextInputProps {
 
 const TextInput = (props: TextInputProps) => {
 	const { innerStyle, helperText, style, ...rest } = props;
-	const globalStyles = useGlobalStyles();
 
 	return (
-		<View style={Object.assign({ ...globalStyles.fw }, style)}>
+		<View style={[globalStyles.fw, style]}>
 			<RNPTextInput style={innerStyle} {...rest} />
 			{helperText && <HelperText type="error">{helperText}</HelperText>}
 		</View>

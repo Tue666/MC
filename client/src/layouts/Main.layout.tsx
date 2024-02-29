@@ -5,7 +5,7 @@ import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { ConstantConfig, ResourceConfig } from '../configs';
 import { useSetting } from '../hooks';
-import { useGlobalStyles, useStackStyles } from '../styles';
+import { globalStyles, stackStyles } from '../styles';
 import { MainLayoutProps } from '../types';
 
 const { MAIN_LAYOUT } = ConstantConfig;
@@ -22,21 +22,17 @@ const MainLayout = (props: PropsWithChildren & Partial<MainLayoutProps>) => {
 	const isHiddenBar = routeName && HIDDEN_BAR_TABS.indexOf(routeName) !== -1;
 	const theme = useTheme();
 	const { themeMode, onChangeTheme } = useSetting();
-	const globalStyles = useGlobalStyles();
-	const stackStyles = useStackStyles();
 
 	return (
 		<View
-			style={{
-				...styles.container,
-				...globalStyles.bg,
-				paddingBottom: isHiddenBar ? 0 : MAIN_LAYOUT.PADDING_BOTTOM,
-			}}
+			style={[
+				styles.container,
+				globalStyles.bg,
+				{ paddingBottom: isHiddenBar ? 0 : MAIN_LAYOUT.PADDING_BOTTOM },
+			]}
 		>
-			<View
-				style={{ ...styles.header, ...globalStyles.paper, ...globalStyles.shadow, ...stackStyles.row }}
-			>
-				<View style={{ ...stackStyles.row }}>
+			<View style={[styles.header, globalStyles.paper, globalStyles.shadow, stackStyles.row]}>
+				<View style={[stackStyles.row]}>
 					<Icon name="paid" size={MAIN_LAYOUT.HEADER.ICON_SIZE} color={theme.colors.tertiary} />
 					<Text variant="labelSmall"> 999.999.999</Text>
 				</View>

@@ -2,19 +2,17 @@ import { PropsWithChildren } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Logo } from '../components';
 import { ConstantConfig } from '../configs';
-import { useGlobalStyles, useStackStyles } from '../styles';
+import { globalStyles, stackStyles } from '../styles';
 
 const { AUTHENTICATION_LAYOUT } = ConstantConfig;
 
 const AuthenticationLayout = (props: PropsWithChildren) => {
 	const { children } = props;
-	const globalStyles = useGlobalStyles();
-	const stackStyles = useStackStyles();
 
 	return (
-		<View style={{ ...styles.container, ...globalStyles.paper, ...stackStyles.center }}>
+		<View style={[styles.container, globalStyles.paper, stackStyles.center]}>
 			<Logo />
-			<View style={{ ...globalStyles.fw }}>{children}</View>
+			<View style={[globalStyles.fw]}>{children}</View>
 		</View>
 	);
 };

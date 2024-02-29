@@ -5,7 +5,7 @@ import { ConstantConfig } from '../../configs';
 import { useModal } from '../../hooks';
 import { useAppSelector } from '../../redux/hooks';
 import { selectModal } from '../../redux/slices/modal.slice';
-import { useGlobalStyles, useStackStyles } from '../../styles';
+import { globalStyles, stackStyles } from '../../styles';
 import { IRoom } from '../../types';
 import { Button, CircleBorder } from '..';
 
@@ -13,8 +13,6 @@ const { MODAL } = ConstantConfig;
 
 export interface ModalProps {
 	navigation: any;
-	globalStyles: any;
-	stackStyles: any;
 	closeModal: () => void;
 }
 
@@ -28,7 +26,7 @@ const components = {
 		return null;
 	},
 	WINNER: (props: WinnerModalProps) => {
-		const { navigation, globalStyles, stackStyles, closeModal, client, isWinner } = props;
+		const { navigation, closeModal, client, isWinner } = props;
 
 		const onPressContinue = () => {
 			navigation.navigate('Statistic', { client, isWinner });
@@ -36,17 +34,19 @@ const components = {
 		};
 		return (
 			<View
-				style={{
-					...globalStyles.paper,
-					...globalStyles.shadow,
-					...stackStyles.center,
-					width: MODAL.WINNER.WIDTH,
-					padding: MODAL.WINNER.PADDING,
-					borderRadius: MODAL.WINNER.BORDER_RADIUS,
-				}}
+				style={[
+					globalStyles.paper,
+					globalStyles.shadow,
+					stackStyles.center,
+					{
+						width: MODAL.WINNER.WIDTH,
+						padding: MODAL.WINNER.PADDING,
+						borderRadius: MODAL.WINNER.BORDER_RADIUS,
+					},
+				]}
 			>
 				<CircleBorder
-					style={{ marginVertical: MODAL.WINNER.AVATAR.MARGIN_VERTICAL }}
+					style={[{ marginVertical: MODAL.WINNER.AVATAR.MARGIN_VERTICAL }]}
 					label={client?.name ?? ''}
 				>
 					<Avatar.Image
@@ -54,7 +54,7 @@ const components = {
 						source={require('../../assets/images/avatar.png')}
 					/>
 				</CircleBorder>
-				<Text variant="headlineMedium">Chiến Thắng</Text>
+				<Text variant="headlineSmall">Chiến Thắng</Text>
 				<Button mode="contained" onPress={onPressContinue} soundName="button_click.mp3" icon="skip-next">
 					Tiếp tục
 				</Button>
@@ -67,8 +67,6 @@ const Modal = () => {
 	const navigation = useNavigation();
 	const { isOpen, closable, component, params } = useAppSelector(selectModal);
 	const { closeModal } = useModal();
-	const globalStyles = useGlobalStyles();
-	const stackStyles = useStackStyles();
 
 	return (
 		<RNPModal
@@ -78,7 +76,7 @@ const Modal = () => {
 			onDismiss={closeModal}
 			contentContainerStyle={{ ...stackStyles.center }}
 		>
-			{components[component]({ navigation, globalStyles, stackStyles, closeModal, ...params })}
+			{components[component]({ navigation, closeModal, ...params })}
 		</RNPModal>
 	);
 };

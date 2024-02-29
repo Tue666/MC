@@ -1,18 +1,11 @@
 import { useState } from 'react';
-import {
-	Dimensions,
-	RefreshControl,
-	ScrollView,
-	StyleSheet,
-	TouchableOpacity,
-	View,
-} from 'react-native';
+import { Dimensions, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { Text, useTheme } from 'react-native-paper';
 import { Box } from '../../../components';
 import { ConstantConfig, ResourceConfig } from '../../../configs';
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
 import { initAccount, selectAccount } from '../../../redux/slices/account.slice';
-import { useGlobalStyles, useStackStyles } from '../../../styles';
+import { globalStyles, stackStyles } from '../../../styles';
 import { ConquerProps, ConquerStackListParams } from '../../../types';
 import { openDialog } from '../../../utils';
 
@@ -33,8 +26,6 @@ const Conquer = (props: ConquerProps) => {
 	const [refreshing, setRefreshing] = useState(false);
 	const { resources } = useAppSelector(selectAccount);
 	const dispatch = useAppDispatch();
-	const globalStyles = useGlobalStyles();
-	const stackStyles = useStackStyles();
 	const resourceDifficulty = RESOURCE_DIFFICULTIES(theme);
 
 	const onPressResource = (params: ConquerStackListParams<'Waiting'>) => {
@@ -55,12 +46,12 @@ const Conquer = (props: ConquerProps) => {
 	};
 	return (
 		<ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefreshScreen} />}>
-			<View style={{ ...stackStyles.rowWrap }}>
+			<View style={[stackStyles.rowWrap]}>
 				{Object.entries(resources).map(([resourceAllowed, permissionAllowed]) => {
 					// Stop render out of arrangement
 					if (ROW_INDEX >= RESOURCE_ARRANGEMENT.length) return;
 
-					const { _id, name, description, difficulty, operations } = permissionAllowed;
+					const { _id, name, description, difficulty } = permissionAllowed;
 					const idleMode = RESOURCES[_id]?.idleMode || 'SINGLE';
 					const difficultLevel = getDifficultLevel(difficulty, resourceDifficulty);
 					const { label, bgColor, textColor } =
@@ -82,18 +73,17 @@ const Conquer = (props: ConquerProps) => {
 					return (
 						<Box
 							key={resourceAllowed}
-							onPress={() => onPressResource({ _id, name, operations, idleMode })}
+							onPress={() => onPressResource({ resource: permissionAllowed, idleMode })}
 							onLongPress={() => onLongPressResource(name, description)}
-							style={{
-								...styles.resource,
-								backgroundColor: bgColor || globalStyles.paper.backgroundColor,
-								width: resourceWidth,
-							}}
+							style={[
+								styles.resource,
+								{ backgroundColor: bgColor || globalStyles.paper.backgroundColor, width: resourceWidth },
+							]}
 							soundName="button_click.mp3"
 						>
-							<Text style={{ ...{ color: textColor || theme.colors.onSurface } }}>{name}</Text>
+							<Text style={[{ color: textColor || theme.colors.onSurface }]}>{name}</Text>
 							{label && (
-								<Text variant="labelSmall" style={{ ...{ color: textColor || theme.colors.onSurface } }}>
+								<Text variant="labelSmall" style={[{ color: textColor || theme.colors.onSurface }]}>
 									({label})
 								</Text>
 							)}

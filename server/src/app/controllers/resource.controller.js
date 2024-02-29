@@ -59,7 +59,7 @@ class ResourceController {
 
   async insert(req, res, next) {
     try {
-      let { name, operations, description, priority, difficulty } = req.body;
+      let { name, operations, ...rest } = req.body;
 
       const okRequiredFields = ValidateUtil.ensureRequiredFields(name);
       if (!okRequiredFields) {
@@ -83,9 +83,7 @@ class ResourceController {
       const resource = new Resource({
         name,
         operations,
-        description,
-        priority,
-        difficulty,
+        ...rest,
       });
       await resource.save();
 

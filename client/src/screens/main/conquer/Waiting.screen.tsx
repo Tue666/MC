@@ -1,81 +1,86 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Text, useTheme } from 'react-native-paper';
 import { useIsFocused } from '@react-navigation/native';
+import Animated, { FadeInUp, StretchInX } from 'react-native-reanimated';
 import { SoundManager } from '../../../audios';
 import { Button, SingleWaiting } from '../../../components';
 import { ConstantConfig } from '../../../configs';
 import { useSocketClient } from '../../../hooks';
 import { useAppSelector } from '../../../redux/hooks';
-import { selectAccount } from '../../../redux/slices/account.slice';
-import { useStackStyles } from '../../../styles';
+import { AccountState, selectAccount } from '../../../redux/slices/account.slice';
+import { stackStyles } from '../../../styles';
 import { ConquerWaitingProps, IRoom } from '../../../types';
 import { openDialog } from '../../../utils';
 
 const { MAIN_LAYOUT, SPACE_GAP } = ConstantConfig;
 
-const MAX_CAPACITY = 2;
+const MAX_CAPACITY = 1;
 
 const Waiting = (props: ConquerWaitingProps) => {
 	const { navigation, route } = props;
-	const { _id, name, idleMode } = route.params;
+	const { resource, idleMode } = route.params;
+	const { _id, name } = resource;
 	const isFocused = useIsFocused();
 	const theme = useTheme();
 	const [isParticipating, setIsParticipating] = useState(false);
-	const [joinedRoomId, setJoinedRoomId] = useState<string | null>(null);
-	const [clientCount, setClientCount] = useState(0);
+	const [joinedRoom, setJoinedRoom] = useState<IRoom.Room | null>(null);
+	const participateRef = useRef<boolean | null>(false);
 	const { profile } = useAppSelector(selectAccount);
-	const stackStyles = useStackStyles();
 	const socketClient = useSocketClient();
 
 	useEffect(() => {
 		if (isFocused) {
 			SoundManager.playSound('join.mp3');
 		}
+
+		return () => {
+			participateRef.current = null;
+		};
 	}, [isFocused]);
 	useEffect(() => {
-		socketClient?.on('conquer:server-client(participating)', (room: IRoom.Room) => {
-			const { _id, clients } = room;
+		socketClient?.on(
+			'conquer:server-client(participating)',
+			(room: IRoom.Room, client: AccountState['profile']) => {
+				setJoinedRoom(room);
 
-			setJoinedRoomId(_id);
-			setClientCount(clients.length);
-		});
+				if (client._id === profile._id) {
+					participateRef.current = false;
+				}
+			}
+		);
 		socketClient?.on('[ERROR]conquer:server-client(participating)', (error) => {
+			setIsParticipating(false);
 			openDialog({
-				title: 'Lỗi',
+				title: '[Ghép ngẫu nhiên] Lỗi',
 				content: error,
 			});
 		});
 		socketClient?.on('[ERROR]conquer:server-client(cancel-participating)', (error) => {
+			setIsParticipating(true);
 			openDialog({
-				title: 'Lỗi',
+				title: '[Hủy] Lỗi',
 				content: error,
 			});
 		});
 
 		socketClient?.on('conquer:server-client(prepare-participate)', (joinedRoom: IRoom.Room) => {
-			navigation.navigate('Prepare', { room: joinedRoom, _id, name, idleMode });
+			navigation.navigate('Prepare', { resource, room: joinedRoom, idleMode });
 			setIsParticipating(false);
-			setClientCount(0);
 		});
 	}, []);
 	const onPressParticipate = () => {
-		const room = {
-			resource: _id,
-			maxCapacity: MAX_CAPACITY,
-		};
+		if (participateRef.current === true) return;
+
+		participateRef.current = true;
 
 		if (isParticipating) {
 			SoundManager.stopSound('waiting_bg.mp3');
 
 			socketClient?.emit('conquer:client-server(cancel-participating)', {
-				room: {
-					...room,
-					_id: joinedRoomId,
-				},
-				client: {
-					_id: profile._id,
-				},
+				resource: _id,
+				room: joinedRoom,
+				client: profile,
 			});
 			setIsParticipating(false);
 			return;
@@ -84,40 +89,47 @@ const Waiting = (props: ConquerWaitingProps) => {
 		SoundManager.playSound('waiting_bg.mp3', { repeat: true });
 		SoundManager.playSound('participate.mp3');
 		socketClient?.emit('conquer:client-server(participating)', {
-			room,
-			client: {
-				_id: profile._id,
-				name: profile.name,
-				prepared: false,
-			},
+			resource: _id,
+			room: { maxCapacity: MAX_CAPACITY },
+			client: profile,
 		});
 		setIsParticipating(true);
 	};
+	const onPressFindRoom = () => {};
 	return (
-		<View style={{ ...styles.container, ...stackStyles.center }}>
+		<View style={[styles.container, stackStyles.center]}>
 			<Text variant="titleLarge">{name}</Text>
-			{idleMode === 'SINGLE' && <SingleWaiting />}
-			<Button
-				mode="contained"
-				loading={isParticipating}
-				buttonColor={isParticipating ? theme.colors.error : theme.colors.primary}
-				onPress={onPressParticipate}
-				style={{ width: MAIN_LAYOUT.SCREENS.CONQUER.WAITING.AVATAR.ICON_SIZE }}
-				soundName="button_click.mp3"
-				icon={isParticipating ? 'cancel' : 'person-search'}
-				iconColor={isParticipating ? theme.colors.onError : theme.colors.onPrimary}
-			>
-				{isParticipating ? `Hủy (${clientCount}/${MAX_CAPACITY})` : 'Ghép ngẫu nhiên'}
-			</Button>
-			<Button
-				mode="outlined"
-				style={{ width: MAIN_LAYOUT.SCREENS.CONQUER.WAITING.AVATAR.ICON_SIZE }}
-				soundName="button_click.mp3"
-				icon="search"
-				iconColor={theme.colors.primary}
-			>
-				Tìm phòng
-			</Button>
+			{idleMode === 'SINGLE' && (
+				<Animated.View entering={FadeInUp}>
+					<SingleWaiting animated={isParticipating} />
+				</Animated.View>
+			)}
+			<Animated.View entering={StretchInX}>
+				<Button
+					mode="contained"
+					loading={isParticipating}
+					buttonColor={isParticipating ? theme.colors.error : theme.colors.primary}
+					onPress={onPressParticipate}
+					style={[{ width: MAIN_LAYOUT.SCREENS.CONQUER.WAITING.AVATAR.ICON_SIZE }]}
+					soundName="button_click.mp3"
+					icon={isParticipating ? 'cancel' : 'person-search'}
+					iconColor={isParticipating ? theme.colors.onError : theme.colors.onPrimary}
+				>
+					{isParticipating ? `Hủy (${joinedRoom?.clients?.length ?? 0}/${MAX_CAPACITY})` : 'Ghép ngẫu nhiên'}
+				</Button>
+			</Animated.View>
+			<Animated.View entering={StretchInX}>
+				<Button
+					mode="outlined"
+					onPress={onPressFindRoom}
+					style={[{ width: MAIN_LAYOUT.SCREENS.CONQUER.WAITING.AVATAR.ICON_SIZE }]}
+					soundName="button_click.mp3"
+					icon="search"
+					iconColor={theme.colors.primary}
+				>
+					Tìm phòng
+				</Button>
+			</Animated.View>
 		</View>
 	);
 };

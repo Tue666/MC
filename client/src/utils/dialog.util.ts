@@ -1,7 +1,7 @@
 import { useDialog } from '../hooks';
 import { DialogState } from '../redux/slices/dialog.slice';
 
-let dialogRef: any;
+let dialogRef: ReturnType<typeof useDialog>;
 const DialogUtilConfiguration = () => {
 	dialogRef = useDialog();
 

@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { SoundManager } from '../../audios';
 import { ConstantConfig } from '../../configs';
 import { MainLayout } from '../../layouts';
-import { useGlobalStyles, useStackStyles } from '../../styles';
+import { globalStyles, stackStyles } from '../../styles';
 import { MainTabList } from '../../types';
 import { ConquerStack } from './conquer';
 import { Account, Ranking } from '.';
@@ -16,8 +16,6 @@ const Tab = createBottomTabNavigator<MainTabList>();
 
 const MainTab = () => {
 	const theme = useTheme();
-	const globalStyles = useGlobalStyles();
-	const stackStyles = useStackStyles();
 
 	return (
 		<Tab.Navigator
@@ -28,17 +26,11 @@ const MainTab = () => {
 					const { tabBarStyle } = options;
 					if (!tabBarStyle) return styles;
 
-					return Object.assign({ ...styles }, tabBarStyle);
+					return [styles, tabBarStyle];
 				}, {});
 				return (
 					<View
-						style={{
-							...styles.bar,
-							...stackStyles.row,
-							...globalStyles.paper,
-							...globalStyles.shadow,
-							...childrenStyles,
-						}}
+						style={[styles.bar, stackStyles.row, globalStyles.paper, globalStyles.shadow, childrenStyles]}
 					>
 						{state.routes.map((route, index) => {
 							const { options } = descriptors[route.key];
@@ -66,12 +58,7 @@ const MainTab = () => {
 
 							if (icon)
 								return (
-									<TouchableOpacity
-										key={index}
-										onPress={onPress}
-										onLongPress={onLongPress}
-										style={{ ...styles.button }}
-									>
+									<TouchableOpacity key={index} onPress={onPress} onLongPress={onLongPress} style={[styles.button]}>
 										{icon({
 											focused: isFocused,
 											color: isFocused ? theme.colors.primary : theme.colors.outline,

@@ -7,7 +7,7 @@ import { useFormik } from 'formik';
 import { Button, TextInput } from '../../components';
 import { ConstantConfig, FormValidationConfig } from '../../configs';
 import { useAuthentication } from '../../hooks';
-import { useStackStyles, useTypographyStyles } from '../../styles';
+import { stackStyles, typographyStyles } from '../../styles';
 import { IAccount, AuthenticationSignUpProps } from '../../types';
 import { openDialog, openSnackbar } from '../../utils';
 
@@ -20,8 +20,6 @@ const SignUp = (props: AuthenticationSignUpProps) => {
 	const [hiddenPassword, setHiddenPassword] = useState(true);
 	const [hiddenPasswordConfirm, setHiddenPasswordConfirm] = useState(true);
 	const { signUp } = useAuthentication();
-	const stackStyles = useStackStyles();
-	const typographyStyles = useTypographyStyles();
 	const formik = useFormik<IAccount.SignUpBody>({
 		initialValues: {
 			phone_number: '',
@@ -71,8 +69,8 @@ const SignUp = (props: AuthenticationSignUpProps) => {
 		setHiddenPasswordConfirm(!hiddenPasswordConfirm);
 	};
 	return (
-		<View style={{ ...styles.container }}>
-			<Text variant="titleLarge" style={{ ...typographyStyles.highlight, ...styles.gap }}>
+		<View style={[styles.container]}>
+			<Text variant="titleLarge" style={[styles.gap, typographyStyles.highlight]}>
 				Tạo Tài Khoản
 			</Text>
 			<TextInput
@@ -88,7 +86,7 @@ const SignUp = (props: AuthenticationSignUpProps) => {
 						icon={() => <Icon name="person" size={AUTHENTICATION_LAYOUT.TEXT_INPUT.ICON_SIZE} />}
 					/>
 				}
-				style={{ ...styles.gap }}
+				style={[styles.gap]}
 			/>
 			<TextInput
 				label="Mật khẩu"
@@ -115,7 +113,7 @@ const SignUp = (props: AuthenticationSignUpProps) => {
 						onPress={onTogglePasswordVisibility}
 					/>
 				}
-				style={{ ...styles.gap }}
+				style={[styles.gap]}
 			/>
 			<TextInput
 				label="Nhập lại mật khẩu"
@@ -142,9 +140,9 @@ const SignUp = (props: AuthenticationSignUpProps) => {
 						onPress={onTogglePasswordConfirmVisibility}
 					/>
 				}
-				style={{ ...styles.gap }}
+				style={[styles.gap]}
 			/>
-			<View style={{ ...styles.gap }} />
+			<View style={[styles.gap]} />
 			<Button
 				mode="contained"
 				loading={isSubmitting}
@@ -154,10 +152,10 @@ const SignUp = (props: AuthenticationSignUpProps) => {
 			>
 				Đăng ký
 			</Button>
-			<View style={{ ...stackStyles.row }}>
+			<View style={[stackStyles.row]}>
 				<Text variant="labelSmall">Đã có tài khoản? </Text>
 				<TouchableOpacity onPress={onPressSignIn}>
-					<Text variant="labelMedium" style={{ ...typographyStyles.highlight }}>
+					<Text variant="labelMedium" style={[typographyStyles.highlight]}>
 						Đăng nhập
 					</Text>
 				</TouchableOpacity>

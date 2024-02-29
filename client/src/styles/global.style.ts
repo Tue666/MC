@@ -37,4 +37,11 @@ const useGlobalStyles = () => {
 	return styles;
 };
 
-export default useGlobalStyles;
+export let globalStyles: ReturnType<typeof useGlobalStyles>;
+const GlobalStylesConfiguration = () => {
+	globalStyles = useGlobalStyles();
+
+	return null;
+};
+
+export default GlobalStylesConfiguration;

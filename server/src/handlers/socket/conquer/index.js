@@ -5,9 +5,9 @@ const quickMatchHandler = require("./quick-match.handler");
 const onClientParticipating = (io, socket) => {
   socket.on("conquer:client-server(participating)", (data) => {
     try {
-      const { room, client } = data;
+      const { resource, room, client } = data;
 
-      const joinedRoom = RoomController.joinPublicRoom(room, client);
+      const joinedRoom = RoomController.joinPublicRoom(resource, room, client);
       const { _id, maxCapacity, clients } = joinedRoom;
 
       socket.join(_id);
@@ -15,12 +15,17 @@ const onClientParticipating = (io, socket) => {
       if (clients.length >= maxCapacity) {
         io.in(_id).emit(
           "conquer:server-client(prepare-participate)",
-          joinedRoom
+          joinedRoom,
+          client
         );
         return;
       }
 
-      io.in(_id).emit("conquer:server-client(participating)", joinedRoom);
+      io.in(_id).emit(
+        "conquer:server-client(participating)",
+        joinedRoom,
+        client
+      );
     } catch (error) {
       socket.emit("[ERROR]conquer:server-client(participating)", error.message);
     }
@@ -30,12 +35,12 @@ const onClientParticipating = (io, socket) => {
 const onClientCancelParticipating = (io, socket) => {
   socket.on("conquer:client-server(cancel-participating)", (data) => {
     try {
-      const { room, client } = data;
+      const { resource, room, client } = data;
 
-      const leftRoom = RoomController.leavePublicRoom(room, client);
+      const leftRoom = RoomController.leavePublicRoom(resource, room, client);
       const { _id } = leftRoom;
 
-      io.in(_id).emit("conquer:server-client(participating)", leftRoom);
+      io.in(_id).emit("conquer:server-client(participating)", leftRoom, client);
     } catch (error) {
       socket.emit(
         "[ERROR]conquer:server-client(cancel-participating)",
@@ -48,9 +53,9 @@ const onClientCancelParticipating = (io, socket) => {
 const onClientPrepareParticipate = (io, socket) => {
   socket.on("conquer:client-server(prepare-participate)", (data) => {
     try {
-      const { room, client } = data;
+      const { resource, room, client } = data;
 
-      const preparedRoom = RoomController.preparedRoom(room, client);
+      const preparedRoom = RoomController.preparedRoom(resource, room, client);
       const { _id, clients } = preparedRoom;
 
       const allClientPrepared = clients.every((client) => client.prepared);
@@ -64,7 +69,8 @@ const onClientPrepareParticipate = (io, socket) => {
 
       io.in(_id).emit(
         "conquer:server-client(prepare-participate)",
-        preparedRoom
+        preparedRoom,
+        client
       );
     } catch (error) {
       socket.emit(

@@ -1,7 +1,7 @@
 import { useModal } from '../hooks';
 import { ModalState } from '../redux/slices/modal.slice';
 
-let modalRef: any;
+let modalRef: ReturnType<typeof useModal>;
 const ModalUtilConfiguration = () => {
 	modalRef = useModal();
 

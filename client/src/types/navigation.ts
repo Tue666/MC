@@ -1,6 +1,7 @@
 import { StackScreenProps } from '@react-navigation/stack';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import { IOperation, IResource, IRoom } from '.';
+import { Resources } from '../redux/slices/account.slice';
+import { IRoom } from '.';
 
 export type MainTabList = {
 	ConquerStack: undefined;
@@ -25,15 +26,12 @@ export type ConquerIdleMode = 'SINGLE' | 'MULTIPLE';
 export type ConquerStackList = {
 	Conquer: undefined;
 	Waiting: {
-		_id: IResource.Resource['_id'];
-		name: IResource.Resource['name'];
-		operations: IOperation.Operation['_id'][];
+		resource: Resources[keyof Resources];
 		idleMode: ConquerIdleMode;
 	};
 	Prepare: {
+		resource: Resources[keyof Resources];
 		room: IRoom.Room;
-		_id: IResource.Resource['_id'];
-		name: IResource.Resource['name'];
 		idleMode: ConquerIdleMode;
 	};
 	Statistic: {
@@ -41,8 +39,8 @@ export type ConquerStackList = {
 		isWinner: boolean;
 	};
 	QuickMatch: {
+		resource: Resources[keyof Resources];
 		room: IRoom.Room;
-		_id: IResource.Resource['_id'];
 	};
 };
 export type ConquerStackListKey = keyof ConquerStackList;

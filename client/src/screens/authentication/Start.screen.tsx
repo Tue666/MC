@@ -2,14 +2,13 @@ import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
 import { Button } from '../../components';
 import { ConstantConfig } from '../../configs';
-import { useTypographyStyles } from '../../styles';
+import { typographyStyles } from '../../styles';
 import { AuthenticationStartProps } from '../../types';
 
 const { SPACE_GAP } = ConstantConfig;
 
 const Start = (props: AuthenticationStartProps) => {
 	const { navigation } = props;
-	const typographyStyles = useTypographyStyles();
 
 	const onPressSignIn = () => {
 		navigation.navigate('SignIn');
@@ -18,11 +17,11 @@ const Start = (props: AuthenticationStartProps) => {
 		navigation.navigate('SignUp');
 	};
 	return (
-		<View style={{ ...styles.container }}>
-			<Text variant="headlineMedium" style={{ ...typographyStyles.highlight, ...styles.gap }}>
+		<View style={[styles.container]}>
+			<Text variant="headlineMedium" style={[styles.gap, typographyStyles.highlight]}>
 				Conquer Math
 			</Text>
-			<Text style={{ textAlign: 'center', ...styles.gap }}>
+			<Text style={[styles.gap, { textAlign: 'center' }]}>
 				The easiest way to start with your amazing application.
 			</Text>
 			<Button mode="contained" onPress={onPressSignIn} soundName="button_click.mp3">

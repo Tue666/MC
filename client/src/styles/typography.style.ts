@@ -17,4 +17,11 @@ const useTypographyStyles = () => {
 	return styles;
 };
 
-export default useTypographyStyles;
+export let typographyStyles: ReturnType<typeof useTypographyStyles>;
+const TypographyStylesConfiguration = () => {
+	typographyStyles = useTypographyStyles();
+
+	return null;
+};
+
+export default TypographyStylesConfiguration;

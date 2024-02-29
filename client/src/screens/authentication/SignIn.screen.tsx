@@ -7,7 +7,7 @@ import { useFormik } from 'formik';
 import { Button, TextInput } from '../../components';
 import { ConstantConfig, FormValidationConfig } from '../../configs';
 import { useAuthentication } from '../../hooks';
-import { useGlobalStyles, useStackStyles, useTypographyStyles } from '../../styles';
+import { globalStyles, stackStyles, typographyStyles } from '../../styles';
 import { IAccount, AuthenticationSignInProps } from '../../types';
 import { openDialog } from '../../utils';
 
@@ -18,9 +18,6 @@ const SignIn = (props: AuthenticationSignInProps) => {
 	const { navigation } = props;
 	const [hiddenPassword, setHiddenPassword] = useState(true);
 	const { signIn } = useAuthentication();
-	const globalStyles = useGlobalStyles();
-	const stackStyles = useStackStyles();
-	const typographyStyles = useTypographyStyles();
 	const formik = useFormik<IAccount.SignInBody>({
 		initialValues: {
 			phone_number: '',
@@ -60,8 +57,8 @@ const SignIn = (props: AuthenticationSignInProps) => {
 		setHiddenPassword(!hiddenPassword);
 	};
 	return (
-		<View style={{ ...styles.container }}>
-			<Text variant="titleLarge" style={{ ...typographyStyles.highlight, ...styles.gap }}>
+		<View style={[styles.container]}>
+			<Text variant="titleLarge" style={[styles.gap, typographyStyles.highlight]}>
 				Xin Chào!
 			</Text>
 			<TextInput
@@ -77,7 +74,7 @@ const SignIn = (props: AuthenticationSignInProps) => {
 						icon={() => <Icon name="person" size={AUTHENTICATION_LAYOUT.TEXT_INPUT.ICON_SIZE} />}
 					/>
 				}
-				style={{ ...styles.gap }}
+				style={[styles.gap]}
 			/>
 			<TextInput
 				label="Mật khẩu"
@@ -104,11 +101,11 @@ const SignIn = (props: AuthenticationSignInProps) => {
 						onPress={onTogglePasswordVisibility}
 					/>
 				}
-				style={{ ...styles.gap }}
+				style={[styles.gap]}
 			/>
-			<View style={{ alignItems: 'flex-end', ...globalStyles.fw, ...styles.gap }}>
+			<View style={[styles.gap, globalStyles.fw, { alignItems: 'flex-end' }]}>
 				<TouchableOpacity>
-					<Text variant="labelSmall" style={{ color: 'gray' }}>
+					<Text variant="labelSmall" style={[{ color: 'gray' }]}>
 						Quên mật khẩu?
 					</Text>
 				</TouchableOpacity>
@@ -122,10 +119,10 @@ const SignIn = (props: AuthenticationSignInProps) => {
 			>
 				Đăng nhập
 			</Button>
-			<View style={{ ...stackStyles.row }}>
+			<View style={[stackStyles.row]}>
 				<Text variant="labelSmall">Chưa có tài khoản? </Text>
 				<TouchableOpacity onPress={onPressSignUp}>
-					<Text variant="labelMedium" style={{ ...typographyStyles.highlight }}>
+					<Text variant="labelMedium" style={[typographyStyles.highlight]}>
 						Đăng ký
 					</Text>
 				</TouchableOpacity>

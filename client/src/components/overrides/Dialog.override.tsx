@@ -5,7 +5,7 @@ import RenderHTML from 'react-native-render-html';
 import { ConstantConfig } from '../../configs';
 import { useAppSelector } from '../../redux/hooks';
 import { selectDialog } from '../../redux/slices/dialog.slice';
-import { useGlobalStyles } from '../../styles';
+import { globalStyles } from '../../styles';
 import { closeDialog } from '../../utils';
 
 const { DIALOG } = ConstantConfig;
@@ -14,7 +14,6 @@ const Dialog = () => {
 	const { width } = useWindowDimensions();
 	const { isOpen, closable, icon, title, content, contentScrollable, actions } =
 		useAppSelector(selectDialog);
-	const globalStyles = useGlobalStyles();
 
 	return (
 		<Portal>
@@ -23,7 +22,7 @@ const Dialog = () => {
 				dismissable={closable}
 				dismissableBackButton={closable}
 				onDismiss={closeDialog}
-				style={{ ...globalStyles.paper }}
+				style={[globalStyles.paper]}
 			>
 				{icon && <RNPDialog.Icon icon={() => <Icon name={icon} size={DIALOG.ICON_SIZE} />} />}
 				{title && <RNPDialog.Title>{title}</RNPDialog.Title>}

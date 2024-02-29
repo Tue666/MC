@@ -1,7 +1,7 @@
 import { GestureResponderEvent, TouchableOpacity, TouchableOpacityProps } from 'react-native';
 import { SoundManager, SoundName } from '../audios';
 import { ConstantConfig } from '../configs';
-import { useGlobalStyles } from '../styles';
+import { globalStyles } from '../styles';
 
 const { BOX } = ConstantConfig;
 
@@ -11,7 +11,6 @@ interface BoxProps extends TouchableOpacityProps {
 
 const Box = (props: BoxProps) => {
 	const { soundName, children, style, onPress, ...rest } = props;
-	const globalStyles = useGlobalStyles();
 
 	const onOverridePress = (e: GestureResponderEvent) => {
 		if (soundName) {
@@ -24,14 +23,7 @@ const Box = (props: BoxProps) => {
 	};
 	return (
 		<TouchableOpacity
-			style={Object.assign(
-				{
-					...globalStyles.paper,
-					...globalStyles.shadow,
-					borderRadius: BOX.BORDER_RADIUS,
-				},
-				style
-			)}
+			style={[globalStyles.paper, globalStyles.shadow, { borderRadius: BOX.BORDER_RADIUS }, style]}
 			onPress={onOverridePress}
 			{...rest}
 		>

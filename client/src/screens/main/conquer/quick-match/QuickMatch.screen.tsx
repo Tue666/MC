@@ -1,68 +1,82 @@
 import { useEffect, useRef, useState } from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
-import { Avatar, Text, useTheme } from 'react-native-paper';
+import { ScrollView, TouchableOpacity, View } from 'react-native';
+import { Avatar, Divider, Text, useTheme } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import axios from 'axios';
 import { SoundManager } from '../../../../audios';
-import { CircleBorder, CountdownTimer, SingleModeAnswer } from '../../../../components';
+import {
+	CircleBorder,
+	CountdownTimer,
+	SingleModeAnswer,
+	SingleModeQuestion,
+} from '../../../../components';
 import { ConstantConfig } from '../../../../configs';
 import { useSocketClient } from '../../../../hooks';
 import { useAppSelector } from '../../../../redux/hooks';
 import { selectAccount } from '../../../../redux/slices/account.slice';
-import { useGlobalStyles, useStackStyles } from '../../../../styles';
+import { stackStyles } from '../../../../styles';
 import { ConquerQuickMatchProps, IQuestion, IRoom } from '../../../../types';
 import { openDialog } from '../../../../utils';
 
 const { MAIN_LAYOUT } = ConstantConfig;
 
 const COUNT_DOWN_TIME = 10;
-const ANSWER_TIME = 10;
-const QUESTION: IQuestion.Question = {
-	_id: '123',
-	content: `Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
-	industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type
-	and scrambled it to make a type specimen book. It has survived not only five centuries, but also the
-	leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s
-	with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop
-	publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply
-	dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard
-	dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to
-	make a type specimen book.`,
-	type: 'SINGLE',
-	description: 'Chọn 1 câu trả lời đúng trong các đáp án dưới nhé!',
-	values: [2],
-	answers: [
-		{ _id: '1', value: 1, content: 'Lorem Ipsum' },
-		{ _id: '2', value: 2, content: 'Lorem Ipsum' },
-		{ _id: '3', value: 3, content: 'Lorem Ipsum' },
-		{ _id: '4', value: 4, content: 'Lorem Ipsum' },
-	],
-	created_at: '',
-	updated_at: '',
-	deleted_at: '',
-	deleted_by: {
-		_id: '',
-		name: '',
-	},
-};
+const ANSWER_TIME = 600;
+const IN_ANSWER_TEXT = 'Đang trả lời...';
 
 export type State = 'IN_COUNTDOWN_TIME' | 'IN_RAISE_HAND_TIME' | 'IN_ANSWER_TIME';
 
 const QuickMatch = (props: ConquerQuickMatchProps) => {
 	const { navigation, route } = props;
-	const { content, type, values, answers } = QUESTION;
-	const { room: joinedRoom, _id } = route.params;
+	const { resource, room: joinedRoom } = route.params;
+	const { _id } = resource;
 	const theme = useTheme();
 	const raiseHandRef = useRef(false);
 	const scrollViewRef = useRef<ScrollView>(null);
+	const [question, setQuestion] = useState<IQuestion.Question | null>(null);
 	const [state, setState] = useState<State>('IN_COUNTDOWN_TIME');
 	const [firstRaisedHand, setFirstRaisedHand] = useState<IRoom.Room['clients'][number] | null>(null);
 	const { profile } = useAppSelector(selectAccount);
 	const socketClient = useSocketClient();
-	const globalStyles = useGlobalStyles();
-	const stackStyles = useStackStyles();
 
 	useEffect(() => {
 		SoundManager.playSound('quick_match_bg.mp3', { repeat: true });
+
+		const findQuestion = async () => {
+			try {
+				const url = `https://sheets.googleapis.com/v4/spreadsheets/1D5lO8XHlKTEDJLeUmeH13ynV_g7A1weYcGF84InzoTs/values/Sheet1?key=AIzaSyBZu2RzFLhG5EyR7yQGwdkRNavlVxO__2U`;
+				const res = await (axios.get(url) as Promise<any>);
+				const { values } = res.data;
+
+				const randomIndex = Math.floor(Math.random() * (10 - 1 + 1)) + 1;
+				const [_id, content, type, value, ...answers] = values[randomIndex];
+				const question: IQuestion.Question = {
+					_id,
+					content,
+					type,
+					resources: [],
+					description: '',
+					values: [parseInt(value)],
+					answers: answers.map((answer: string, index: number) => ({
+						_id: (index + 1).toString(),
+						value: index + 1,
+						content: answer,
+					})),
+					created_at: '',
+					updated_at: '',
+					deleted_at: '',
+					deleted_by: {
+						_id: '',
+						name: '',
+					},
+				};
+				setQuestion(question);
+			} catch (error) {
+				console.log(error);
+			}
+		};
+
+		findQuestion();
 	}, []);
 	useEffect(() => {
 		socketClient?.on(
@@ -101,42 +115,49 @@ const QuickMatch = (props: ConquerQuickMatchProps) => {
 		});
 		raiseHandRef.current = true;
 	};
+
+	if (question === null || question === undefined)
+		return (
+			<View>
+				<Text>Loading...</Text>
+			</View>
+		);
+
 	return (
-		<View style={{ ...stackStyles.center }}>
+		<View style={[stackStyles.center]}>
 			<ScrollView ref={scrollViewRef}>
-				<View
-					style={{ ...styles.question, ...globalStyles.paper, ...globalStyles.shadow, ...stackStyles.center }}
-				>
-					<Text>{content}</Text>
-				</View>
-				<TouchableOpacity style={{ ...stackStyles.center }}>
+				<SingleModeQuestion content={question.content} />
+				<View style={[stackStyles.center]}>
 					{state !== 'IN_ANSWER_TIME' && (
 						<CircleBorder>
 							{state === 'IN_COUNTDOWN_TIME' && (
 								<CountdownTimer timer={COUNT_DOWN_TIME} timerSelected={['M']} onExpired={onCountdownExpired} />
 							)}
 							{state === 'IN_RAISE_HAND_TIME' && (
-								<Icon
-									name="notifications-active"
-									size={MAIN_LAYOUT.SCREENS.CONQUER.RAISE_HAND.ICON_SIZE}
-									color={theme.colors.tertiary}
-									onPress={onPressRaiseHand}
-								/>
+								<TouchableOpacity>
+									<Icon
+										name="notifications-active"
+										size={MAIN_LAYOUT.SCREENS.CONQUER.RAISE_HAND.ICON_SIZE}
+										color={theme.colors.tertiary}
+										onPress={onPressRaiseHand}
+									/>
+								</TouchableOpacity>
 							)}
 						</CircleBorder>
 					)}
 					{state === 'IN_ANSWER_TIME' && (
-						<View style={{ alignItems: 'center' }}>
+						<>
 							<CircleBorder label={firstRaisedHand?.name ?? ''}>
 								<Avatar.Text
 									size={MAIN_LAYOUT.SCREENS.CONQUER.RAISE_HAND.ICON_SIZE}
 									label={firstRaisedHand?.name ?? ''}
 								/>
 							</CircleBorder>
-							<Text variant="labelSmall">Đang trả lời...</Text>
-						</View>
+							<Text variant="labelSmall">{IN_ANSWER_TEXT}</Text>
+						</>
 					)}
-				</TouchableOpacity>
+				</View>
+				<Divider />
 				<SingleModeAnswer
 					navigation={navigation}
 					route={route}
@@ -144,19 +165,11 @@ const QuickMatch = (props: ConquerQuickMatchProps) => {
 					answerTime={ANSWER_TIME}
 					isAllowedAnswer={firstRaisedHand?._id === profile._id}
 					firstRaisedHand={firstRaisedHand}
-					question={{ type, values, answers }}
+					question={question}
 				/>
 			</ScrollView>
 		</View>
 	);
 };
-
-const styles = StyleSheet.create({
-	question: {
-		padding: MAIN_LAYOUT.SCREENS.CONQUER.QUESTION_BOX.PADDING,
-		borderRadius: MAIN_LAYOUT.SCREENS.CONQUER.QUESTION_BOX.BORDER_RADIUS,
-		marginBottom: MAIN_LAYOUT.SCREENS.CONQUER.QUESTION_BOX.MARGIN_BOTTOM,
-	},
-});
 
 export default QuickMatch;

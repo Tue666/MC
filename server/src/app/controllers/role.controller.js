@@ -156,7 +156,7 @@ class RoleController {
 
   async insert(req, res, next) {
     try {
-      let { name, permissions, description } = req.body;
+      let { name, permissions, ...rest } = req.body;
 
       const okRequiredFields = ValidateUtil.ensureRequiredFields(name);
       if (!okRequiredFields) {
@@ -191,24 +191,13 @@ class RoleController {
       const role = new Role({
         name,
         permissions,
-        description,
+        ...rest,
       });
       await role.save();
 
       res.status(201).json({
         msg: `Tạo vai trò [${_id}] thành công!`,
         role,
-      });
-    } catch (error) {
-      next({ status: 500, msg: error.message });
-    }
-  }
-
-  async test(req, res, next) {
-    try {
-      console.log("Test role");
-      res.status(201).json({
-        msg: `hahaha`,
       });
     } catch (error) {
       next({ status: 500, msg: error.message });

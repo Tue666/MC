@@ -30,9 +30,7 @@ const Snackbar = () => {
 					: undefined
 			}
 			action={action}
-			style={{
-				...(color && { backgroundColor: color }),
-			}}
+			style={color ? [{ backgroundColor: color }] : []}
 		>
 			{content}
 		</RNPSnackbar>

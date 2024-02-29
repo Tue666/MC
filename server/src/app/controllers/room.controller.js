@@ -23,7 +23,6 @@ class RoomController {
     this.rooms = {};
   }
 
-  // Testing
   findAllRoom() {
     return this.rooms;
   }
@@ -32,10 +31,12 @@ class RoomController {
     return this.rooms[resource];
   }
 
-  joinPublicRoom(room, client) {
-    const { resource, ...rest } = room;
-
-    const okRequiredFields = ValidateUtil.ensureRequiredFields(resource);
+  joinPublicRoom(resource, room, client) {
+    const okRequiredFields = ValidateUtil.ensureRequiredFields(
+      resource,
+      room,
+      client
+    );
     if (!okRequiredFields) {
       throw Error("Không tìm thấy tài nguyên!");
     }
@@ -60,7 +61,7 @@ class RoomController {
           key: null,
           owner: null,
           password: null,
-          ...rest,
+          ...room,
           clients: [],
         },
       };
@@ -70,14 +71,17 @@ class RoomController {
       (cl) => cl._id === client._id
     );
     if (!hasClient) {
-      this.rooms[resource][availableRoom].clients.push(client);
+      this.rooms[resource][availableRoom].clients.push({
+        ...client,
+        prepared: false,
+      });
     }
 
     return this.rooms[resource][availableRoom];
   }
 
-  leavePublicRoom(room, client) {
-    const { resource, _id: roomId } = room;
+  leavePublicRoom(resource, room, client) {
+    const { _id: roomId } = room;
     const { _id: clientId } = client;
 
     const okRequiredFields = ValidateUtil.ensureRequiredFields(
@@ -106,8 +110,8 @@ class RoomController {
     return cloneLeftRoom;
   }
 
-  preparedRoom(room, client) {
-    const { resource, _id: roomId } = room;
+  preparedRoom(resource, room, client) {
+    const { _id: roomId } = room;
     const { _id: clientId, prepared } = client;
 
     const okRequiredFields = ValidateUtil.ensureRequiredFields(

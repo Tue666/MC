@@ -4,7 +4,7 @@ import { ConstantConfig } from '../configs';
 const { LOGO } = ConstantConfig;
 
 const Logo = () => {
-	return <Image style={styles.container} source={require('../assets/images/logo.png')} />;
+	return <Image style={[styles.container]} source={require('../assets/images/logo.png')} />;
 };
 
 const styles = StyleSheet.create({

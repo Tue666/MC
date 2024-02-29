@@ -1,13 +1,13 @@
 import { useAuthentication } from '../hooks';
 import { AuthenticationStack } from './authentication';
 import { MainTab } from './main';
-import { Loading } from '.';
+import { Splash } from '.';
 
 const Main = () => {
 	const { isInitialized, isAuthenticated } = useAuthentication();
 
 	if (!isInitialized) {
-		return <Loading />;
+		return <Splash />;
 	}
 
 	if (isInitialized && !isAuthenticated) {

@@ -31,7 +31,7 @@ const Button = (props: ButtonProps) => {
 	return (
 		<TouchableOpacity
 			disabled={rest.disabled}
-			style={Object.assign({ ...styles.container }, style)}
+			style={[styles.container, style]}
 			onPress={onOverridePress}
 		>
 			<RNPButton

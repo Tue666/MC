@@ -26,4 +26,11 @@ const useStackStyles = () => {
 	return styles;
 };
 
-export default useStackStyles;
+export let stackStyles: ReturnType<typeof useStackStyles>;
+const StackStylesConfiguration = () => {
+	stackStyles = useStackStyles();
+
+	return null;
+};
+
+export default StackStylesConfiguration;

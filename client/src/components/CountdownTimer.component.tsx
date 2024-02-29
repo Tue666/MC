@@ -3,7 +3,7 @@ import { StyleSheet, View, ViewProps } from 'react-native';
 import { MD3TypescaleKey, Text } from 'react-native-paper';
 import { ConstantConfig } from '../configs';
 import { useTimer } from '../hooks';
-import { useStackStyles } from '../styles';
+import { stackStyles } from '../styles';
 
 const { COUNT_DOWN_TIMER } = ConstantConfig;
 
@@ -25,7 +25,6 @@ const CountdownTimer = (props: CountdownTimerProps) => {
 		...rest
 	} = props;
 	const { isExpired, days, hours, minutes, seconds } = useTimer(timer);
-	const stackStyles = useStackStyles();
 
 	useEffect(() => {
 		if (isExpired) onExpired && onExpired();
@@ -34,10 +33,10 @@ const CountdownTimer = (props: CountdownTimerProps) => {
 	if (isExpired) return null;
 
 	return (
-		<View style={{ ...stackStyles.row }} {...rest}>
+		<View style={[stackStyles.row]} {...rest}>
 			{timerSelected.includes('D') && (
 				<Fragment>
-					<View style={{ ...styles.timer }}>
+					<View style={[styles.timer]}>
 						<Text variant={timerVariant}>{days < 10 ? `0${days}` : days}</Text>
 					</View>
 					<Text variant={timerVariant}>:</Text>
@@ -45,7 +44,7 @@ const CountdownTimer = (props: CountdownTimerProps) => {
 			)}
 			{timerSelected.includes('H') && (
 				<Fragment>
-					<View style={{ ...styles.timer }}>
+					<View style={[styles.timer]}>
 						<Text variant={timerVariant}>{hours < 10 ? `0${hours}` : hours}</Text>
 					</View>
 					<Text variant={timerVariant}>:</Text>
@@ -53,13 +52,13 @@ const CountdownTimer = (props: CountdownTimerProps) => {
 			)}
 			{timerSelected.includes('M') && (
 				<Fragment>
-					<View style={{ ...styles.timer }}>
+					<View style={[styles.timer]}>
 						<Text variant={timerVariant}>{minutes < 10 ? `0${minutes}` : minutes}</Text>
 					</View>
 					<Text variant={timerVariant}>:</Text>
 				</Fragment>
 			)}
-			<View style={{ ...styles.timer }}>
+			<View style={[styles.timer]}>
 				<Text variant={timerVariant}>{seconds < 10 ? `0${seconds}` : seconds}</Text>
 			</View>
 		</View>

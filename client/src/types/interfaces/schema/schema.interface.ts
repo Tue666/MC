@@ -35,6 +35,7 @@ export interface QuestionSchema extends TimestampsSchema, SoftDeleteSchema {
 	_id: string;
 	content: string;
 	type: QuestionType;
+	resources: ResourceSchema['_id'][];
 	description: string;
 	values: Answer['value'][];
 	answers: Answer[];

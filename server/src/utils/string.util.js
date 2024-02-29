@@ -3,6 +3,18 @@ class StringUtil {
     return StringUtil.removeVietnamese(value).replace(/ /g, "_").toUpperCase();
   }
 
+  static toArray(value) {
+    if (Array.isArray(value)) {
+      return value;
+    }
+
+    if (typeof value === "string" || value instanceof String) {
+      return value.split(",");
+    }
+
+    return [];
+  }
+
   static randomGenerate(length) {
     let result = "";
     const characters =

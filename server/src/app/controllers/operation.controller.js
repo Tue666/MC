@@ -59,7 +59,7 @@ class OperationController {
 
   async insert(req, res, next) {
     try {
-      let { name, description } = req.body;
+      let { name, ...rest } = req.body;
 
       const okRequiredFields = ValidateUtil.ensureRequiredFields(name);
       if (!okRequiredFields) {
@@ -76,7 +76,7 @@ class OperationController {
 
       const operation = new Operation({
         name,
-        description,
+        ...rest,
       });
       await operation.save();
 

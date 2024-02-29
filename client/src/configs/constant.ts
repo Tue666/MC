@@ -2,6 +2,10 @@ import { Dimensions } from 'react-native';
 
 export const SPACE_GAP = 8;
 
+export const MATHJAX = {
+	FONT_SIZE: '13px',
+};
+
 export const BUTTON = {
 	ICON_SIZE: 20,
 };
@@ -85,22 +89,27 @@ export const MAIN_LAYOUT = {
 				BORDER_RADIUS: 10,
 			},
 			QUESTION_BOX: {
-				PADDING: 20,
+				PADDING: 2,
 				BORDER_RADIUS: 15,
 				MARGIN_BOTTOM: 10,
 			},
+			INSTRUCTION: {
+				MARGIN: 10,
+				PADDING_VERTICAL: 10,
+				PADDING_HORIZONTAL: 20,
+				BORDER_RADIUS: 20,
+			},
 			ANSWER_BOX: {
-				PADDING: 20,
+				PADDING: 2,
 				MARGIN: 4,
 				BORDER_RADIUS: 15,
-				NUMBER_IN_ROW: 2,
 			},
 			RAISE_HAND: {
 				ICON_SIZE: 100,
 			},
 			WAITING: {
 				AVATAR: {
-					ICON_SIZE: 250,
+					ICON_SIZE: 220,
 				},
 			},
 		},
