@@ -90,8 +90,9 @@ const AuthenticationProvider = (props: PropsWithChildren) => {
 				console.log(error);
 				await JWTUtil.setToken(null);
 				openDialog({
+					title: 'Lỗi',
+					content: `${(error as AxiosError).response?.data}`,
 					closable: false,
-					content: `Đã có lỗi xảy ra: ${(error as AxiosError).response?.data}`,
 				});
 				dispatch({
 					type: 'INITIALIZE',

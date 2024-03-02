@@ -23,6 +23,7 @@ export const MODAL = {
 		WIDTH: Dimensions.get('window').width - 100,
 		PADDING: 25,
 		BORDER_RADIUS: 15,
+		ICON_SIZE: 100,
 		AVATAR: {
 			ICON_SIZE: 130,
 			MARGIN_VERTICAL: 10,
@@ -111,6 +112,10 @@ export const MAIN_LAYOUT = {
 				AVATAR: {
 					ICON_SIZE: 220,
 				},
+			},
+			STATISTIC: {
+				ICON_SIZE: 400,
+				MARGIN_BOTTOM: 25,
 			},
 		},
 	},

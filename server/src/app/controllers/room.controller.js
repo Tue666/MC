@@ -139,8 +139,8 @@ class RoomController {
     return roomsInResource[roomId];
   }
 
-  deleteRoom(room) {
-    const { resource, _id } = room;
+  deleteRoom(resource, room) {
+    const { _id } = room;
     const okRequiredFields = ValidateUtil.ensureRequiredFields(resource, _id);
     if (!okRequiredFields) {
       throw Error("Không tìm thấy tài nguyên!");

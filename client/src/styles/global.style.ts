@@ -6,6 +6,9 @@ import { FONT_NAME } from '../theme/font';
 
 const getGlobalStyles = (theme: MD3Theme) =>
 	StyleSheet.create({
+		container: {
+			flex: 1,
+		},
 		bg: {
 			backgroundColor: theme.colors.background,
 		},
@@ -22,8 +25,15 @@ const getGlobalStyles = (theme: MD3Theme) =>
 			shadowRadius: 1.41,
 			elevation: 2,
 		},
+		full: {
+			width: '100%',
+			height: '100%',
+		},
 		fw: {
 			width: '100%',
+		},
+		fh: {
+			height: '100%',
 		},
 		text: {
 			fontFamily: FONT_NAME,

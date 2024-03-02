@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { StyleSheet, Vibration, View } from 'react-native';
+import { Vibration, View } from 'react-native';
 import { Text, useTheme } from 'react-native-paper';
 import Animated, { FadeInUp, StretchInX } from 'react-native-reanimated';
 import { SoundManager } from '../../../audios';
@@ -8,7 +8,7 @@ import { ConstantConfig } from '../../../configs';
 import { useSocketClient } from '../../../hooks';
 import { useAppSelector } from '../../../redux/hooks';
 import { AccountState, selectAccount } from '../../../redux/slices/account.slice';
-import { stackStyles } from '../../../styles';
+import { globalStyles, stackStyles } from '../../../styles';
 import { ConquerPrepareProps, IRoom } from '../../../types';
 import { openDialog } from '../../../utils';
 
@@ -17,7 +17,6 @@ const { MAIN_LAYOUT, VIBRATIONS } = ConstantConfig;
 const Prepare = (props: ConquerPrepareProps) => {
 	const { navigation, route } = props;
 	const { resource, room: joinedRoom, idleMode } = route.params;
-	const { _id, name } = resource;
 	const theme = useTheme();
 	const [isPrepared, setIsPrepared] = useState(false);
 	const [preparedCount, setPreparedCount] = useState(0);
@@ -69,7 +68,7 @@ const Prepare = (props: ConquerPrepareProps) => {
 		}
 
 		socketClient?.emit('conquer:client-server(prepare-participate)', {
-			resource: _id,
+			resource: resource._id,
 			room: joinedRoom,
 			client: {
 				...profile,
@@ -80,8 +79,8 @@ const Prepare = (props: ConquerPrepareProps) => {
 		setIsPrepared(!isPrepared);
 	};
 	return (
-		<View style={[styles.container, stackStyles.center]}>
-			<Text variant="titleLarge">{name}</Text>
+		<View style={[globalStyles.container, stackStyles.center]}>
+			<Text variant="titleLarge">{resource.name}</Text>
 			{idleMode === 'SINGLE' && (
 				<Animated.View entering={FadeInUp}>
 					<SingleWaiting animated={isPrepared} />
@@ -104,11 +103,5 @@ const Prepare = (props: ConquerPrepareProps) => {
 		</View>
 	);
 };
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-	},
-});
 
 export default Prepare;

@@ -39,8 +39,8 @@ const SignIn = (props: AuthenticationSignInProps) => {
 			} catch (error) {
 				resetForm();
 				openDialog({
-					content: `[Đăng nhập] Đã có lỗi xảy ra: ${(error as AxiosError).response?.data}`,
-					actions: [{ label: 'Đồng ý' }],
+					title: '[Đăng nhập] Lỗi',
+					content: `${(error as AxiosError).response?.data}`,
 				});
 			}
 		},

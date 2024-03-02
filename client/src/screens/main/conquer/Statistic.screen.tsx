@@ -1,28 +1,30 @@
 import { useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { Avatar, Text } from 'react-native-paper';
+import { View } from 'react-native';
+import { Text } from 'react-native-paper';
 import { StackActions } from '@react-navigation/native';
+import Animated, { BounceInDown, FadeInUp } from 'react-native-reanimated';
+import LottieView from 'lottie-react-native';
 import { SoundManager } from '../../../audios';
-import { Button, CircleBorder } from '../../../components';
+import { Button } from '../../../components';
 import { ConstantConfig } from '../../../configs';
 import { useAppSelector } from '../../../redux/hooks';
 import { selectAccount } from '../../../redux/slices/account.slice';
-import { stackStyles } from '../../../styles';
+import { globalStyles, stackStyles } from '../../../styles';
 import { ConquerStatisticProps } from '../../../types';
 
 const { MAIN_LAYOUT } = ConstantConfig;
 
 const Statistic = (props: ConquerStatisticProps) => {
 	const { navigation, route } = props;
-	const { client, isWinner } = route.params;
+	const { client, isCorrect } = route.params;
 	const popAction = StackActions.pop(3);
 	const { profile } = useAppSelector(selectAccount);
-	const won = isWinner && client._id === profile._id;
+	const isWinner = isCorrect && client._id === profile._id;
 
 	useEffect(() => {
 		SoundManager.stopSound('quick_match_bg.mp3');
 
-		if (won) {
+		if (isWinner) {
 			SoundManager.playSound('victory_bg.mp3');
 			SoundManager.playSound('victory_voice.mp3');
 			return;
@@ -31,28 +33,56 @@ const Statistic = (props: ConquerStatisticProps) => {
 		SoundManager.playSound('defeat_voice.mp3');
 	}, []);
 	return (
-		<View style={[styles.container, stackStyles.center]}>
-			<Text variant="titleLarge">{won ? 'Tiếp tục phát huy nhé :D' : 'Cố gắng lần sau nhé :3'}</Text>
-			<CircleBorder>
-				<Avatar.Text size={MAIN_LAYOUT.SCREENS.CONQUER.WAITING.AVATAR.ICON_SIZE} label="0" />
-			</CircleBorder>
-			<Button
-				mode="contained"
-				onPress={() => navigation.dispatch(popAction)}
-				style={[{ width: MAIN_LAYOUT.SCREENS.CONQUER.WAITING.AVATAR.ICON_SIZE }]}
-				soundName="button_click.mp3"
-				icon="keyboard-return"
+		<View style={[globalStyles.container, stackStyles.center]}>
+			{isWinner && (
+				<LottieView
+					source={require('../../../assets/animations/lottie/win.json')}
+					autoPlay
+					loop={false}
+					style={{
+						width: MAIN_LAYOUT.SCREENS.CONQUER.STATISTIC.ICON_SIZE,
+						height: MAIN_LAYOUT.SCREENS.CONQUER.STATISTIC.ICON_SIZE,
+					}}
+				/>
+			)}
+			{!isWinner && (
+				<LottieView
+					source={require('../../../assets/animations/lottie/lose.json')}
+					autoPlay
+					loop={false}
+					style={{
+						width: MAIN_LAYOUT.SCREENS.CONQUER.STATISTIC.ICON_SIZE,
+						height: MAIN_LAYOUT.SCREENS.CONQUER.STATISTIC.ICON_SIZE,
+					}}
+				/>
+			)}
+			<Animated.View
+				entering={FadeInUp.duration(500).delay(1000)}
+				style={[stackStyles.center, { marginBottom: MAIN_LAYOUT.SCREENS.CONQUER.STATISTIC.MARGIN_BOTTOM }]}
 			>
-				Quay về phòng chờ
-			</Button>
+				<Text variant="headlineSmall" style={[{ textTransform: 'uppercase' }]}>
+					{isWinner ? 'Tuyệt vời' : 'Cố lên'}
+				</Text>
+				<Text variant="titleSmall">
+					{isWinner ? 'Tiếp tục phát huy nhé!' : 'Thất bại là mẹ thành công!'}
+				</Text>
+			</Animated.View>
+			<Animated.View
+				entering={BounceInDown.delay(1500)}
+				style={[stackStyles.center, { marginBottom: MAIN_LAYOUT.SCREENS.CONQUER.STATISTIC.MARGIN_BOTTOM }]}
+			>
+				<Button
+					mode="contained"
+					onPress={() => navigation.dispatch(popAction)}
+					style={[{ width: MAIN_LAYOUT.SCREENS.CONQUER.WAITING.AVATAR.ICON_SIZE }]}
+					soundName="button_click.mp3"
+					icon="keyboard-return"
+				>
+					Quay về phòng chờ
+				</Button>
+			</Animated.View>
 		</View>
 	);
 };
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-	},
-});
 
 export default Statistic;

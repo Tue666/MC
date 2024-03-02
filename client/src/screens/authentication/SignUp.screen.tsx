@@ -48,8 +48,8 @@ const SignUp = (props: AuthenticationSignUpProps) => {
 			} catch (error) {
 				resetForm();
 				openDialog({
-					content: `[Đăng ký] Đã có lỗi xảy ra: ${(error as AxiosError).response?.data}`,
-					actions: [{ label: 'Đồng ý' }],
+					title: '[Đăng ký] Lỗi',
+					content: `${(error as AxiosError).response?.data}`,
 				});
 			}
 		},

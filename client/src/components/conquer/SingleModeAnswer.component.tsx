@@ -29,30 +29,62 @@ const calculateAnswered = (
 	return correctAnswers;
 };
 
+const buildSingleAnswered = (
+	value: IQuestion.Question['values'][number],
+	answered: IQuestion.Question['values']
+) => {
+	return [value];
+};
+
+const buildMultipleAnswered = (
+	value: IQuestion.Question['values'][number],
+	answered: IQuestion.Question['values']
+) => {
+	const answerExist = answered.indexOf(value) !== -1;
+
+	if (answerExist) {
+		return answered.filter((answer) => answer !== value);
+	}
+
+	return [...answered, value];
+};
+
+const buildAnswered = (
+	type: IQuestion.Question['type'],
+	value: IQuestion.Question['values'][number],
+	answered: IQuestion.Question['values']
+) => {
+	const builder = {
+		SINGLE: buildSingleAnswered,
+		MULTIPLE: buildMultipleAnswered,
+	};
+
+	return builder[type](value, answered);
+};
+
 export type State = 'IDLE' | 'CALCULATING_RESULTS';
 
 interface SingleModeAnswerProps {
 	navigation: ConquerQuickMatchProps['navigation'];
 	route: ConquerQuickMatchProps['route'];
-	isInAnswerTime: boolean;
 	answerTime: number;
-	isAllowedAnswer: boolean;
-	firstRaisedHand: IRoom.Room['clients'][number] | null;
 	question: IQuestion.Question;
+	firstRaisedHand: IRoom.Room['clients'][number] | null;
+	isInAnswerTime: boolean;
+	isAllowedAnswer: boolean;
 }
 
 const SingleModeAnswer = (props: SingleModeAnswerProps) => {
 	const {
 		navigation,
 		route,
-		isInAnswerTime,
 		answerTime,
-		isAllowedAnswer,
-		firstRaisedHand,
 		question,
+		firstRaisedHand,
+		isInAnswerTime,
+		isAllowedAnswer,
 	} = props;
 	const { resource, room } = route.params;
-	const { _id } = resource;
 	const { type, description, values, answers } = question;
 	const theme = useTheme();
 	const [state, setState] = useState<State>('IDLE');
@@ -60,30 +92,27 @@ const SingleModeAnswer = (props: SingleModeAnswerProps) => {
 	const [isConfirmedAnswer, setIsConfirmedAnswer] = useState(false);
 	const socketClient = useSocketClient();
 
-	const buildSingleAnswered = (value: IQuestion.Question['values'][number]) => {
-		return [value];
-	};
+	const buildColorAnswer = (value: IQuestion.Question['values'][number]) => {
+		let bgColor = globalStyles.paper.backgroundColor;
+		let textColor = theme.colors.onSurface;
 
-	const buildMultipleAnswered = (value: IQuestion.Question['values'][number]) => {
-		const answerExist = answered.indexOf(value) !== -1;
-
-		if (answerExist) {
-			return answered.filter((answer) => answer !== value);
-		} else {
-			return [...answered, value];
+		const choseAnswer = answered.indexOf(value) !== -1;
+		if (choseAnswer && state === 'IDLE') {
+			bgColor = theme.colors.primary;
+			textColor = theme.colors.onPrimary;
 		}
-	};
+		if (state === 'CALCULATING_RESULTS') {
+			const isCorrect = values.indexOf(value) !== -1;
+			if (isCorrect) {
+				bgColor = theme.colors.secondary;
+				textColor = theme.colors.onSecondary;
+			} else if (choseAnswer) {
+				bgColor = theme.colors.error;
+				textColor = theme.colors.onError;
+			}
+		}
 
-	const buildAnswered = (
-		type: IQuestion.Question['type'],
-		value: IQuestion.Question['values'][number]
-	) => {
-		const builder = {
-			SINGLE: buildSingleAnswered,
-			MULTIPLE: buildMultipleAnswered,
-		};
-
-		return builder[type](value);
+		return { bgColor, textColor };
 	};
 
 	useEffect(() => {
@@ -91,12 +120,12 @@ const SingleModeAnswer = (props: SingleModeAnswerProps) => {
 			const { question } = data;
 			const { type, value } = question;
 
-			const selectedAnswers = buildAnswered(type, value);
+			const selectedAnswers = buildAnswered(type, value, answered);
 			setAnswered(selectedAnswers);
 		});
 		socketClient?.on('[ERROR]conquer[quick-match]:server-client(selected-answer)', (error) => {
 			openDialog({
-				title: 'Lỗi',
+				title: '[Chọn đáp án] Lỗi',
 				content: error,
 			});
 		});
@@ -105,40 +134,38 @@ const SingleModeAnswer = (props: SingleModeAnswerProps) => {
 			const { answered, client } = data;
 			const { correctAnswers } = answered;
 
-			const isWinner = correctAnswers.length === values.length;
-			SoundManager.playSound(isWinner ? 'correct.mp3' : 'incorrect.mp3');
+			const isCorrect = correctAnswers.length === values.length;
 			Vibration.vibrate(VIBRATIONS[1]);
+			SoundManager.playSound(isCorrect ? 'correct.mp3' : 'incorrect.mp3');
+
 			setState('CALCULATING_RESULTS');
 			await HelperUtil.sleep(CALCULATING_DELAY_TIME);
 
-			if (isWinner) {
+			if (isCorrect) {
 				SoundManager.playSound('won.mp3');
-				openModal({
+				openModal<'WINNER'>({
 					closable: false,
 					component: 'WINNER',
 					params: {
 						client,
-						isWinner,
+						isCorrect,
 					},
 				});
 				return;
 			}
 
-			// Everyone loses
-			navigation.navigate('Statistic', { client, isWinner });
+			navigation.navigate('Statistic', { client, isCorrect });
 		});
 		socketClient?.on('[ERROR]conquer[quick-match]:server-client(submit-answers)', (error) => {
 			openDialog({
-				title: 'Lỗi',
+				title: '[Kiểm tra đáp án] Lỗi',
 				content: error,
 			});
 		});
 	}, []);
 	const onPressAnswer = (value: number) => {
 		socketClient?.emit('conquer[quick-match]:client-server(selected-answer)', {
-			room: {
-				_id: room._id,
-			},
+			room,
 			question: {
 				type,
 				value,
@@ -146,16 +173,15 @@ const SingleModeAnswer = (props: SingleModeAnswerProps) => {
 		});
 	};
 	const onProcessResults = async () => {
-		setIsConfirmedAnswer(true);
 		if (!isAllowedAnswer) return;
+
+		setIsConfirmedAnswer(true);
 
 		const correctAnswers = calculateAnswered(answered, values);
 
 		socketClient?.emit('conquer[quick-match]:client-server(submit-answers)', {
-			room: {
-				resource: _id,
-				_id: room._id,
-			},
+			resource: resource._id,
+			room,
 			answered: {
 				correctAnswers,
 			},
@@ -171,23 +197,7 @@ const SingleModeAnswer = (props: SingleModeAnswerProps) => {
 				{description && <Instruction />}
 				{answers.map((answer) => {
 					const { _id, value, content } = answer;
-					let bgColor = globalStyles.paper.backgroundColor;
-					let textColor = theme.colors.onSurface;
-					const choseAnswer = answered.indexOf(value) !== -1;
-					if (choseAnswer && state === 'IDLE') {
-						bgColor = theme.colors.primary;
-						textColor = theme.colors.onPrimary;
-					}
-					if (state === 'CALCULATING_RESULTS') {
-						const isCorrect = values.indexOf(value) !== -1;
-						if (isCorrect) {
-							bgColor = theme.colors.secondary;
-							textColor = theme.colors.onSecondary;
-						} else if (choseAnswer) {
-							bgColor = theme.colors.error;
-							textColor = theme.colors.onError;
-						}
-					}
+					const { bgColor, textColor } = buildColorAnswer(value);
 
 					return (
 						<Box

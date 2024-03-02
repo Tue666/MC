@@ -1,5 +1,5 @@
 import { useModal } from '../hooks';
-import { ModalState } from '../redux/slices/modal.slice';
+import { ModalComponent, ModalState } from '../redux/slices/modal.slice';
 
 let modalRef: ReturnType<typeof useModal>;
 const ModalUtilConfiguration = () => {
@@ -8,8 +8,8 @@ const ModalUtilConfiguration = () => {
 	return null;
 };
 
-export const openModal = (state: Partial<ModalState>) => {
-	modalRef.openModal(state);
+export const openModal = <T extends ModalComponent>(state: Partial<ModalState<T>>) => {
+	modalRef.openModal<T>(state);
 };
 
 export const closeModal = () => {

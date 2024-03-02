@@ -6,8 +6,8 @@ const raised = {};
 const onClientRaiseHand = (io, socket) => {
   socket.on("conquer[quick-match]:client-server(raise-hand)", (data) => {
     try {
-      const { room, client } = data;
-      const { resource, _id } = room;
+      const { resource, room, client } = data;
+      const { _id } = room;
 
       const okRequiredFields = ValidateUtil.ensureRequiredFields(
         resource,
@@ -68,8 +68,8 @@ const onSelectedAnswer = (io, socket) => {
 const onSubmitAnswers = (io, socket) => {
   socket.on("conquer[quick-match]:client-server(submit-answers)", (data) => {
     try {
-      const { room, answered, client } = data;
-      const { resource, _id } = room;
+      const { resource, room, answered, client } = data;
+      const { _id } = room;
       const { correctAnswers } = answered;
 
       const okRequiredFields = ValidateUtil.ensureRequiredFields(
@@ -87,7 +87,7 @@ const onSubmitAnswers = (io, socket) => {
         data
       );
 
-      RoomController.deleteRoom(room);
+      RoomController.deleteRoom(resource, room);
     } catch (error) {
       socket.emit(
         "[ERROR]conquer[quick-match]:server-client(submit-answers)",

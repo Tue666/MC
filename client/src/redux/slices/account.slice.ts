@@ -94,8 +94,9 @@ export const initAccount = () => async (dispatch: AppDispatch) => {
 		);
 	} catch (error) {
 		openDialog({
+			title: 'Lỗi',
+			content: `${(error as AxiosError).response?.data}`,
 			closable: false,
-			content: `Đã có lỗi xảy ra: ${(error as AxiosError).response?.data}`,
 		});
 	}
 };

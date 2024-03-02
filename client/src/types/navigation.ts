@@ -36,7 +36,7 @@ export type ConquerStackList = {
 	};
 	Statistic: {
 		client: IRoom.Room['clients'][number];
-		isWinner: boolean;
+		isCorrect: boolean;
 	};
 	QuickMatch: {
 		resource: Resources[keyof Resources];

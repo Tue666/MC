@@ -9,7 +9,7 @@ import { ConstantConfig } from '../../../configs';
 import { useSocketClient } from '../../../hooks';
 import { useAppSelector } from '../../../redux/hooks';
 import { AccountState, selectAccount } from '../../../redux/slices/account.slice';
-import { stackStyles } from '../../../styles';
+import { globalStyles, stackStyles } from '../../../styles';
 import { ConquerWaitingProps, IRoom } from '../../../types';
 import { openDialog } from '../../../utils';
 
@@ -20,7 +20,6 @@ const MAX_CAPACITY = 1;
 const Waiting = (props: ConquerWaitingProps) => {
 	const { navigation, route } = props;
 	const { resource, idleMode } = route.params;
-	const { _id, name } = resource;
 	const isFocused = useIsFocused();
 	const theme = useTheme();
 	const [isParticipating, setIsParticipating] = useState(false);
@@ -78,7 +77,7 @@ const Waiting = (props: ConquerWaitingProps) => {
 			SoundManager.stopSound('waiting_bg.mp3');
 
 			socketClient?.emit('conquer:client-server(cancel-participating)', {
-				resource: _id,
+				resource: resource._id,
 				room: joinedRoom,
 				client: profile,
 			});
@@ -89,7 +88,7 @@ const Waiting = (props: ConquerWaitingProps) => {
 		SoundManager.playSound('waiting_bg.mp3', { repeat: true });
 		SoundManager.playSound('participate.mp3');
 		socketClient?.emit('conquer:client-server(participating)', {
-			resource: _id,
+			resource: resource._id,
 			room: { maxCapacity: MAX_CAPACITY },
 			client: profile,
 		});
@@ -97,8 +96,8 @@ const Waiting = (props: ConquerWaitingProps) => {
 	};
 	const onPressFindRoom = () => {};
 	return (
-		<View style={[styles.container, stackStyles.center]}>
-			<Text variant="titleLarge">{name}</Text>
+		<View style={[globalStyles.container, stackStyles.center]}>
+			<Text variant="titleLarge">{resource.name}</Text>
 			{idleMode === 'SINGLE' && (
 				<Animated.View entering={FadeInUp}>
 					<SingleWaiting animated={isParticipating} />
@@ -135,9 +134,6 @@ const Waiting = (props: ConquerWaitingProps) => {
 };
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-	},
 	gap: {
 		marginBottom: SPACE_GAP,
 	},

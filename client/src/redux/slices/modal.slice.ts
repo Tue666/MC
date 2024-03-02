@@ -1,16 +1,25 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { WinnerProps } from '../../components/modal';
 import { RootState } from '../store';
 
-export type ModalComponent = 'DEFAULT' | 'WINNER';
+export type ModalComponent = 'DEFAULT' | 'WINNER' | 'ABC';
 
-export interface ModalState {
-	isOpen: boolean;
-	closable?: boolean;
-	component: ModalComponent;
-	params?: any;
+export interface ModalProps {
+	DEFAULT: {};
+	WINNER: WinnerProps;
+	ABC: {
+		haha: string;
+	};
 }
 
-export const initialState: ModalState = {
+export interface ModalState<T extends ModalComponent> {
+	isOpen: boolean;
+	closable?: boolean;
+	component: T;
+	params?: ModalProps[T];
+}
+
+export const initialState: ModalState<'DEFAULT'> = {
 	isOpen: false,
 	closable: true,
 	component: 'DEFAULT',
@@ -20,14 +29,17 @@ export const slice = createSlice({
 	name: 'modal',
 	initialState,
 	reducers: {
-		renderModal: (state: ModalState, action: PayloadAction<ModalState>) => {
+		renderModal: (
+			state: ModalState<ModalComponent>,
+			action: PayloadAction<ModalState<ModalComponent>>
+		) => {
 			const { isOpen, closable, component, params } = action.payload;
 			state.isOpen = isOpen;
 			state.closable = closable;
 			state.component = component;
 			state.params = params;
 		},
-		disappearModal: (state: ModalState) => {
+		disappearModal: (state: ModalState<'DEFAULT'>) => {
 			const { isOpen, closable, component, params } = initialState;
 			state.isOpen = isOpen;
 			state.closable = closable;

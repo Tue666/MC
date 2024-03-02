@@ -27,6 +27,7 @@ const MainLayout = (props: PropsWithChildren & Partial<MainLayoutProps>) => {
 		<View
 			style={[
 				styles.container,
+				globalStyles.container,
 				globalStyles.bg,
 				{ paddingBottom: isHiddenBar ? 0 : MAIN_LAYOUT.PADDING_BOTTOM },
 			]}
@@ -50,7 +51,6 @@ const MainLayout = (props: PropsWithChildren & Partial<MainLayoutProps>) => {
 
 const styles = StyleSheet.create({
 	container: {
-		flex: 1,
 		padding: MAIN_LAYOUT.PADDING,
 	},
 	header: {
