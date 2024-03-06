@@ -3,7 +3,7 @@ const ValidateUtil = require("../../utils/validate.util");
 const StringUtil = require("../../utils/string.util");
 
 class QuestionController {
-  async insert(req, res, next) {
+  async create(req, res, next) {
     try {
       let { content, type, values, answers, ...rest } = req.body;
 
@@ -50,37 +50,27 @@ class QuestionController {
     }
   }
 
-  async findByRandom(req, res, next) {
-    try {
-      let { size, resources } = req.query;
+  async findRandomQuestions(queryParams) {
+    let { size, resources } = queryParams;
 
-      const okRequiredFields = ValidateUtil.ensureRequiredFields(size);
-      if (!okRequiredFields) {
-        next({ status: 200, msg: "Các giá trị bắt buộc không được bỏ trống!" });
-        return;
-      }
+    size = size ? parseInt(size) : 1;
 
-      size = parseInt(size);
+    const queries = {};
 
-      const queries = {};
-
-      if (resources !== null && resources !== undefined) {
-        resources = StringUtil.toArray(resources);
-        queries["resources"] = { $in: resources };
-      }
-
-      const questions = await Question.aggregate([
-        { $match: queries },
-        { $sample: { size } },
-      ]);
-
-      res.status(201).json({
-        questions,
-      });
-    } catch (error) {
-      next({ status: 500, msg: error.message });
+    if (resources !== null && resources !== undefined) {
+      resources = StringUtil.toArray(resources);
+      queries["resources"] = { $in: resources };
     }
+
+    const questions = await Question.aggregate([
+      { $match: queries },
+      { $sample: { size } },
+    ]);
+
+    return questions;
   }
 }
 
-module.exports = new QuestionController();
+module.exports = {
+  QuestionController: new QuestionController(),
+};

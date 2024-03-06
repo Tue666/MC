@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Dimensions, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { Text, useTheme } from 'react-native-paper';
-import { Box } from '../../../components';
+import { TouchableBox } from '../../../components';
 import { ConstantConfig, ResourceConfig } from '../../../configs';
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
 import { initAccount, selectAccount } from '../../../redux/slices/account.slice';
@@ -71,7 +71,7 @@ const Conquer = (props: ConquerProps) => {
 					}
 
 					return (
-						<Box
+						<TouchableBox
 							key={resourceAllowed}
 							onPress={() => onPressResource({ resource: permissionAllowed, idleMode })}
 							onLongPress={() => onLongPressResource(name, description)}
@@ -87,7 +87,7 @@ const Conquer = (props: ConquerProps) => {
 									({label})
 								</Text>
 							)}
-						</Box>
+						</TouchableBox>
 					);
 				})}
 			</View>

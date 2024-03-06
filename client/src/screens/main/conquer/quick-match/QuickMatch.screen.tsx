@@ -2,13 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 import { ScrollView, TouchableOpacity, View } from 'react-native';
 import { Avatar, Divider, Text, useTheme } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { AxiosError } from 'axios';
-import { QuestionAPI } from '../../../../apis';
 import { SoundManager } from '../../../../audios';
 import {
 	CircleBorder,
 	CountdownTimer,
-	Loading,
 	SingleModeAnswer,
 	SingleModeQuestion,
 } from '../../../../components';
@@ -17,7 +14,7 @@ import { useSocketClient } from '../../../../hooks';
 import { useAppSelector } from '../../../../redux/hooks';
 import { selectAccount } from '../../../../redux/slices/account.slice';
 import { stackStyles } from '../../../../styles';
-import { ConquerQuickMatchProps, IQuestion, IRoom } from '../../../../types';
+import { ConquerQuickMatchProps, IRoom } from '../../../../types';
 import { openDialog } from '../../../../utils';
 
 const { MAIN_LAYOUT } = ConstantConfig;
@@ -30,48 +27,17 @@ export type State = 'IN_COUNTDOWN_TIME' | 'IN_RAISE_HAND_TIME' | 'IN_ANSWER_TIME
 
 const QuickMatch = (props: ConquerQuickMatchProps) => {
 	const { navigation, route } = props;
-	const { resource, room: joinedRoom } = route.params;
+	const { resource, room: joinedRoom, roomMode, question } = route.params;
 	const theme = useTheme();
 	const raiseHandRef = useRef<boolean | null>(false);
 	const scrollViewRef = useRef<ScrollView | null>(null);
 	const [state, setState] = useState<State>('IN_COUNTDOWN_TIME');
-	const [question, setQuestion] = useState<IQuestion.Question | null>(null);
 	const [firstRaisedHand, setFirstRaisedHand] = useState<IRoom.Room['clients'][number] | null>(null);
 	const { profile } = useAppSelector(selectAccount);
 	const socketClient = useSocketClient();
 
 	useEffect(() => {
 		SoundManager.playSound('quick_match_bg.mp3', { repeat: true });
-
-		const findByRandom = async () => {
-			try {
-				const { questions, error } = await QuestionAPI.findByRandom();
-				if (error) {
-					openDialog({
-						title: '[Tìm câu hỏi] Lỗi',
-						content: error,
-					});
-					return;
-				}
-
-				if (!questions.length) {
-					openDialog({
-						title: '[Tìm câu hỏi] Lỗi',
-						content: `Không tìm thấy câu hỏi nào!`,
-					});
-					return;
-				}
-
-				setQuestion(questions[0]);
-			} catch (error) {
-				openDialog({
-					title: '[Tìm câu hỏi] Lỗi',
-					content: `${(error as AxiosError).response?.data}`,
-				});
-			}
-		};
-
-		findByRandom();
 
 		return () => {
 			raiseHandRef.current = null;
@@ -104,13 +70,12 @@ const QuickMatch = (props: ConquerQuickMatchProps) => {
 		raiseHandRef.current = true;
 
 		socketClient?.emit('conquer[quick-match]:client-server(raise-hand)', {
+			mode: roomMode,
 			resource: resource._id,
 			room: joinedRoom,
 			client: profile,
 		});
 	};
-
-	if (!question) return <Loading />;
 
 	return (
 		<View style={[stackStyles.center]}>

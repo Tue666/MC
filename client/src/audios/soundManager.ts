@@ -7,7 +7,7 @@ export type SoundName =
 	| 'defeat_voice.mp3'
 	| 'incorrect.mp3'
 	| 'join.mp3'
-	| 'participate.mp3'
+	| 'matching.mp3'
 	| 'prepare.mp3'
 	| 'quick_match_bg.mp3'
 	| 'victory_bg.mp3'
@@ -22,7 +22,7 @@ export const SOUNDS: SoundName[] = [
 	'defeat_voice.mp3',
 	'incorrect.mp3',
 	'join.mp3',
-	'participate.mp3',
+	'matching.mp3',
 	'prepare.mp3',
 	'quick_match_bg.mp3',
 	'victory_bg.mp3',
@@ -51,15 +51,12 @@ class SoundManager {
 	static initSounds(): void {
 		for (let i = 0; i < SOUNDS.length; i++) {
 			const soundName = SOUNDS[i];
-			console.log(`Start load sound ${soundName}`);
 
 			soundMapping[soundName] = new Sound(soundName, Sound.MAIN_BUNDLE, (error) => {
 				if (error) {
 					console.log(`Failed to load sound ${soundName}: ${error.message}`);
 					return;
 				}
-
-				console.log(`Load sound ${soundName} success`);
 			});
 		}
 	}

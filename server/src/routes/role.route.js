@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
 
-const roleController = require("../app/controllers/role.controller");
+const { RoleController } = require("../app/controllers/role.controller");
 
-router.patch("/status", roleController.changeStatus);
-router.post("/_ids", roleController.findByIds);
-router.post("/", roleController.insert);
+router.patch("/", RoleController.partialUpdate.bind(RoleController));
+router.post("/_ids", RoleController.findByIds);
+router.post("/", RoleController.create);
 
 module.exports = router;

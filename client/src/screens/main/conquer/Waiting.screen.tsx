@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import { Text, useTheme } from 'react-native-paper';
 import { useIsFocused } from '@react-navigation/native';
 import Animated, { FadeInUp, StretchInX } from 'react-native-reanimated';
@@ -13,18 +13,19 @@ import { globalStyles, stackStyles } from '../../../styles';
 import { ConquerWaitingProps, IRoom } from '../../../types';
 import { openDialog } from '../../../utils';
 
-const { MAIN_LAYOUT, SPACE_GAP } = ConstantConfig;
+const { MAIN_LAYOUT, ROOM } = ConstantConfig;
 
-const MAX_CAPACITY = 1;
+const MAX_CAPACITY = 2;
+const MAX_WAITING_TIME = 300;
 
 const Waiting = (props: ConquerWaitingProps) => {
 	const { navigation, route } = props;
 	const { resource, idleMode } = route.params;
 	const isFocused = useIsFocused();
 	const theme = useTheme();
-	const [isParticipating, setIsParticipating] = useState(false);
+	const [isMatching, setIsMatching] = useState(false);
 	const [joinedRoom, setJoinedRoom] = useState<IRoom.Room | null>(null);
-	const participateRef = useRef<boolean | null>(false);
+	const matchingRef = useRef<boolean | null>(false);
 	const { profile } = useAppSelector(selectAccount);
 	const socketClient = useSocketClient();
 
@@ -34,65 +35,71 @@ const Waiting = (props: ConquerWaitingProps) => {
 		}
 
 		return () => {
-			participateRef.current = null;
+			matchingRef.current = null;
 		};
 	}, [isFocused]);
 	useEffect(() => {
 		socketClient?.on(
-			'conquer:server-client(participating)',
+			'conquer:server-client(matching)',
 			(room: IRoom.Room, client: AccountState['profile']) => {
 				setJoinedRoom(room);
 
 				if (client._id === profile._id) {
-					participateRef.current = false;
+					matchingRef.current = false;
 				}
 			}
 		);
-		socketClient?.on('[ERROR]conquer:server-client(participating)', (error) => {
-			setIsParticipating(false);
+		socketClient?.on('[ERROR]conquer:server-client(matching)', (error) => {
+			SoundManager.stopSound('waiting_bg.mp3');
+			setIsMatching(false);
 			openDialog({
 				title: '[Ghép ngẫu nhiên] Lỗi',
 				content: error,
 			});
 		});
-		socketClient?.on('[ERROR]conquer:server-client(cancel-participating)', (error) => {
-			setIsParticipating(true);
+		socketClient?.on('[ERROR]conquer:server-client(cancel-matching)', (error) => {
+			setIsMatching(true);
 			openDialog({
 				title: '[Hủy] Lỗi',
 				content: error,
 			});
 		});
 
-		socketClient?.on('conquer:server-client(prepare-participate)', (joinedRoom: IRoom.Room) => {
-			navigation.navigate('Prepare', { resource, room: joinedRoom, idleMode });
-			setIsParticipating(false);
+		socketClient?.on('conquer:server-client(start-preparing)', (joinedRoom: IRoom.Room) => {
+			setIsMatching(false);
+			navigation.navigate('Prepare', { resource, room: joinedRoom, roomMode: ROOM.MODE.auto, idleMode });
 		});
 	}, []);
-	const onPressParticipate = () => {
-		if (participateRef.current === true) return;
+	const onCountdownComplete = () => {
+		onPressAutoMatching();
+	};
+	const onPressAutoMatching = () => {
+		if (matchingRef.current === true) return;
 
-		participateRef.current = true;
+		matchingRef.current = true;
 
-		if (isParticipating) {
+		if (isMatching) {
 			SoundManager.stopSound('waiting_bg.mp3');
 
-			socketClient?.emit('conquer:client-server(cancel-participating)', {
+			socketClient?.emit('conquer:client-server(cancel-matching)', {
+				mode: ROOM.MODE.auto,
 				resource: resource._id,
 				room: joinedRoom,
 				client: profile,
 			});
-			setIsParticipating(false);
+			setIsMatching(false);
 			return;
 		}
 
 		SoundManager.playSound('waiting_bg.mp3', { repeat: true });
-		SoundManager.playSound('participate.mp3');
-		socketClient?.emit('conquer:client-server(participating)', {
+		SoundManager.playSound('matching.mp3');
+		socketClient?.emit('conquer:client-server(matching)', {
+			mode: ROOM.MODE.auto,
 			resource: resource._id,
 			room: { maxCapacity: MAX_CAPACITY },
 			client: profile,
 		});
-		setIsParticipating(true);
+		setIsMatching(true);
 	};
 	const onPressFindRoom = () => {};
 	return (
@@ -100,21 +107,21 @@ const Waiting = (props: ConquerWaitingProps) => {
 			<Text variant="titleLarge">{resource.name}</Text>
 			{idleMode === 'SINGLE' && (
 				<Animated.View entering={FadeInUp}>
-					<SingleWaiting animated={isParticipating} />
+					<SingleWaiting animated={isMatching} duration={MAX_WAITING_TIME} onComplete={onCountdownComplete} />
 				</Animated.View>
 			)}
 			<Animated.View entering={StretchInX}>
 				<Button
 					mode="contained"
-					loading={isParticipating}
-					buttonColor={isParticipating ? theme.colors.error : theme.colors.primary}
-					onPress={onPressParticipate}
+					loading={isMatching}
+					buttonColor={isMatching ? theme.colors.error : theme.colors.primary}
+					onPress={onPressAutoMatching}
 					style={[{ width: MAIN_LAYOUT.SCREENS.CONQUER.WAITING.AVATAR.ICON_SIZE }]}
 					soundName="button_click.mp3"
-					icon={isParticipating ? 'cancel' : 'person-search'}
-					iconColor={isParticipating ? theme.colors.onError : theme.colors.onPrimary}
+					icon={isMatching ? 'cancel' : 'person-search'}
+					iconColor={isMatching ? theme.colors.onError : theme.colors.onPrimary}
 				>
-					{isParticipating ? `Hủy (${joinedRoom?.clients?.length ?? 0}/${MAX_CAPACITY})` : 'Ghép ngẫu nhiên'}
+					{isMatching ? `Hủy (${joinedRoom?.clients?.length ?? 0}/${MAX_CAPACITY})` : 'Ghép ngẫu nhiên'}
 				</Button>
 			</Animated.View>
 			<Animated.View entering={StretchInX}>
@@ -132,11 +139,5 @@ const Waiting = (props: ConquerWaitingProps) => {
 		</View>
 	);
 };
-
-const styles = StyleSheet.create({
-	gap: {
-		marginBottom: SPACE_GAP,
-	},
-});
 
 export default Waiting;

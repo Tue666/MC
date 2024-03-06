@@ -1,12 +1,74 @@
 const { isValidObjectId, Types } = require("mongoose");
 const { Account, Student, ACCOUNT_TYPES } = require("../models/account.model");
 const BcryptUtil = require("../../utils/bcrypt.util");
+const CloudinaryUtil = require("../../utils/cloundinary.util");
 const JWTUtil = require("../../utils/jwt.util");
 const ValidateUtil = require("../../utils/validate.util");
 
 const { ObjectId } = Types;
 
 class AccountController {
+  async updateAvatar(req, res, next) {
+    const cloudinaryUploaded = [];
+    try {
+      const avatar = req.file;
+      let { _id } = req.account;
+      const { avatar_url } = req.body;
+
+      if (!isValidObjectId(_id)) {
+        next({ status: 200, msg: "Các giá trị bắt buộc không được bỏ trống!" });
+        return;
+      }
+
+      _id = ObjectId(_id);
+
+      // Must have avatar to update
+      if (!avatar && !avatar_url) {
+        next({ status: 200, msg: "Các giá trị bắt buộc không được bỏ trống!" });
+        return;
+      }
+
+      const transformedData = {};
+
+      // Transform avatar into path
+      if (avatar) {
+        const { public_id } = await CloudinaryUtil.upload(avatar.path, {
+          folder: "account/avatar",
+        });
+        transformedData["avatar"] = public_id;
+        cloudinaryUploaded.push(public_id);
+      } else if (avatar_url) {
+        transformedData["avatar"] = avatar_url;
+      }
+
+      const account = await Account.findByIdAndUpdate(
+        _id,
+        {
+          $set: transformedData,
+        },
+        {
+          new: true,
+        }
+      );
+
+      res.status(200).json({
+        msg: `Cập nhật avatar [${_id}] thành công!`,
+        account,
+      });
+    } catch (error) {
+      // Remove images were uploaded to cloudinary when insert failed
+      if (cloudinaryUploaded.length > 0) {
+        await Promise.all(
+          cloudinaryUploaded.map(async (image) => {
+            await CloudinaryUtil.destroy(image);
+          })
+        );
+      }
+
+      next({ status: 500, msg: error.message });
+    }
+  }
+
   async signIn(req, res, next) {
     try {
       const { phone_number, password } = req.body;
@@ -166,4 +228,6 @@ class AccountController {
   }
 }
 
-module.exports = new AccountController();
+module.exports = {
+  AccountController: new AccountController(),
+};

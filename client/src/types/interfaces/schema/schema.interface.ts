@@ -44,7 +44,11 @@ export interface QuestionSchema extends TimestampsSchema, SoftDeleteSchema {
 // =========================================================================================
 // ===================================== ROOM SCHEMA =======================================
 
-export type RoomMode = 'PUBLIC' | 'MULTIPLE';
+export type RoomMode = 'AUTO' | 'PUBLIC';
+
+export type RoomModeMapping = {
+	[K in RoomMode as `${Lowercase<K>}`]: K;
+};
 
 export interface ClientSchema {
 	_id: string;

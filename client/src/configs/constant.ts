@@ -1,4 +1,16 @@
 import { Dimensions } from 'react-native';
+import { ISchema } from '../types';
+
+export type RoomCons = {
+	MODE: ISchema.RoomModeMapping;
+};
+
+export const ROOM: RoomCons = {
+	MODE: {
+		auto: 'AUTO',
+		public: 'PUBLIC',
+	},
+};
 
 export const SPACE_GAP = 8;
 
@@ -44,7 +56,7 @@ export const SNACKBAR = {
 };
 
 export const CIRCLE_BORDER = {
-	PADDING: 10,
+	PADDING: 5,
 	MARGIN_VERTICAL: 25,
 	BORDER_WIDTH: 5,
 };

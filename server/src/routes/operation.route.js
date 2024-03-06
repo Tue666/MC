@@ -1,9 +1,11 @@
 const express = require("express");
 const router = express.Router();
 
-const operationController = require("../app/controllers/operation.controller");
+const {
+  OperationController,
+} = require("../app/controllers/operation.controller");
 
-router.patch("/status", operationController.changeStatus);
-router.post("/", operationController.insert);
+router.patch("/", OperationController.partialUpdate.bind(OperationController));
+router.post("/", OperationController.create);
 
 module.exports = router;

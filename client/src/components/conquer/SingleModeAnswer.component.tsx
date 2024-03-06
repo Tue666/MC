@@ -7,7 +7,7 @@ import { useSocketClient } from '../../hooks';
 import { globalStyles, stackStyles } from '../../styles';
 import { ConquerQuickMatchProps, IQuestion, IRoom } from '../../types';
 import { HelperUtil, openDialog, openModal } from '../../utils';
-import { Box, Button, CountdownProgress, Instruction, MathContent } from '..';
+import { Button, CountdownProgress, Instruction, MathContent, TouchableBox } from '..';
 
 const { MAIN_LAYOUT, VIBRATIONS } = ConstantConfig;
 
@@ -84,7 +84,7 @@ const SingleModeAnswer = (props: SingleModeAnswerProps) => {
 		isInAnswerTime,
 		isAllowedAnswer,
 	} = props;
-	const { resource, room } = route.params;
+	const { resource, room, roomMode } = route.params;
 	const { type, description, values, answers } = question;
 	const theme = useTheme();
 	const [state, setState] = useState<State>('IDLE');
@@ -134,6 +134,10 @@ const SingleModeAnswer = (props: SingleModeAnswerProps) => {
 			const { answered, client } = data;
 			const { correctAnswers } = answered;
 
+			if (!isConfirmedAnswer) {
+				setIsConfirmedAnswer(true);
+			}
+
 			const isCorrect = correctAnswers.length === values.length;
 			Vibration.vibrate(VIBRATIONS[1]);
 			SoundManager.playSound(isCorrect ? 'correct.mp3' : 'incorrect.mp3');
@@ -180,6 +184,7 @@ const SingleModeAnswer = (props: SingleModeAnswerProps) => {
 		const correctAnswers = calculateAnswered(answered, values);
 
 		socketClient?.emit('conquer[quick-match]:client-server(submit-answers)', {
+			mode: roomMode,
 			resource: resource._id,
 			room,
 			answered: {
@@ -200,14 +205,14 @@ const SingleModeAnswer = (props: SingleModeAnswerProps) => {
 					const { bgColor, textColor } = buildColorAnswer(value);
 
 					return (
-						<Box
+						<TouchableBox
 							key={_id}
 							onPress={() => onPressAnswer(value)}
 							style={[styles.answer, globalStyles.fw, { backgroundColor: bgColor }]}
 							soundName="button_click.mp3"
 						>
 							<MathContent content={content} style={[{ backgroundColor: bgColor }]} textColor={textColor} />
-						</Box>
+						</TouchableBox>
 					);
 				})}
 			</View>

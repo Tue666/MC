@@ -3,38 +3,64 @@ const StringUtil = require("../../utils/string.util");
 const ValidateUtil = require("../../utils/validate.util");
 
 class OperationController {
-  async changeStatus(req, res, next) {
-    try {
-      let { _id, status } = req.body;
+  buildStatusValue(value) {
+    const status = value.toUpperCase();
 
-      const okRequiredFields = ValidateUtil.ensureRequiredFields(_id, status);
+    const okIncludeOne = ValidateUtil.ensureIncludeOne(
+      status,
+      Object.values(OPERATION_STATUS)
+    );
+    if (!okIncludeOne) {
+      throw Error(
+        `Trạng thái [${status}] không tồn tại. Hãy thử lại với: ${Object.values(
+          OPERATION_STATUS
+        ).join(", ")}.`
+      );
+    }
+
+    return status;
+  }
+
+  buildValue(value) {
+    return value;
+  }
+
+  valueUpdater(field, value) {
+    const updater = {
+      status: this.buildStatusValue,
+    };
+
+    if (!updater[field]) return this.buildValue(value);
+
+    return updater[field](value);
+  }
+
+  buildUpdate(fields) {
+    const builder = {};
+
+    for (const [field, value] of Object.entries(fields)) {
+      builder[field] = this.valueUpdater(field, value);
+    }
+
+    return builder;
+  }
+
+  async partialUpdate(req, res, next) {
+    try {
+      let { _id, ...rest } = req.body;
+
+      const okRequiredFields = ValidateUtil.ensureRequiredFields(_id);
       if (!okRequiredFields) {
         next({ status: 200, msg: "Các giá trị bắt buộc không được bỏ trống!" });
         return;
       }
 
       _id = StringUtil.toStringID(_id);
-      status = status.toUpperCase();
-      const okIncludeOne = ValidateUtil.ensureIncludeOne(
-        status,
-        Object.values(OPERATION_STATUS)
-      );
-      if (!okIncludeOne) {
-        next({
-          status: 200,
-          msg: `Trạng thái [${status}] không tồn tại. Hãy thử lại với: ${Object.values(
-            OPERATION_STATUS
-          ).join(", ")}.`,
-        });
-        return;
-      }
 
       const operation = await Operation.findByIdAndUpdate(
         _id,
         {
-          $set: {
-            status,
-          },
+          $set: this.buildUpdate(rest),
         },
         {
           new: true,
@@ -57,7 +83,7 @@ class OperationController {
     }
   }
 
-  async insert(req, res, next) {
+  async create(req, res, next) {
     try {
       let { name, ...rest } = req.body;
 
@@ -90,4 +116,6 @@ class OperationController {
   }
 }
 
-module.exports = new OperationController();
+module.exports = {
+  OperationController: new OperationController(),
+};

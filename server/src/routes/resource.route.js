@@ -1,9 +1,11 @@
 const express = require("express");
 const router = express.Router();
 
-const resourceController = require("../app/controllers/resource.controller");
+const {
+  ResourceController,
+} = require("../app/controllers/resource.controller");
 
-router.patch("/status", resourceController.changeStatus);
-router.post("/", resourceController.insert);
+router.patch("/", ResourceController.partialUpdate.bind(ResourceController));
+router.post("/", ResourceController.create);
 
 module.exports = router;

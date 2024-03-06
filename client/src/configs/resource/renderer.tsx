@@ -1,6 +1,6 @@
 import { StackNavigationOptions } from '@react-navigation/stack';
 import { PreventHardwareBackGuard } from '../../guards';
-import { Conquer, Prepare, Statistic, Waiting } from '../../screens/main/conquer';
+import { Conquer, LoadingQuestion, Prepare, Statistic, Waiting } from '../../screens/main/conquer';
 import { QuickMatch } from '../../screens/main/conquer/quick-match';
 import {
 	ConquerQuickMatchProps,
@@ -10,6 +10,7 @@ import {
 	ConquerStackListKey,
 	ConquerStatisticProps,
 	ConquerWaitingProps,
+	ConquerLoadingQuestionProps,
 } from '../../types';
 
 export type ConquerRenderer = {
@@ -54,6 +55,17 @@ export const CONQUER_RENDERER: ConquerRenderer = {
 			onRender: (props: ConquerPrepareProps) => (
 				<PreventHardwareBackGuard>
 					<Prepare {...props} />
+				</PreventHardwareBackGuard>
+			),
+		},
+		LOADING_QUESTION: {
+			name: 'LoadingQuestion',
+			options: {
+				headerShown: false,
+			},
+			onRender: (props: ConquerLoadingQuestionProps) => (
+				<PreventHardwareBackGuard>
+					<LoadingQuestion {...props} />
 				</PreventHardwareBackGuard>
 			),
 		},

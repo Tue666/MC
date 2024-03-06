@@ -2,14 +2,11 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { WinnerProps } from '../../components/modal';
 import { RootState } from '../store';
 
-export type ModalComponent = 'DEFAULT' | 'WINNER' | 'ABC';
+export type ModalComponent = 'DEFAULT' | 'WINNER';
 
 export interface ModalProps {
 	DEFAULT: {};
 	WINNER: WinnerProps;
-	ABC: {
-		haha: string;
-	};
 }
 
 export interface ModalState<T extends ModalComponent> {

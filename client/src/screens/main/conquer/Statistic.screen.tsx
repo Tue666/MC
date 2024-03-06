@@ -17,7 +17,7 @@ const { MAIN_LAYOUT } = ConstantConfig;
 const Statistic = (props: ConquerStatisticProps) => {
 	const { navigation, route } = props;
 	const { client, isCorrect } = route.params;
-	const popAction = StackActions.pop(3);
+	const popAction = StackActions.pop(4);
 	const { profile } = useAppSelector(selectAccount);
 	const isWinner = isCorrect && client._id === profile._id;
 

@@ -7,8 +7,9 @@ import { ConstantConfig } from '../../configs';
 import { MainLayout } from '../../layouts';
 import { globalStyles, stackStyles } from '../../styles';
 import { MainTabList } from '../../types';
+import { AccountStack } from './account';
 import { ConquerStack } from './conquer';
-import { Account, Ranking } from '.';
+import { Ranking } from '.';
 
 const { MAIN_LAYOUT } = ConstantConfig;
 
@@ -77,7 +78,7 @@ const MainTab = () => {
 			>
 				{(props) => (
 					<MainLayout {...props}>
-						<ConquerStack {...props} />
+						<ConquerStack />
 					</MainLayout>
 				)}
 			</Tab.Screen>
@@ -92,12 +93,12 @@ const MainTab = () => {
 				)}
 			</Tab.Screen>
 			<Tab.Screen
-				name="Account"
+				name="AccountStack"
 				options={{ tabBarIcon: ({ color, size }) => <Icon name="person" color={color} size={size} /> }}
 			>
-				{() => (
-					<MainLayout>
-						<Account />
+				{(props) => (
+					<MainLayout hiddenHeader={true} {...props}>
+						<AccountStack />
 					</MainLayout>
 				)}
 			</Tab.Screen>

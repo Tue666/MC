@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
 
-const questionController = require("../app/controllers/question.controller");
+const {
+  QuestionController,
+} = require("../app/controllers/question.controller");
 
-router.post("/", questionController.insert);
-router.get("/random", questionController.findByRandom);
+router.post("/", QuestionController.create);
 
 module.exports = router;
