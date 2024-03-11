@@ -52,7 +52,8 @@ const Conquer = (props: ConquerProps) => {
 					if (ROW_INDEX >= RESOURCE_ARRANGEMENT.length) return;
 
 					const { _id, name, description, difficulty } = permissionAllowed;
-					const idleMode = RESOURCES[_id]?.idleMode || 'SINGLE';
+					const resource = RESOURCES[_id];
+					const idleMode = resource?.idleMode || 'SINGLE';
 					const difficultLevel = getDifficultLevel(difficulty, resourceDifficulty);
 					const { label, bgColor, textColor } =
 						resourceDifficulty[difficultLevel as keyof typeof resourceDifficulty];
@@ -73,17 +74,25 @@ const Conquer = (props: ConquerProps) => {
 					return (
 						<TouchableBox
 							key={resourceAllowed}
+							disabled={!resource}
 							onPress={() => onPressResource({ resource: permissionAllowed, idleMode })}
 							onLongPress={() => onLongPressResource(name, description)}
 							style={[
 								styles.resource,
-								{ backgroundColor: bgColor || globalStyles.paper.backgroundColor, width: resourceWidth },
+								{ backgroundColor: resource ? bgColor : theme.colors.outline, width: resourceWidth },
 							]}
 							soundName="button_click.mp3"
 						>
-							<Text style={[{ color: textColor || theme.colors.onSurface }]}>{name}</Text>
+							<Text style={[{ color: resource ? textColor : theme.colors.outlineVariant }]}>
+								{!resource && (
+									<Text variant="labelSmall" style={[{ color: resource ? textColor : theme.colors.outlineVariant }]}>
+										(Khóa)
+									</Text>
+								)}{' '}
+								{name}
+							</Text>
 							{label && (
-								<Text variant="labelSmall" style={[{ color: textColor || theme.colors.onSurface }]}>
+								<Text variant="labelSmall" style={[{ color: resource ? textColor : theme.colors.outlineVariant }]}>
 									({label})
 								</Text>
 							)}

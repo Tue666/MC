@@ -16,9 +16,9 @@ const LoadingQuestion = (props: ConquerLoadingQuestionProps) => {
 
 	useEffect(() => {
 		const isOwner = room.owner === profile._id;
-		if (isOwner) {
-			requestQuestions();
-		}
+		if (!isOwner) return;
+
+		requestQuestions();
 	}, []);
 	const requestQuestions = () => {
 		const questionQueryParams = {};
@@ -31,33 +31,46 @@ const LoadingQuestion = (props: ConquerLoadingQuestionProps) => {
 		});
 	};
 	useEffect(() => {
-		socketClient?.on(
-			'conquer[quick-match]:server-client(loading-question)',
-			(questions: IQuestion.Question[]) => {
-				if (!questions.length) {
-					navigation.dispatch(popAction);
-					openDialog({
-						title: '[Tìm câu hỏi] Không tìm thấy',
-						content: 'Hiện tại không có câu hỏi phù hợp nào, quay lại sau bạn nhé!',
-					});
-					return;
-				}
-
-				const question = questions[0];
-				navigation.navigate('QuickMatch', { resource, room, roomMode, question });
+		const onLoadingQuestionEvent = (questions: IQuestion.Question[]) => {
+			if (!questions.length) {
+				navigation.dispatch(popAction);
+				openDialog({
+					title: '[Tìm câu hỏi] Không tìm thấy',
+					content: 'Hiện tại không có câu hỏi phù hợp nào, quay lại sau bạn nhé',
+					actions: [{ label: 'Đồng ý' }],
+				});
+				return;
 			}
-		);
 
-		socketClient?.on('[ERROR]conquer[quick-match]:server-client(loading-question)', (error) => {
+			const question = questions[0];
+			navigation.navigate('QuickMatch', { resource, room, roomMode, question });
+		};
+		socketClient?.on('conquer[quick-match]:server-client(loading-question)', onLoadingQuestionEvent);
+
+		const onErrorLoadingQuestionEvent = (error: string) => {
 			openDialog({
 				title: '[Tìm câu hỏi] Lỗi',
 				content: error,
 			});
-		});
+		};
+		socketClient?.on(
+			'[ERROR]conquer[quick-match]:server-client(loading-question)',
+			onErrorLoadingQuestionEvent
+		);
 
-		socketClient?.on('conquer:server-client(transfer-owner-loading)', () => {
+		const onTransferOwnerLoading = () => {
 			requestQuestions();
-		});
+		};
+		socketClient?.on('conquer:server-client(transfer-owner-loading)', onTransferOwnerLoading);
+
+		return () => {
+			socketClient?.off('conquer[quick-match]:server-client(loading-question)', onLoadingQuestionEvent);
+			socketClient?.off(
+				'[ERROR]conquer[quick-match]:server-client(loading-question)',
+				onErrorLoadingQuestionEvent
+			);
+			socketClient?.off('conquer:server-client(transfer-owner-loading)', onTransferOwnerLoading);
+		};
 	}, []);
 	return <Loading />;
 };

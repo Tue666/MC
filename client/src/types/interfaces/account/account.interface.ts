@@ -18,7 +18,7 @@ export interface SignInResponse extends Response {
 	accessToken: Tokens['AC_T'];
 }
 
-export interface SignUpBody extends Pick<Account, 'phone_number' | 'password'> {
+export interface SignUpBody extends Pick<Account, 'phone_number' | 'password' | 'name'> {
 	passwordConfirm: string;
 }
 

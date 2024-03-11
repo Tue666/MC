@@ -1,6 +1,4 @@
-const {
-  roomBuilder,
-} = require("../../../app/controllers/room/room-factory.controller");
+const { roomBuilder } = require("../../../app/controllers/room/room.factory");
 const {
   QuestionController,
 } = require("../../../app/controllers/question.controller");
@@ -15,22 +13,35 @@ const onLoadingQuestion = (io, socket) => {
         const { mode, resource, room, questionQueryParams = {} } = data;
         const roomFTR = roomBuilder(mode, resource);
 
+        if (!roomFTR.canLoadingQuestion(room._id)) return;
+
         const randomQuestions = await QuestionController.findRandomQuestions({
           resources: resource,
           ...questionQueryParams,
         });
 
-        roomFTR.updateRoom(room._id, {
-          state: ROOM.STATE.playing,
-        });
+        if (randomQuestions.length > 0) {
+          const question = randomQuestions[0];
+
+          roomFTR.updateRoom(room._id, {
+            state: ROOM.STATE.playing,
+            question,
+          });
+        } else {
+          const resetRoom = roomFTR.endPlay(room._id);
+
+          if (resetRoom) {
+            io.in(resetRoom._id).emit(
+              "conquer:server-client(in-room-forming)",
+              resetRoom
+            );
+          }
+        }
+
         io.in(room._id).emit(
           "conquer[quick-match]:server-client(loading-question)",
           randomQuestions
         );
-
-        if (!randomQuestions.length) {
-          roomFTR.deleteRoom(room._id);
-        }
       } catch (error) {
         socket.emit(
           "[ERROR]conquer[quick-match]:server-client(loading-question)",
@@ -104,7 +115,14 @@ const onSubmitAnswers = (io, socket) => {
         data
       );
 
-      roomFTR.deleteRoom(room._id);
+      const resetRoom = roomFTR.endPlay(room._id);
+
+      if (resetRoom) {
+        io.in(resetRoom._id).emit(
+          "conquer:server-client(in-room-forming)",
+          resetRoom
+        );
+      }
     } catch (error) {
       socket.emit(
         "[ERROR]conquer[quick-match]:server-client(submit-answers)",

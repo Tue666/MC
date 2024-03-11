@@ -7,21 +7,22 @@ import { Box } from '..';
 const { MAIN_LAYOUT } = ConstantConfig;
 
 const WIDTH_SIZE = Dimensions.get('window').width;
-const CONTAINER_WIDTH = WIDTH_SIZE - MAIN_LAYOUT.PADDING * 2 - 20;
+const CONTAINER_WIDTH =
+	WIDTH_SIZE - MAIN_LAYOUT.PADDING * 2 - MAIN_LAYOUT.SCREENS.ACCOUNT.PADDING * 2;
 
 const Statistics = () => {
 	return (
 		<View style={[stackStyles.rowWrap]}>
 			{[...Array(5)].map((_, index) => {
-				const statisticsWidth = (CONTAINER_WIDTH - 5 * 2 * 2) * 0.5;
+				const statisticsWidth = (CONTAINER_WIDTH - (MAIN_LAYOUT.SCREENS.ACCOUNT.MARGIN / 2) * 2 * 2) * 0.5;
 
 				return (
 					<Box key={index} style={[styles.statistics, { width: statisticsWidth }]}>
 						<Text variant="labelSmall" style={[{ fontWeight: 'bold' }]}>
-							1000
+							???
 						</Text>
 						<Text variant="labelSmall" style={[{ fontStyle: 'italic' }]}>
-							Ngày Streack
+							Ngày ???
 						</Text>
 					</Box>
 				);
@@ -32,8 +33,8 @@ const Statistics = () => {
 
 const styles = StyleSheet.create({
 	statistics: {
-		padding: 10,
-		margin: 5,
+		padding: MAIN_LAYOUT.SCREENS.ACCOUNT.PADDING,
+		margin: MAIN_LAYOUT.SCREENS.ACCOUNT.MARGIN / 2,
 	},
 });
 

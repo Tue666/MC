@@ -4,7 +4,7 @@ import { APIConfig } from '../configs';
 
 const { APP } = APIConfig;
 
-const URL = APP.server.url;
+const URL = APP.server.host;
 const socketClient: Socket = io(URL);
 
 const SocketClientContext = createContext<Socket | null>(null);

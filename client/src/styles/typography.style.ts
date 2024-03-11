@@ -8,6 +8,9 @@ const getTypographyStyles = (theme: MD3Theme) =>
 			color: theme.colors.primary,
 			fontWeight: 'bold',
 		},
+		center: {
+			textAlign: 'center',
+		},
 	});
 
 const useTypographyStyles = () => {

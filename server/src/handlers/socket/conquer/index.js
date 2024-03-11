@@ -1,6 +1,4 @@
-const {
-  roomBuilder,
-} = require("../../../app/controllers/room/room-factory.controller");
+const { roomBuilder } = require("../../../app/controllers/room/room.factory");
 const { ROOM } = require("../../../config/constant");
 const quickMatchHandler = require("./quick-match.handler");
 const disconnectingHandler = require("./disconnecting.handler");
@@ -15,6 +13,8 @@ const onFindRooms = (io, socket) => {
 
       io.to(socket.id).emit(
         "[TESTING]conquer:server-client(find-rooms)",
+        mode,
+        resource,
         rooms
       );
     } catch (error) {
@@ -22,6 +22,102 @@ const onFindRooms = (io, socket) => {
         "[ERROR][TESTING]conquer:server-client(find-rooms)",
         error.message
       );
+    }
+  });
+};
+
+const onFindForming = (io, socket) => {
+  socket.on("conquer:client-server(find-forming)", (data) => {
+    try {
+      const { mode, resource } = data;
+      const roomFTR = roomBuilder(mode, resource);
+
+      const rooms = roomFTR.findRooms();
+      io.emit("conquer:server-client(forming)", Object.values(rooms));
+    } catch (error) {
+      socket.emit("[ERROR]conquer:server-client(find-forming)", error.message);
+    }
+  });
+};
+
+const onClientForming = (io, socket) => {
+  socket.on("conquer:client-server(forming)", (data) => {
+    try {
+      const { mode, resource, room, client } = data;
+      const roomFTR = roomBuilder(mode, resource);
+
+      client.socketId = socket.id;
+      const joinedRoom = roomFTR.joinRoom(room, client);
+
+      io.to(socket.id).emit(
+        "conquer:server-client(out-room-forming)",
+        joinedRoom
+      );
+
+      // If client does not join the room because any reasons, stop
+      if (joinedRoom.error) return;
+
+      // Otherwise,
+      // Inform all client that rooms have changed
+      const rooms = roomFTR.findRooms();
+      io.emit("conquer:server-client(forming)", Object.values(rooms));
+
+      const { _id } = joinedRoom.room;
+
+      // Client joins room so informs to all member in room
+      if (room._id) {
+        io.in(_id).emit(
+          "conquer:server-client(in-room-forming)",
+          joinedRoom.room
+        );
+      }
+
+      socket.join(_id);
+    } catch (error) {
+      socket.emit("[ERROR]conquer:server-client(forming)", error.message);
+    }
+  });
+};
+
+const onClientLeaveForming = (io, socket) => {
+  socket.on("conquer:client-server(leave-forming)", (data) => {
+    try {
+      const { mode, resource, room, client } = data;
+      const roomFTR = roomBuilder(mode, resource);
+
+      const leftRoom = roomFTR.leaveRoom(room._id, client._id);
+
+      // Inform all client that rooms have changed
+      const rooms = roomFTR.findRooms();
+      io.emit("conquer:server-client(forming)", Object.values(rooms));
+
+      const { _id } = leftRoom;
+      socket.leave(_id);
+
+      io.in(_id).emit("conquer:server-client(in-room-forming)", leftRoom);
+    } catch (error) {
+      socket.emit("[ERROR]conquer:server-client(leave-forming)", error.message);
+    }
+  });
+};
+
+const onClientStartForming = (io, socket) => {
+  socket.on("conquer:client-server(start-forming)", (data) => {
+    try {
+      const { mode, resource, room } = data;
+      const roomFTR = roomBuilder(mode, resource);
+
+      roomFTR.updateRoom(room._id, {
+        state: ROOM.STATE.preparing,
+      });
+
+      // Inform all client that rooms have changed
+      const rooms = roomFTR.findRooms();
+      io.emit("conquer:server-client(forming)", Object.values(rooms));
+
+      io.in(room._id).emit("conquer:server-client(start-forming)", room);
+    } catch (error) {
+      socket.emit("[ERROR]conquer:server-client(start-forming)", error.message);
     }
   });
 };
@@ -34,16 +130,18 @@ const onClientMatching = (io, socket) => {
 
       client.socketId = socket.id;
       const joinedRoom = roomFTR.joinRoom(room, client);
-      const { _id, maxCapacity, clients } = joinedRoom;
 
+      const { _id } = joinedRoom;
       socket.join(_id);
 
-      if (clients.length >= maxCapacity) {
+      if (roomFTR.isReadyToPrepare(_id)) {
+        const roomWithNewState = roomFTR.updateRoom(_id, {
+          state: ROOM.STATE.preparing,
+        });
+
         io.in(_id).emit(
           "conquer:server-client(start-preparing)",
-          roomFTR.updateRoom(_id, {
-            state: ROOM.STATE.preparing,
-          })
+          roomWithNewState
         );
         return;
       }
@@ -62,6 +160,7 @@ const onClientCancelMatching = (io, socket) => {
       const roomFTR = roomBuilder(mode, resource);
 
       const leftRoom = roomFTR.leaveRoom(room._id, client._id);
+
       const { _id } = leftRoom;
 
       io.in(_id).emit("conquer:server-client(matching)", leftRoom, client);
@@ -83,15 +182,17 @@ const onClientPreparing = (io, socket) => {
       const roomFTR = roomBuilder(mode, resource);
 
       const preparedRoom = roomFTR.prepareRoom(room._id, client);
-      const { _id, clients } = preparedRoom;
 
-      const allClientPrepared = clients.every((client) => client.prepared);
-      if (allClientPrepared) {
+      const { _id } = preparedRoom;
+
+      if (roomFTR.isReadyToLoadingQuestion(_id)) {
+        const roomWithNewState = roomFTR.updateRoom(_id, {
+          state: ROOM.STATE.loading_question,
+        });
+
         io.in(_id).emit(
           "conquer:server-client(start-loading-question)",
-          roomFTR.updateRoom(_id, {
-            state: ROOM.STATE.loading_question,
-          })
+          roomWithNewState
         );
         return;
       }
@@ -109,7 +210,14 @@ const onTimeoutPreparing = (io, socket) => {
       const { mode, resource, room } = data;
       const roomFTR = roomBuilder(mode, resource);
 
-      roomFTR.deleteRoom(room._id);
+      const resetRoom = roomFTR.prepareTimeout(room._id);
+
+      if (resetRoom) {
+        io.in(resetRoom._id).emit(
+          "conquer:server-client(in-room-forming)",
+          resetRoom
+        );
+      }
     } catch (error) {
       socket.emit(
         "[ERROR]conquer:server-client(timeout-preparing)",
@@ -121,6 +229,14 @@ const onTimeoutPreparing = (io, socket) => {
 
 module.exports = (io, socket) => {
   onFindRooms(io, socket);
+
+  onFindForming(io, socket);
+
+  onClientForming(io, socket);
+
+  onClientLeaveForming(io, socket);
+
+  onClientStartForming(io, socket);
 
   onClientMatching(io, socket);
 

@@ -30,7 +30,7 @@ const ConquerStack = () => {
 				const { name, options, onRender } = config;
 
 				return (
-					<Stack.Screen key={screen} name={name} options={{ ...options }}>
+					<Stack.Screen key={screen} name={name} options={options}>
 						{(props) => onRender(props)}
 					</Stack.Screen>
 				);
@@ -39,7 +39,7 @@ const ConquerStack = () => {
 				const { name, options, onRender } = config;
 
 				return (
-					<Stack.Screen key={screen} name={name} options={{ ...options }}>
+					<Stack.Screen key={screen} name={name} options={options}>
 						{(props) => onRender(props)}
 					</Stack.Screen>
 				);

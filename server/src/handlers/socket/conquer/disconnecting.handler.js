@@ -1,83 +1,59 @@
-const {
-  roomBuilder,
-} = require("../../../app/controllers/room/room-factory.controller");
+const { roomBuilder } = require("../../../app/controllers/room/room.factory");
 const { ROOM } = require("../../../config/constant");
 
-const onMatchingDisconnecting = (io, container) => {
-  const { roomFTR, room, client } = container;
+const onFormingDisconnecting = (io, socket, disconnect) => {
+  const { room } = disconnect;
 
-  const matchingRoom = roomFTR.leaveRoom(room._id, client._id);
-  const { _id } = matchingRoom;
+  const { _id } = room;
 
-  io.in(_id).emit("conquer:server-client(matching)", matchingRoom, client);
+  io.in(_id).emit("conquer:server-client(in-room-forming)", room);
 };
 
-const onPreparingDisconnecting = (io, container) => {
-  const { roomFTR, room, client } = container;
+const onMatchingDisconnecting = (io, socket, disconnect) => {
+  const { room, client } = disconnect;
 
-  const preparingRoom = roomFTR.updateClient(room._id, {
-    ...client,
-    state: ROOM.CLIENT_STATE.disconnect,
-    prepared: false,
-  });
-  const { _id } = preparingRoom;
+  const { _id } = room;
 
-  io.in(_id).emit("conquer:server-client(preparing)", preparingRoom, client);
+  io.in(_id).emit("conquer:server-client(matching)", room, client);
 };
 
-const onLoadingQuestionDisconnecting = (io, container) => {
-  const { roomFTR, room, client } = container;
+const onPreparingDisconnecting = (io, socket, disconnect) => {
+  const { room, client } = disconnect;
 
-  const loadingRoom = roomFTR.updateClient(room._id, {
-    ...client,
-    state: ROOM.CLIENT_STATE.disconnect,
-  });
+  const { _id } = room;
 
-  if (room.owner !== client._id) return;
+  io.in(_id).emit("conquer:server-client(preparing)", room, client);
+};
 
-  const { clients } = loadingRoom;
-  const connectClients = clients.filter(
-    (client) => client.state === ROOM.CLIENT_STATE.connect
-  );
-  if (!connectClients.length) {
-    roomFTR.deleteRoom(room._id);
-    return;
-  }
+const onLoadingQuestionDisconnecting = (io, socket, container) => {
+  const { originRoom, room, client } = container;
 
-  const newOwner = connectClients[0];
+  // Only the room owner can transfer loading question
+  if (client._id !== originRoom.owner) return;
+
+  const { owner, clients } = room;
+
+  const newOwner = clients.find((client) => client._id === owner);
   io.to(newOwner.socketId).emit(
     "conquer:server-client(transfer-owner-loading)"
   );
 };
 
-const onPlayingDisconnecting = (io, container) => {
-  const { roomFTR, room, client } = container;
-
-  const playingRoom = roomFTR.updateClient(room._id, {
-    ...client,
-    state: ROOM.CLIENT_STATE.disconnect,
-  });
-
-  const { clients } = playingRoom;
-  const allClientDisconnect = clients.every(
-    (client) => client.state === ROOM.CLIENT_STATE.disconnect
-  );
-  if (!allClientDisconnect) return;
-
-  roomFTR.deleteRoom(room._id);
-};
+const onPlayingDisconnecting = (io, socket, container) => {};
 
 const stateHandler = {
+  [ROOM.STATE.forming]: onFormingDisconnecting,
   [ROOM.STATE.matching]: onMatchingDisconnecting,
   [ROOM.STATE.preparing]: onPreparingDisconnecting,
   [ROOM.STATE.loading_question]: onLoadingQuestionDisconnecting,
   [ROOM.STATE.playing]: onPlayingDisconnecting,
 };
 
-const roomHandler = (io, container) => {
-  const { room } = container;
+const roomHandler = (io, socket, disconnect) => {
+  const { room } = disconnect;
 
-  if (stateHandler[room.state]) stateHandler[room.state](io, container);
+  if (stateHandler[room.state])
+    stateHandler[room.state](io, socket, disconnect);
 };
 
 module.exports = (io, socket) => {
@@ -89,11 +65,9 @@ module.exports = (io, socket) => {
       if (roomId) {
         const [mode, resource, _] = roomId.split(ROOM.ID_CONNECTOR);
         const roomFTR = roomBuilder(mode, resource);
-        const container = roomFTR.findBySocket(roomId, socketId);
+        const disconnect = roomFTR.disconnecting(roomId, socketId);
 
-        if (container) {
-          roomHandler(io, { roomFTR, ...container });
-        }
+        roomHandler(io, socket, { roomFTR, ...disconnect });
       }
     } catch (error) {
       console.log(`[Error] Disconnecting:`, error.message);

@@ -1,4 +1,5 @@
 import { MD3Theme } from 'react-native-paper';
+import { globalStyles } from '../../styles';
 
 export const RESOURCE_DIFFICULTIES = (theme: MD3Theme) => ({
 	easy: {
@@ -9,14 +10,14 @@ export const RESOURCE_DIFFICULTIES = (theme: MD3Theme) => ({
 	},
 	middle: {
 		label: undefined,
-		bgColor: undefined,
-		textColor: undefined,
+		bgColor: globalStyles.paper.backgroundColor,
+		textColor: theme.colors.onSurface,
 		range: [2, 6],
 	},
 	hard: {
 		label: undefined,
-		bgColor: undefined,
-		textColor: undefined,
+		bgColor: globalStyles.paper.backgroundColor,
+		textColor: theme.colors.onSurface,
 		range: [7, 9],
 	},
 	nightmare: {

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import { Text, TextInput as RNPTextInput } from 'react-native-paper';
+import { Text, TextInput as RNPTextInput, useTheme } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { AxiosError } from 'axios';
 import { useFormik } from 'formik';
@@ -16,6 +16,7 @@ const { signInValidation } = FormValidationConfig;
 
 const SignIn = (props: AuthenticationSignInProps) => {
 	const { navigation } = props;
+	const theme = useTheme();
 	const [hiddenPassword, setHiddenPassword] = useState(true);
 	const { signIn } = useAuthentication();
 	const formik = useFormik<IAccount.SignInBody>({
@@ -71,7 +72,13 @@ const SignIn = (props: AuthenticationSignInProps) => {
 				helperText={touched.phone_number && errors.phone_number}
 				left={
 					<RNPTextInput.Icon
-						icon={() => <Icon name="person" size={AUTHENTICATION_LAYOUT.TEXT_INPUT.ICON_SIZE} />}
+						icon={() => (
+							<Icon
+								name="person"
+								size={AUTHENTICATION_LAYOUT.TEXT_INPUT.ICON_SIZE}
+								color={theme.colors.onSurface}
+							/>
+						)}
 					/>
 				}
 				style={[styles.gap]}
@@ -87,7 +94,13 @@ const SignIn = (props: AuthenticationSignInProps) => {
 				secureTextEntry={hiddenPassword}
 				left={
 					<RNPTextInput.Icon
-						icon={() => <Icon name="lock" size={AUTHENTICATION_LAYOUT.TEXT_INPUT.ICON_SIZE} />}
+						icon={() => (
+							<Icon
+								name="lock"
+								size={AUTHENTICATION_LAYOUT.TEXT_INPUT.ICON_SIZE}
+								color={theme.colors.onSurface}
+							/>
+						)}
 					/>
 				}
 				right={
@@ -96,6 +109,7 @@ const SignIn = (props: AuthenticationSignInProps) => {
 							<Icon
 								name={hiddenPassword ? 'visibility' : 'visibility-off'}
 								size={AUTHENTICATION_LAYOUT.TEXT_INPUT.ICON_SIZE}
+								color={theme.colors.onSurface}
 							/>
 						)}
 						onPress={onTogglePasswordVisibility}

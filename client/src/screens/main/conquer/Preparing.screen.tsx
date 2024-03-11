@@ -9,14 +9,14 @@ import { useSocketClient } from '../../../hooks';
 import { useAppSelector } from '../../../redux/hooks';
 import { AccountState, selectAccount } from '../../../redux/slices/account.slice';
 import { globalStyles, stackStyles } from '../../../styles';
-import { ConquerPrepareProps, IRoom } from '../../../types';
+import { ConquerPreparingProps, IRoom } from '../../../types';
 import { openDialog } from '../../../utils';
 
 const { MAIN_LAYOUT, VIBRATIONS } = ConstantConfig;
 
-const MAX_PREPARING_TIME = 30;
+const MAX_PREPARING_TIME = 15;
 
-const Prepare = (props: ConquerPrepareProps) => {
+const Preparing = (props: ConquerPreparingProps) => {
 	const { navigation, route } = props;
 	const { resource, room: joinedRoom, roomMode, idleMode } = route.params;
 	const theme = useTheme();
@@ -38,33 +38,40 @@ const Prepare = (props: ConquerPrepareProps) => {
 		};
 	}, []);
 	useEffect(() => {
-		socketClient?.on(
-			'conquer:server-client(preparing)',
-			(room: IRoom.Room, client: AccountState['profile']) => {
-				const { clients } = room;
+		const onPreparingEvent = (room: IRoom.Room, client: AccountState['profile']) => {
+			const { clients } = room;
 
-				const preparedCount = clients.filter((client) => client.prepared).length;
-				setPreparedCount(preparedCount);
+			const preparedCount = clients.filter((client) => client.prepared).length;
+			setPreparedCount(preparedCount);
 
-				if (client._id === profile._id) {
-					prepareRef.current = false;
-				}
+			if (client._id === profile._id) {
+				prepareRef.current = false;
 			}
-		);
-		socketClient?.on('[ERROR]conquer:server-client(preparing)', (error) => {
+		};
+		socketClient?.on('conquer:server-client(preparing)', onPreparingEvent);
+
+		const onErrorPreparingEvent = (error: string) => {
 			openDialog({
 				title: '[Sẵn sàng] Lỗi',
 				content: error,
 			});
-		});
+		};
+		socketClient?.on('[ERROR]conquer:server-client(preparing)', onErrorPreparingEvent);
 
-		socketClient?.on('conquer:server-client(start-loading-question)', (room: IRoom.Room) => {
+		const onStartLoadingQuestionEvent = (room: IRoom.Room) => {
 			if (countdownExpiredRef.current) return;
 
 			setAllPrepared(true);
 			SoundManager.stopSound('waiting_bg.mp3');
 			navigation.navigate('LoadingQuestion', { resource, room, roomMode });
-		});
+		};
+		socketClient?.on('conquer:server-client(start-loading-question)', onStartLoadingQuestionEvent);
+
+		return () => {
+			socketClient?.off('conquer:server-client(preparing)', onPreparingEvent);
+			socketClient?.off('[ERROR]conquer:server-client(preparing)', onErrorPreparingEvent);
+			socketClient?.off('conquer:server-client(start-loading-question)', onStartLoadingQuestionEvent);
+		};
 	}, []);
 	const onCountdownComplete = useCallback(() => {
 		countdownExpiredRef.current = true;
@@ -106,7 +113,12 @@ const Prepare = (props: ConquerPrepareProps) => {
 			<Text variant="titleLarge">{resource.name}</Text>
 			{idleMode === 'SINGLE' && !allPrepared && (
 				<Animated.View entering={FadeInUp}>
-					<SingleWaiting animated={true} duration={MAX_PREPARING_TIME} onComplete={onCountdownComplete} />
+					<SingleWaiting
+						avatar={profile.avatar}
+						animated={true}
+						duration={MAX_PREPARING_TIME}
+						onComplete={onCountdownComplete}
+					/>
 				</Animated.View>
 			)}
 			<Animated.View entering={StretchInX}>
@@ -127,4 +139,4 @@ const Prepare = (props: ConquerPrepareProps) => {
 	);
 };
 
-export default Prepare;
+export default Preparing;

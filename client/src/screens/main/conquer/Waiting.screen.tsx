@@ -15,7 +15,7 @@ import { openDialog } from '../../../utils';
 
 const { MAIN_LAYOUT, ROOM } = ConstantConfig;
 
-const MAX_CAPACITY = 2;
+const DEFAULT_MAX_CAPACITY = 3;
 const MAX_WAITING_TIME = 300;
 
 const Waiting = (props: ConquerWaitingProps) => {
@@ -39,36 +39,51 @@ const Waiting = (props: ConquerWaitingProps) => {
 		};
 	}, [isFocused]);
 	useEffect(() => {
-		socketClient?.on(
-			'conquer:server-client(matching)',
-			(room: IRoom.Room, client: AccountState['profile']) => {
-				setJoinedRoom(room);
+		const onMatchingEvent = (room: IRoom.Room, client: AccountState['profile']) => {
+			setJoinedRoom(room);
 
-				if (client._id === profile._id) {
-					matchingRef.current = false;
-				}
+			if (client._id === profile._id) {
+				matchingRef.current = false;
 			}
-		);
-		socketClient?.on('[ERROR]conquer:server-client(matching)', (error) => {
+		};
+		socketClient?.on('conquer:server-client(matching)', onMatchingEvent);
+
+		const onErrorMatchingEvent = (error: string) => {
 			SoundManager.stopSound('waiting_bg.mp3');
 			setIsMatching(false);
 			openDialog({
 				title: '[Ghép ngẫu nhiên] Lỗi',
 				content: error,
 			});
-		});
-		socketClient?.on('[ERROR]conquer:server-client(cancel-matching)', (error) => {
+		};
+		socketClient?.on('[ERROR]conquer:server-client(matching)', onErrorMatchingEvent);
+
+		const onErrorCancelMatchingEvent = (error: string) => {
 			setIsMatching(true);
 			openDialog({
 				title: '[Hủy] Lỗi',
 				content: error,
 			});
-		});
+		};
+		socketClient?.on('[ERROR]conquer:server-client(cancel-matching)', onErrorCancelMatchingEvent);
 
-		socketClient?.on('conquer:server-client(start-preparing)', (joinedRoom: IRoom.Room) => {
+		const onStartPreparingEvent = (joinedRoom: IRoom.Room) => {
 			setIsMatching(false);
-			navigation.navigate('Prepare', { resource, room: joinedRoom, roomMode: ROOM.MODE.auto, idleMode });
-		});
+			navigation.navigate('Preparing', {
+				resource,
+				room: joinedRoom,
+				roomMode: ROOM.MODE.auto,
+				idleMode,
+			});
+		};
+		socketClient?.on('conquer:server-client(start-preparing)', onStartPreparingEvent);
+
+		return () => {
+			socketClient?.off('conquer:server-client(matching)', onMatchingEvent);
+			socketClient?.off('[ERROR]conquer:server-client(matching)', onErrorMatchingEvent);
+			socketClient?.off('[ERROR]conquer:server-client(cancel-matching)', onErrorCancelMatchingEvent);
+			socketClient?.off('conquer:server-client(start-preparing)', onStartPreparingEvent);
+		};
 	}, []);
 	const onCountdownComplete = () => {
 		onPressAutoMatching();
@@ -96,18 +111,35 @@ const Waiting = (props: ConquerWaitingProps) => {
 		socketClient?.emit('conquer:client-server(matching)', {
 			mode: ROOM.MODE.auto,
 			resource: resource._id,
-			room: { maxCapacity: MAX_CAPACITY },
+			room: { maxCapacity: DEFAULT_MAX_CAPACITY },
 			client: profile,
 		});
 		setIsMatching(true);
 	};
-	const onPressFindRoom = () => {};
+	const onPressFindRoom = () => {
+		navigation.navigate('FindRoom', {
+			resource,
+			roomMode: ROOM.MODE.normal,
+			idleMode,
+			maxCapacity: DEFAULT_MAX_CAPACITY,
+		});
+
+		socketClient?.emit('conquer:client-server(find-forming)', {
+			mode: ROOM.MODE.normal,
+			resource: resource._id,
+		});
+	};
 	return (
 		<View style={[globalStyles.container, stackStyles.center]}>
 			<Text variant="titleLarge">{resource.name}</Text>
 			{idleMode === 'SINGLE' && (
 				<Animated.View entering={FadeInUp}>
-					<SingleWaiting animated={isMatching} duration={MAX_WAITING_TIME} onComplete={onCountdownComplete} />
+					<SingleWaiting
+						avatar={profile.avatar}
+						animated={isMatching}
+						duration={MAX_WAITING_TIME}
+						onComplete={onCountdownComplete}
+					/>
 				</Animated.View>
 			)}
 			<Animated.View entering={StretchInX}>
@@ -121,7 +153,9 @@ const Waiting = (props: ConquerWaitingProps) => {
 					icon={isMatching ? 'cancel' : 'person-search'}
 					iconColor={isMatching ? theme.colors.onError : theme.colors.onPrimary}
 				>
-					{isMatching ? `Hủy (${joinedRoom?.clients?.length ?? 0}/${MAX_CAPACITY})` : 'Ghép ngẫu nhiên'}
+					{isMatching
+						? `Hủy (${joinedRoom?.clients?.length ?? 0}/${joinedRoom?.maxCapacity})`
+						: 'Ghép ngẫu nhiên'}
 				</Button>
 			</Animated.View>
 			<Animated.View entering={StretchInX}>

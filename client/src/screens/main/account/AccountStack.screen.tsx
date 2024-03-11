@@ -1,7 +1,8 @@
 import { useTheme } from 'react-native-paper';
 import { createStackNavigator } from '@react-navigation/stack';
+import { globalStyles } from '../../../styles';
 import { AccountStackList } from '../../../types';
-import { Account } from '.';
+import { Account, Setting } from '.';
 
 const Stack = createStackNavigator<AccountStackList>();
 
@@ -11,7 +12,9 @@ const AccountStack = () => {
 	return (
 		<Stack.Navigator
 			screenOptions={{
-				headerShown: false,
+				headerStyle: [globalStyles.paper],
+				headerTitleStyle: [globalStyles.text, { color: theme.colors.onSurface }],
+				headerTintColor: theme.colors.onSurface,
 				cardStyle: [
 					{
 						backgroundColor: theme.colors.background,
@@ -19,7 +22,12 @@ const AccountStack = () => {
 				],
 			}}
 		>
-			<Stack.Screen name="Account">{(props) => <Account {...props} />}</Stack.Screen>
+			<Stack.Screen name="Account" options={{ headerShown: false }}>
+				{(props) => <Account {...props} />}
+			</Stack.Screen>
+			<Stack.Screen name="Setting" options={{ title: 'Cài đặt' }}>
+				{(props) => <Setting {...props} />}
+			</Stack.Screen>
 		</Stack.Navigator>
 	);
 };

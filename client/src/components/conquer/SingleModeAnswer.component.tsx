@@ -62,6 +62,20 @@ const buildAnswered = (
 	return builder[type](value, answered);
 };
 
+interface SelectedAnswer {
+	question: {
+		type: IQuestion.Question['type'];
+		value: IQuestion.Question['values'][number];
+	};
+}
+
+interface SubmitAnswers {
+	answered: {
+		correctAnswers: IQuestion.Question['values'];
+	};
+	client: IRoom.Room['clients'][number];
+}
+
 export type State = 'IDLE' | 'CALCULATING_RESULTS';
 
 interface SingleModeAnswerProps {
@@ -116,21 +130,27 @@ const SingleModeAnswer = (props: SingleModeAnswerProps) => {
 	};
 
 	useEffect(() => {
-		socketClient?.on('conquer[quick-match]:server-client(selected-answer)', (data) => {
+		const onSelectedAnswerEvent = (data: SelectedAnswer) => {
 			const { question } = data;
 			const { type, value } = question;
 
 			const selectedAnswers = buildAnswered(type, value, answered);
 			setAnswered(selectedAnswers);
-		});
-		socketClient?.on('[ERROR]conquer[quick-match]:server-client(selected-answer)', (error) => {
+		};
+		socketClient?.on('conquer[quick-match]:server-client(selected-answer)', onSelectedAnswerEvent);
+
+		const onErrorSelectedAnswerEvent = (error: string) => {
 			openDialog({
 				title: '[Chọn đáp án] Lỗi',
 				content: error,
 			});
-		});
+		};
+		socketClient?.on(
+			'[ERROR]conquer[quick-match]:server-client(selected-answer)',
+			onErrorSelectedAnswerEvent
+		);
 
-		socketClient?.on('conquer[quick-match]:server-client(submit-answers)', async (data) => {
+		const onSubmitAnswersEvent = async (data: SubmitAnswers) => {
 			const { answered, client } = data;
 			const { correctAnswers } = answered;
 
@@ -159,13 +179,32 @@ const SingleModeAnswer = (props: SingleModeAnswerProps) => {
 			}
 
 			navigation.navigate('Statistic', { client, isCorrect });
-		});
-		socketClient?.on('[ERROR]conquer[quick-match]:server-client(submit-answers)', (error) => {
+		};
+		socketClient?.on('conquer[quick-match]:server-client(submit-answers)', onSubmitAnswersEvent);
+
+		const onErrorSubmitAnswersEvent = (error: string) => {
 			openDialog({
 				title: '[Kiểm tra đáp án] Lỗi',
 				content: error,
 			});
-		});
+		};
+		socketClient?.on(
+			'[ERROR]conquer[quick-match]:server-client(submit-answers)',
+			onErrorSubmitAnswersEvent
+		);
+
+		return () => {
+			socketClient?.off('conquer[quick-match]:server-client(selected-answer)', onSelectedAnswerEvent);
+			socketClient?.off(
+				'[ERROR]conquer[quick-match]:server-client(selected-answer)',
+				onErrorSelectedAnswerEvent
+			);
+			socketClient?.off('conquer[quick-match]:server-client(submit-answers)', onSubmitAnswersEvent);
+			socketClient?.off(
+				'[ERROR]conquer[quick-match]:server-client(submit-answers)',
+				onErrorSubmitAnswersEvent
+			);
+		};
 	}, []);
 	const onPressAnswer = (value: number) => {
 		socketClient?.emit('conquer[quick-match]:client-server(selected-answer)', {

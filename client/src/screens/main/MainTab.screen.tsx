@@ -1,5 +1,6 @@
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useTheme } from 'react-native-paper';
+import { CommonActions } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { SoundManager } from '../../audios';
@@ -9,7 +10,7 @@ import { globalStyles, stackStyles } from '../../styles';
 import { MainTabList } from '../../types';
 import { AccountStack } from './account';
 import { ConquerStack } from './conquer';
-import { Ranking } from '.';
+import { Ranking, Shop } from '.';
 
 const { MAIN_LAYOUT } = ConstantConfig;
 
@@ -20,7 +21,7 @@ const MainTab = () => {
 
 	return (
 		<Tab.Navigator
-			screenOptions={{ headerShown: false }}
+			screenOptions={{ headerShown: false, unmountOnBlur: true }}
 			tabBar={({ state, descriptors, navigation }) => {
 				const childrenStyles = state.routes.reduce((styles, route) => {
 					const { options } = descriptors[route.key];
@@ -47,7 +48,12 @@ const MainTab = () => {
 
 								if (!isFocused && !event.defaultPrevented) {
 									SoundManager.playSound('button_click.mp3');
-									navigation.navigate(route.name, route.params);
+									navigation.dispatch(
+										CommonActions.reset({
+											index: 0,
+											routes: [{ name: route.name, params: route.params }],
+										})
+									);
 								}
 							};
 							const onLongPress = () => {
@@ -79,6 +85,16 @@ const MainTab = () => {
 				{(props) => (
 					<MainLayout {...props}>
 						<ConquerStack />
+					</MainLayout>
+				)}
+			</Tab.Screen>
+			<Tab.Screen
+				name="Shop"
+				options={{ tabBarIcon: ({ color, size }) => <Icon name="storefront" color={color} size={size} /> }}
+			>
+				{() => (
+					<MainLayout>
+						<Shop />
 					</MainLayout>
 				)}
 			</Tab.Screen>

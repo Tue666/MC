@@ -7,7 +7,7 @@ const { APP } = APIConfig;
 
 const APIClient = () => {
 	const axiosClient = axios.create({
-		baseURL: `${APP.server.url}/${APP.server.path}`,
+		baseURL: `${APP.server.host}/${APP.server.path}`,
 	});
 
 	axiosClient.interceptors.request.use(

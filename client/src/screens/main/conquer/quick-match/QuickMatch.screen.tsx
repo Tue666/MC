@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { ScrollView, TouchableOpacity, View } from 'react-native';
-import { Avatar, Divider, Text, useTheme } from 'react-native-paper';
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Divider, Text, useTheme } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { SoundManager } from '../../../../audios';
 import {
+	Avatar,
 	CircleBorder,
 	CountdownTimer,
 	SingleModeAnswer,
@@ -45,21 +46,26 @@ const QuickMatch = (props: ConquerQuickMatchProps) => {
 		};
 	}, []);
 	useEffect(() => {
-		socketClient?.on(
-			'conquer[quick-match]:server-client(raise-hand)',
-			(client: IRoom.Room['clients'][number]) => {
-				SoundManager.playSound('bell.mp3');
-				setFirstRaisedHand(client);
-				setState('IN_ANSWER_TIME');
-				scrollViewRef.current?.scrollToEnd();
-			}
-		);
-		socketClient?.on('[ERROR]conquer[quick-match]:server-client(raise-hand)', (error) => {
+		const onRaiseHandEvent = (client: IRoom.Room['clients'][number]) => {
+			SoundManager.playSound('bell.mp3');
+			setFirstRaisedHand(client);
+			setState('IN_ANSWER_TIME');
+			scrollViewRef.current?.scrollToEnd();
+		};
+		socketClient?.on('conquer[quick-match]:server-client(raise-hand)', onRaiseHandEvent);
+
+		const onErrorRaiseHandEvent = (error: string) => {
 			openDialog({
 				title: '[Giơ tay] Lỗi',
 				content: error,
 			});
-		});
+		};
+		socketClient?.on('[ERROR]conquer[quick-match]:server-client(raise-hand)', onErrorRaiseHandEvent);
+
+		return () => {
+			socketClient?.off('conquer[quick-match]:server-client(raise-hand)', onRaiseHandEvent);
+			socketClient?.off('[ERROR]conquer[quick-match]:server-client(raise-hand)', onErrorRaiseHandEvent);
+		};
 	}, []);
 	const onCountdownExpired = () => {
 		setState('IN_RAISE_HAND_TIME');
@@ -81,7 +87,7 @@ const QuickMatch = (props: ConquerQuickMatchProps) => {
 		<View style={[stackStyles.center]}>
 			<ScrollView ref={scrollViewRef}>
 				<SingleModeQuestion content={question.content} />
-				<View style={[stackStyles.center]}>
+				<View style={[styles.raise, stackStyles.center]}>
 					{state !== 'IN_ANSWER_TIME' && (
 						<CircleBorder>
 							{state === 'IN_COUNTDOWN_TIME' && (
@@ -101,12 +107,11 @@ const QuickMatch = (props: ConquerQuickMatchProps) => {
 					)}
 					{state === 'IN_ANSWER_TIME' && (
 						<>
-							<CircleBorder label={firstRaisedHand?.name ?? ''}>
-								<Avatar.Text
-									size={MAIN_LAYOUT.SCREENS.CONQUER.RAISE_HAND.ICON_SIZE}
-									label={firstRaisedHand?.name ?? ''}
-								/>
-							</CircleBorder>
+							<Avatar
+								label={firstRaisedHand?.name ?? ''}
+								avatar={firstRaisedHand?.avatar}
+								size={MAIN_LAYOUT.SCREENS.CONQUER.RAISE_HAND.ICON_SIZE}
+							/>
 							<Text variant="labelSmall">{IN_ANSWER_TEXT}</Text>
 						</>
 					)}
@@ -125,5 +130,11 @@ const QuickMatch = (props: ConquerQuickMatchProps) => {
 		</View>
 	);
 };
+
+const styles = StyleSheet.create({
+	raise: {
+		marginBottom: MAIN_LAYOUT.SCREENS.CONQUER.QUESTION_BOX.MARGIN_BOTTOM,
+	},
+});
 
 export default QuickMatch;

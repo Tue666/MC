@@ -11,6 +11,7 @@ export interface AccountSchema extends TimestampsSchema, SoftDeleteSchema {
 	phone_number: string;
 	is_phone_verified: boolean;
 	name: string;
+	avatar: string;
 	password: string;
 	roles: RoleSchema['_id'][];
 	account_type: AccountType[keyof AccountType];
@@ -44,23 +45,35 @@ export interface QuestionSchema extends TimestampsSchema, SoftDeleteSchema {
 // =========================================================================================
 // ===================================== ROOM SCHEMA =======================================
 
-export type RoomMode = 'AUTO' | 'PUBLIC';
+export type RoomMode = 'NORMAL' | 'AUTO';
 
 export type RoomModeMapping = {
 	[K in RoomMode as `${Lowercase<K>}`]: K;
 };
 
+export type RoomState = 'FORMING' | 'MATCHING' | 'PREPARING' | 'LOADING_QUESTION' | 'PLAYING';
+
+export type ClientState = 'CONNECT' | 'DISCONNECT';
+
 export interface ClientSchema {
+	socketId: string;
 	_id: string;
 	name: string;
+	avatar: string;
+	state: ClientState;
 	prepared: boolean;
 }
 
 export interface RoomSchema {
 	_id: string;
-	mode: RoomMode;
+	name: string;
+	description: string;
+	state: RoomState;
+	password: string;
 	owner: string | null;
 	maxCapacity: number;
+	firstRaisedHand: ClientSchema['_id'];
+	createdAt: string;
 	clients: ClientSchema[];
 }
 

@@ -5,18 +5,14 @@ import { Box } from '..';
 
 const { MAIN_LAYOUT } = ConstantConfig;
 
-const Achievement = () => {
+const Support = () => {
 	return (
 		<View>
 			{[...Array(5)].map((_, index) => {
 				return (
-					<Box key={index} style={[styles.achievement]}>
+					<Box key={index} style={[styles.support]}>
 						<Text variant="labelSmall" style={[{ fontWeight: 'bold' }]}>
-							Huyền thoại ??
-						</Text>
-						<Text variant="labelSmall" numberOfLines={2} style={[{ fontStyle: 'italic', height: 40 }]}>
-							Chiến thắng liên tục 100 lần chế độ ???. Chiến thắng liên tục 100 lần chế độ ???. Chiến thắng liên
-							tục 100 lần chế độ ???
+							Huyền thoại Đấu Nhanh
 						</Text>
 					</Box>
 				);
@@ -26,10 +22,10 @@ const Achievement = () => {
 };
 
 const styles = StyleSheet.create({
-	achievement: {
+	support: {
 		padding: MAIN_LAYOUT.SCREENS.ACCOUNT.PADDING,
 		margin: MAIN_LAYOUT.SCREENS.ACCOUNT.MARGIN / 2,
 	},
 });
 
-export default Achievement;
+export default Support;

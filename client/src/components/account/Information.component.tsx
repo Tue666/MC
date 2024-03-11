@@ -1,27 +1,36 @@
 import { StyleSheet, View } from 'react-native';
-import { Text, useTheme } from 'react-native-paper';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { Text } from 'react-native-paper';
+import { AVATAR_SIZE } from '../../screens/main/account/Account.screen';
+import { ConstantConfig } from '../../configs';
 import { stackStyles } from '../../styles';
-import { Box } from '..';
+import { IAccount } from '../../types';
+import { Box, Rank } from '..';
 
-const Information = () => {
-	const theme = useTheme();
+const { MAIN_LAYOUT } = ConstantConfig;
+
+interface InformationProps extends Pick<IAccount.Account, 'name' | 'created_at'> {}
+
+const Information = (props: InformationProps) => {
+	const { name, created_at } = props;
 
 	return (
 		<Box style={[styles.container, stackStyles.row]}>
 			<View style={[styles.detail]}>
 				<Text variant="titleSmall" style={[{ fontWeight: 'bold' }]}>
-					Lê Chính Tuệ
+					{name}
 				</Text>
 				<Text variant="labelSmall" style={[{ fontWeight: 'bold' }]}>
-					Kim Cương (2 ⚜️)
+					Chưa Xếp hạng
 				</Text>
-				<Text variant="labelSmall" style={[{ fontStyle: 'italic', marginTop: 5 }]}>
-					Đã tham gia vào Tháng 9 XX-XX-X
+				<Text
+					variant="labelSmall"
+					style={[{ fontStyle: 'italic', marginTop: MAIN_LAYOUT.SCREENS.ACCOUNT.MARGIN / 2 }]}
+				>
+					Đã tham gia vào {created_at}
 				</Text>
 			</View>
 			<View style={[styles.rank, stackStyles.center]}>
-				<Icon name="token" size={130} color={theme.colors.primary} />
+				<Rank />
 			</View>
 		</Box>
 	);
@@ -30,22 +39,20 @@ const Information = () => {
 const styles = StyleSheet.create({
 	container: {
 		justifyContent: 'space-between',
-		paddingTop: 185 / 2,
-		paddingHorizontal: 10,
-		paddingBottom: 10,
+		paddingTop: AVATAR_SIZE / 2 + MAIN_LAYOUT.SCREENS.ACCOUNT.PADDING,
+		paddingHorizontal: MAIN_LAYOUT.SCREENS.ACCOUNT.PADDING,
+		paddingBottom: MAIN_LAYOUT.SCREENS.ACCOUNT.PADDING,
 		borderTopLeftRadius: 0,
 		borderTopRightRadius: 0,
-		borderBottomLeftRadius: 10,
-		borderBottomRightRadius: 10,
+		borderBottomLeftRadius: MAIN_LAYOUT.SCREENS.ACCOUNT.BORDER_RADIUS,
+		borderBottomRightRadius: MAIN_LAYOUT.SCREENS.ACCOUNT.BORDER_RADIUS,
 	},
 	detail: {
 		width: '65%',
-		paddingRight: 40,
+		paddingRight: MAIN_LAYOUT.SCREENS.ACCOUNT.INFORMATION.DETAIL_PADDING,
 	},
 	rank: {
-		width: '35%',
-		justifyContent: 'center',
-		alignItems: 'center',
+		flex: 1,
 	},
 });
 

@@ -2,26 +2,54 @@ import { Dimensions, ScrollView, StyleSheet, View } from 'react-native';
 import { Text, useTheme } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Achievement, Avatar, Cover, Information, Statistics } from '../../../components';
+import { ConstantConfig } from '../../../configs';
+import { useAppSelector } from '../../../redux/hooks';
+import { selectAccount } from '../../../redux/slices/account.slice';
 import { AccountProps } from '../../../types';
 
-const Account = (props: AccountProps) => {
-	const theme = useTheme();
+const { CIRCLE_BORDER, MAIN_LAYOUT } = ConstantConfig;
 
+const WIDTH_SIZE = Dimensions.get('window').width;
+const CONTAINER_WIDTH = WIDTH_SIZE - MAIN_LAYOUT.PADDING * 2;
+
+export const AVATAR_SIZE =
+	MAIN_LAYOUT.SCREENS.ACCOUNT.AVATAR.ICON_SIZE +
+	CIRCLE_BORDER.PADDING * 2 +
+	CIRCLE_BORDER.BORDER_WIDTH * 2;
+
+const Account = (props: AccountProps) => {
+	const { navigation } = props;
+	const theme = useTheme();
+	const { profile } = useAppSelector(selectAccount);
+
+	const onPressSetting = () => {
+		navigation.navigate('Setting');
+	};
 	return (
 		<ScrollView>
 			<View>
-				<Icon name="settings" size={25} color={theme.colors.onPrimary} style={[styles.setting]} />
+				<Icon
+					name="settings"
+					size={MAIN_LAYOUT.SCREENS.ACCOUNT.SETTING.ICON_SIZE}
+					color={theme.colors.onPrimary}
+					onPress={onPressSetting}
+					style={[styles.setting]}
+				/>
 				<Cover />
-				<Avatar size={150} style={[styles.avatar]} />
-				<Information />
+				<Avatar
+					size={MAIN_LAYOUT.SCREENS.ACCOUNT.AVATAR.ICON_SIZE}
+					avatar={profile.avatar}
+					style={[styles.avatar]}
+				/>
+				<Information name={profile.name} created_at={profile.created_at} />
 			</View>
-			<View style={[{ marginTop: 20, padding: 10 }]}>
+			<View style={[styles.space]}>
 				<Text variant="titleMedium" style={[{ fontWeight: 'bold' }]}>
 					Thống kê
 				</Text>
 				<Statistics />
 			</View>
-			<View style={[{ marginTop: 20, padding: 10 }]}>
+			<View style={[styles.space]}>
 				<Text variant="titleMedium" style={[{ fontWeight: 'bold' }]}>
 					Thành tựu
 				</Text>
@@ -40,10 +68,13 @@ const styles = StyleSheet.create({
 	},
 	avatar: {
 		position: 'absolute',
-		// backgroundColor: 'pink',
-		top: 200 - 175 / 2,
-		left: Dimensions.get('window').width / 2 - 190 / 2,
+		top: MAIN_LAYOUT.SCREENS.ACCOUNT.AVATAR.COVER_HEIGHT - AVATAR_SIZE / 2,
+		left: CONTAINER_WIDTH / 2 - AVATAR_SIZE / 2,
 		zIndex: 9999,
+	},
+	space: {
+		marginTop: MAIN_LAYOUT.SCREENS.ACCOUNT.MARGIN * 2,
+		padding: MAIN_LAYOUT.SCREENS.ACCOUNT.PADDING,
 	},
 });
 

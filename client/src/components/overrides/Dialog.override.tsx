@@ -1,5 +1,5 @@
-import { DimensionValue, ScrollView, useWindowDimensions } from 'react-native';
-import { Button, Portal, Dialog as RNPDialog } from 'react-native-paper';
+import { DimensionValue, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
+import { Button, Portal, Dialog as RNPDialog, Text, useTheme } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import RenderHTML from 'react-native-render-html';
 import { ConstantConfig } from '../../configs';
@@ -12,6 +12,7 @@ const { DIALOG } = ConstantConfig;
 
 const Dialog = () => {
 	const { width } = useWindowDimensions();
+	const theme = useTheme();
 	const { isOpen, closable, icon, title, content, contentScrollable, actions } =
 		useAppSelector(selectDialog);
 
@@ -25,10 +26,21 @@ const Dialog = () => {
 				style={[globalStyles.paper]}
 			>
 				{icon && <RNPDialog.Icon icon={() => <Icon name={icon} size={DIALOG.ICON_SIZE} />} />}
-				{title && <RNPDialog.Title>{title}</RNPDialog.Title>}
+				{title && (
+					<RNPDialog.Title>
+						<Text variant="titleMedium" style={[styles.title]}>
+							{title}
+						</Text>
+					</RNPDialog.Title>
+				)}
 				{content && !contentScrollable && (
 					<RNPDialog.Content>
-						<RenderHTML contentWidth={width} source={{ html: content }} />
+						<RenderHTML
+							contentWidth={width}
+							source={{
+								html: `<div style="color: ${theme.colors.onSurface};">${content}</div>`,
+							}}
+						/>
 					</RNPDialog.Content>
 				)}
 				{content && contentScrollable && (
@@ -39,7 +51,12 @@ const Dialog = () => {
 						}}
 					>
 						<ScrollView>
-							<RenderHTML contentWidth={width} source={{ html: content }} />
+							<RenderHTML
+								contentWidth={width}
+								source={{
+									html: `<div style="color: ${theme.colors.onSurface};">${content}</div>`,
+								}}
+							/>
 						</ScrollView>
 					</RNPDialog.ScrollArea>
 				)}
@@ -59,5 +76,11 @@ const Dialog = () => {
 		</Portal>
 	);
 };
+
+const styles = StyleSheet.create({
+	title: {
+		fontWeight: 'bold',
+	},
+});
 
 export default Dialog;

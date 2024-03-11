@@ -3,12 +3,25 @@ import { ISchema } from '../types';
 
 export type RoomCons = {
 	MODE: ISchema.RoomModeMapping;
+	STATE: any;
+	CLIENT_STATE: any;
 };
 
 export const ROOM: RoomCons = {
 	MODE: {
+		normal: 'NORMAL',
 		auto: 'AUTO',
-		public: 'PUBLIC',
+	},
+	STATE: {
+		forming: 'FORMING',
+		matching: 'MATCHING',
+		preparing: 'PREPARING',
+		loading_question: 'LOADING_QUESTION',
+		playing: 'PLAYING',
+	},
+	CLIENT_STATE: {
+		connect: 'CONNECT',
+		disconnect: 'DISCONNECT',
 	},
 };
 
@@ -31,6 +44,18 @@ export const DIALOG = {
 };
 
 export const MODAL = {
+	CREATE_FORMING: {
+		WIDTH: 320,
+		ICON_SIZE: 20,
+		PADDING: 25,
+		BORDER_RADIUS: 15,
+	},
+	JOIN_FORMING: {
+		WIDTH: 320,
+		ICON_SIZE: 20,
+		PADDING: 25,
+		BORDER_RADIUS: 15,
+	},
 	WINNER: {
 		WIDTH: Dimensions.get('window').width - 100,
 		PADDING: 25,
@@ -57,6 +82,7 @@ export const SNACKBAR = {
 
 export const CIRCLE_BORDER = {
 	PADDING: 5,
+	MARGIN: 10,
 	MARGIN_VERTICAL: 25,
 	BORDER_WIDTH: 5,
 };
@@ -95,6 +121,23 @@ export const MAIN_LAYOUT = {
 		},
 	},
 	SCREENS: {
+		ACCOUNT: {
+			MARGIN: 10,
+			PADDING: 10,
+			BORDER_RADIUS: 10,
+			SETTING: {
+				ICON_SIZE: 25,
+			},
+			AVATAR: {
+				COVER_HEIGHT: 200,
+				ICON_SIZE: 150,
+			},
+			INFORMATION: {
+				DETAIL_PADDING: 40,
+				RANK_WIDTH: 130,
+				RANK_HEIGHT: 130,
+			},
+		},
 		CONQUER: {
 			RESOURCE: {
 				MARGIN: 5,
@@ -123,6 +166,28 @@ export const MAIN_LAYOUT = {
 			WAITING: {
 				AVATAR: {
 					ICON_SIZE: 220,
+				},
+			},
+			FIND_ROOM: {
+				PADDING: 10,
+				MARGIN: 10,
+				HEADER: {
+					ICON_SIZE: 30,
+				},
+				ITEM: {
+					ICON_SIZE: 50,
+					SUB_ICON_SIZE: 20,
+				},
+			},
+			FORMING: {
+				PADDING: 10,
+				MARGIN: 10,
+				ITEM: {
+					ICON_SIZE: 30,
+				},
+				BOTTOM: {
+					ICON_SIZE: 70,
+					HEIGHT: 270,
 				},
 			},
 			STATISTIC: {

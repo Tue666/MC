@@ -25,6 +25,7 @@ const SignUp = (props: AuthenticationSignUpProps) => {
 			phone_number: '',
 			password: '',
 			passwordConfirm: '',
+			name: '',
 		},
 		validationSchema: signUpValidation,
 		onSubmit: async (values, { resetForm }) => {
@@ -83,7 +84,13 @@ const SignUp = (props: AuthenticationSignUpProps) => {
 				helperText={touched.phone_number && errors.phone_number}
 				left={
 					<RNPTextInput.Icon
-						icon={() => <Icon name="person" size={AUTHENTICATION_LAYOUT.TEXT_INPUT.ICON_SIZE} />}
+						icon={() => (
+							<Icon
+								name="person"
+								size={AUTHENTICATION_LAYOUT.TEXT_INPUT.ICON_SIZE}
+								color={theme.colors.onSurface}
+							/>
+						)}
 					/>
 				}
 				style={[styles.gap]}
@@ -99,7 +106,13 @@ const SignUp = (props: AuthenticationSignUpProps) => {
 				secureTextEntry={hiddenPassword}
 				left={
 					<RNPTextInput.Icon
-						icon={() => <Icon name="lock" size={AUTHENTICATION_LAYOUT.TEXT_INPUT.ICON_SIZE} />}
+						icon={() => (
+							<Icon
+								name="lock"
+								size={AUTHENTICATION_LAYOUT.TEXT_INPUT.ICON_SIZE}
+								color={theme.colors.onSurface}
+							/>
+						)}
 					/>
 				}
 				right={
@@ -108,6 +121,7 @@ const SignUp = (props: AuthenticationSignUpProps) => {
 							<Icon
 								name={hiddenPassword ? 'visibility' : 'visibility-off'}
 								size={AUTHENTICATION_LAYOUT.TEXT_INPUT.ICON_SIZE}
+								color={theme.colors.onSurface}
 							/>
 						)}
 						onPress={onTogglePasswordVisibility}
@@ -126,7 +140,13 @@ const SignUp = (props: AuthenticationSignUpProps) => {
 				secureTextEntry={hiddenPasswordConfirm}
 				left={
 					<RNPTextInput.Icon
-						icon={() => <Icon name="lock-reset" size={AUTHENTICATION_LAYOUT.TEXT_INPUT.ICON_SIZE} />}
+						icon={() => (
+							<Icon
+								name="lock-reset"
+								size={AUTHENTICATION_LAYOUT.TEXT_INPUT.ICON_SIZE}
+								color={theme.colors.onSurface}
+							/>
+						)}
 					/>
 				}
 				right={
@@ -135,9 +155,31 @@ const SignUp = (props: AuthenticationSignUpProps) => {
 							<Icon
 								name={hiddenPasswordConfirm ? 'visibility' : 'visibility-off'}
 								size={AUTHENTICATION_LAYOUT.TEXT_INPUT.ICON_SIZE}
+								color={theme.colors.onSurface}
 							/>
 						)}
 						onPress={onTogglePasswordConfirmVisibility}
+					/>
+				}
+				style={[styles.gap]}
+			/>
+			<TextInput
+				label="Tên người dùng"
+				mode="outlined"
+				dense
+				value={values.name}
+				onChangeText={handleChange('name')}
+				error={Boolean(touched.name && errors.name)}
+				helperText={touched.name && errors.name}
+				left={
+					<RNPTextInput.Icon
+						icon={() => (
+							<Icon
+								name="badge"
+								size={AUTHENTICATION_LAYOUT.TEXT_INPUT.ICON_SIZE}
+								color={theme.colors.onSurface}
+							/>
+						)}
 					/>
 				}
 				style={[styles.gap]}
