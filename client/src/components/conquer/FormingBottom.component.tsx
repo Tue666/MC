@@ -1,13 +1,20 @@
 import { StyleSheet, View } from 'react-native';
 import { Text, useTheme } from 'react-native-paper';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import { ConstantConfig } from '../../configs';
 import { AccountState } from '../../redux/slices/account.slice';
 import { globalStyles, stackStyles, typographyStyles } from '../../styles';
-import { ConquerFormingProps, IRoom } from '../../types';
+import { IRoom } from '../../types';
 import { openDialog } from '../../utils';
 import { Avatar, Box, Button, Rank } from '..';
 
-const { MAIN_LAYOUT } = ConstantConfig;
+const { CIRCLE_BORDER, MAIN_LAYOUT } = ConstantConfig;
+
+const AVATAR_SIZE =
+	MAIN_LAYOUT.SCREENS.CONQUER.FORMING.BOTTOM.ICON_SIZE +
+	CIRCLE_BORDER.PADDING * 2 +
+	CIRCLE_BORDER.BORDER_WIDTH * 2 +
+	MAIN_LAYOUT.SCREENS.CONQUER.FORMING.PADDING / 2;
 
 interface FormingBottomProps {
 	isOwner: boolean;
@@ -43,12 +50,25 @@ const FormingBottom = (props: FormingBottomProps) => {
 	return (
 		<Box style={[styles.container, stackStyles.row]}>
 			<View style={[styles.wrap, globalStyles.container, globalStyles.fh, stackStyles.center]}>
-				<Avatar
-					label={profile.name}
-					avatar={profile.avatar}
-					size={MAIN_LAYOUT.SCREENS.CONQUER.FORMING.BOTTOM.ICON_SIZE}
-					innerStyle={[{ marginTop: 0 }]}
-				/>
+				<View style={[{ position: 'relative' }]}>
+					{isOwner && (
+						<Icon
+							name="star-rate"
+							size={MAIN_LAYOUT.SCREENS.CONQUER.FORMING.ITEM.ICON_SIZE}
+							color={theme.colors.tertiary}
+							style={[
+								styles.owner,
+								{ right: AVATAR_SIZE / 2 - MAIN_LAYOUT.SCREENS.CONQUER.FORMING.ITEM.ICON_SIZE / 2 },
+							]}
+						/>
+					)}
+					<Avatar
+						label={profile.name}
+						avatar={profile.avatar}
+						size={MAIN_LAYOUT.SCREENS.CONQUER.FORMING.BOTTOM.ICON_SIZE}
+						innerStyle={[{ marginTop: 0 }]}
+					/>
+				</View>
 				<Rank size={MAIN_LAYOUT.SCREENS.CONQUER.FORMING.BOTTOM.ICON_SIZE} />
 			</View>
 			<View style={[styles.wrap, globalStyles.container, globalStyles.fh, stackStyles.center]}>
@@ -97,6 +117,10 @@ const styles = StyleSheet.create({
 	},
 	action: {
 		padding: MAIN_LAYOUT.SCREENS.CONQUER.FORMING.PADDING,
+	},
+	owner: {
+		position: 'absolute',
+		bottom: '100%',
 	},
 });
 

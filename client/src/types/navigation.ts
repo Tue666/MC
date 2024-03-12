@@ -6,17 +6,17 @@ import { IQuestion, IRoom, ISchema } from '.';
 export type MainTabList = {
 	ConquerStack: undefined;
 	Shop: undefined;
-	Ranking: undefined;
+	Inventory: undefined;
 	AccountStack: undefined;
 };
 export type MainConquerStackProps = BottomTabScreenProps<MainTabList, 'ConquerStack'>;
 export type MainShopProps = BottomTabScreenProps<MainTabList, 'Shop'>;
-export type MainRankingProps = BottomTabScreenProps<MainTabList, 'Ranking'>;
+export type MainInventoryProps = BottomTabScreenProps<MainTabList, 'Inventory'>;
 export type MainAccountStackProps = BottomTabScreenProps<MainTabList, 'AccountStack'>;
 export type MainLayoutProps =
 	| MainConquerStackProps
 	| MainShopProps
-	| MainRankingProps
+	| MainInventoryProps
 	| MainAccountStackProps;
 
 export type AuthenticationStackList = {

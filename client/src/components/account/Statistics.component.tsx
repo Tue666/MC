@@ -10,14 +10,25 @@ const WIDTH_SIZE = Dimensions.get('window').width;
 const CONTAINER_WIDTH =
 	WIDTH_SIZE - MAIN_LAYOUT.PADDING * 2 - MAIN_LAYOUT.SCREENS.ACCOUNT.PADDING * 2;
 
-const Statistics = () => {
+interface StatisticsProps {
+	width?: number;
+}
+
+const Statistics = (props: StatisticsProps) => {
+	const { width } = props;
+
 	return (
 		<View style={[stackStyles.rowWrap]}>
 			{[...Array(5)].map((_, index) => {
-				const statisticsWidth = (CONTAINER_WIDTH - (MAIN_LAYOUT.SCREENS.ACCOUNT.MARGIN / 2) * 2 * 2) * 0.5;
+				const itemWidth =
+					(CONTAINER_WIDTH -
+						(MAIN_LAYOUT.SCREENS.ACCOUNT.MARGIN / 2) *
+							2 *
+							MAIN_LAYOUT.SCREENS.ACCOUNT.STATISTICS.NUMBER_ITEM_IN_ROW) *
+					(1 / MAIN_LAYOUT.SCREENS.ACCOUNT.STATISTICS.NUMBER_ITEM_IN_ROW);
 
 				return (
-					<Box key={index} style={[styles.statistics, { width: statisticsWidth }]}>
+					<Box key={index} style={[styles.statistics, { width: width || itemWidth }]}>
 						<Text variant="labelSmall" style={[{ fontWeight: 'bold' }]}>
 							???
 						</Text>

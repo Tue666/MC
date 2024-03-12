@@ -52,6 +52,10 @@ class RoomFactory {
     return this.roomInstance.updateRoom(roomId, roomInf);
   }
 
+  transferRoomOwner(roomId, newOwnerId) {
+    return this.roomInstance.transferRoomOwner(roomId, newOwnerId);
+  }
+
   disconnecting(roomId, socketId) {
     return this.roomInstance.disconnecting(roomId, socketId);
   }

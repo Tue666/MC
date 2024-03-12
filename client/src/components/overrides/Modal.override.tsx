@@ -1,5 +1,5 @@
 import { Modal as RNPModal } from 'react-native-paper';
-import { CreateForming, JoinForming, Winner } from '../modal';
+import { Account, CreateForming, Item, JoinForming, Winner } from '../modal';
 import { useModal } from '../../hooks';
 import { useAppSelector } from '../../redux/hooks';
 import { ModalProps, selectModal } from '../../redux/slices/modal.slice';
@@ -7,7 +7,9 @@ import { globalStyles, stackStyles } from '../../styles';
 
 const components = {
 	DEFAULT: (props?: ModalProps['DEFAULT']) => null,
+	ACCOUNT: (props: ModalProps['ACCOUNT']) => <Account {...props} />,
 	CREATE_FORMING: (props: ModalProps['CREATE_FORMING']) => <CreateForming {...props} />,
+	ITEM: (props: ModalProps['ITEM']) => <Item {...props} />,
 	JOIN_FORMING: (props: ModalProps['JOIN_FORMING']) => <JoinForming {...props} />,
 	WINNER: (props: ModalProps['WINNER']) => <Winner {...props} />,
 };

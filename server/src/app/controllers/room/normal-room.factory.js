@@ -172,6 +172,10 @@ class ConcreteNormalRoom {
     return preparedRoom;
   }
 
+  transferRoomOwner(roomId, newOwnerId) {
+    return this.resourceInstance.transferRoomOwner(roomId, newOwnerId);
+  }
+
   updateRoom(roomId, roomInf) {
     const okRequiredFields = ValidateUtil.ensureRequiredFields(roomId, roomInf);
     if (!okRequiredFields) {

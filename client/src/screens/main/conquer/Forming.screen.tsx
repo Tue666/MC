@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { ScrollView, View } from 'react-native';
+import { SoundManager } from '../../../audios';
 import { FormingBottom, FormingItem } from '../../../components';
 import { ConstantConfig } from '../../../configs';
 import { useSocketClient } from '../../../hooks';
@@ -24,10 +25,27 @@ const Forming = (props: ConquerFormingProps) => {
 
 	useEffect(() => {
 		const onInRoomFormingEvent = (room: IRoom.Room) => {
+			const { name, owner, clients } = room;
+
+			// The room has changed owner
+			if (owner !== joinedRoom.owner) {
+				const newOwner = clients.find((client) => client._id === owner);
+				openDialog({
+					title: `[${name}] Thay đổi chủ phòng`,
+					content: `<strong>${newOwner?.name}</strong> đã trở thành chủ phòng mới`,
+					actions: [{ label: 'Đồng ý' }],
+				});
+			}
+
 			setJoinedRoom(room);
 		};
 		socketClient?.on('conquer:server-client(in-room-forming)', onInRoomFormingEvent);
 
+		return () => {
+			socketClient?.off('conquer:server-client(in-room-forming)', onInRoomFormingEvent);
+		};
+	}, [joinedRoom]);
+	useEffect(() => {
 		const onStartFormingEvent = (room: IRoom.Room) => {
 			navigation.navigate('Preparing', {
 				resource,
@@ -48,10 +66,49 @@ const Forming = (props: ConquerFormingProps) => {
 		};
 		socketClient?.on('[ERROR]conquer:server-client(start-forming)', onErrorStartFormingEvent);
 
+		const onErrorTransferOwnerFormingEvent = (error: string) => {
+			openDialog({
+				title: '[Thay đổi chủ phòng] Lỗi',
+				content: error,
+			});
+		};
+		socketClient?.on(
+			'[ERROR]conquer:server-client(transfer-owner-forming)',
+			onErrorTransferOwnerFormingEvent
+		);
+
+		const onRemovedFromFormingEvent = () => {
+			onLeaveForming();
+			openDialog({
+				title: 'Oh',
+				content: 'Bạn đã bị đá khỏi phòng',
+			});
+		};
+		socketClient?.on('conquer:server-client(removed-from-forming)', onRemovedFromFormingEvent);
+
+		const onErrorRemoveClientFormingEvent = (error: string) => {
+			openDialog({
+				title: '[Đá khỏi phòng] Lỗi',
+				content: error,
+			});
+		};
+		socketClient?.on(
+			'[ERROR]conquer:server-client(remove-client-forming)',
+			onErrorRemoveClientFormingEvent
+		);
+
 		return () => {
-			socketClient?.off('conquer:server-client(in-room-forming)', onInRoomFormingEvent);
 			socketClient?.off('conquer:server-client(start-forming)', onStartFormingEvent);
 			socketClient?.off('[ERROR]conquer:server-client(start-forming)', onErrorStartFormingEvent);
+			socketClient?.off(
+				'[ERROR]conquer:server-client(transfer-owner-forming)',
+				onErrorTransferOwnerFormingEvent
+			);
+			socketClient?.off('conquer:server-client(removed-from-forming)', onRemovedFromFormingEvent);
+			socketClient?.off(
+				'[ERROR]conquer:server-client(remove-client-forming)',
+				onErrorRemoveClientFormingEvent
+			);
 		};
 	}, []);
 	const onLeaveForming = () => {
@@ -64,11 +121,25 @@ const Forming = (props: ConquerFormingProps) => {
 
 		navigation.goBack();
 	};
+	const onTransferForming = (newOwner: IRoom.Room['clients'][number]) => {
+		socketClient?.emit('conquer:client-server(transfer-owner-forming)', {
+			mode: roomMode,
+			resource: resource._id,
+			room: joinedRoom,
+			newOwner,
+		});
+	};
+	const onRemoveFromForming = (client: IRoom.Room['clients'][number]) => {
+		socketClient?.emit('conquer:client-server(remove-client-forming)', {
+			client,
+		});
+	};
 	const onStart = () => {
 		if (startFormingRef.current) return;
 
 		startFormingRef.current = true;
 
+		SoundManager.playSound('waiting_bg.mp3', { repeat: true });
 		socketClient?.emit('conquer:client-server(start-forming)', {
 			mode: roomMode,
 			resource: resource._id,
@@ -81,7 +152,16 @@ const Forming = (props: ConquerFormingProps) => {
 				<View style={[stackStyles.rowWrap]}>
 					{clients?.length &&
 						clients.map((client, index) => {
-							return <FormingItem key={index} owner={owner} client={client} />;
+							return (
+								<FormingItem
+									key={index}
+									clientId={profile._id}
+									roomOwner={owner}
+									client={client}
+									onTransferForming={onTransferForming}
+									onRemoveFromForming={onRemoveFromForming}
+								/>
+							);
 						})}
 				</View>
 			</ScrollView>

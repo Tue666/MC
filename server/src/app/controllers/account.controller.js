@@ -8,12 +8,72 @@ const ValidateUtil = require("../../utils/validate.util");
 const { ObjectId } = Types;
 
 class AccountController {
+  async updateCover(req, res, next) {
+    const cloudinaryUploaded = [];
+    try {
+      const cover = req.file;
+      let { _id } = req.account;
+
+      if (!isValidObjectId(_id)) {
+        next({ status: 200, msg: "Các giá trị bắt buộc không được bỏ trống!" });
+        return;
+      }
+
+      _id = ObjectId(_id);
+
+      // Must have cover to update
+      if (!cover) {
+        next({ status: 200, msg: "Các giá trị bắt buộc không được bỏ trống!" });
+        return;
+      }
+
+      const transformedData = {};
+
+      // Transform cover into path
+      if (cover) {
+        const { public_id } = await CloudinaryUtil.upload(cover.path, {
+          folder: "account/cover",
+        });
+        transformedData["cover"] = public_id;
+        cloudinaryUploaded.push(public_id);
+      }
+
+      const account = await Account.findByIdAndUpdate(
+        _id,
+        {
+          $set: transformedData,
+        },
+        {
+          new: true,
+        }
+      );
+
+      res.status(200).json({
+        msg: `Cập nhật cover [${_id}] thành công!`,
+        account: {
+          _id,
+          cover: account.cover,
+        },
+      });
+    } catch (error) {
+      // Remove images were uploaded to cloudinary when insert failed
+      if (cloudinaryUploaded.length > 0) {
+        await Promise.all(
+          cloudinaryUploaded.map(async (image) => {
+            await CloudinaryUtil.destroy(image);
+          })
+        );
+      }
+
+      next({ status: 500, msg: error.message });
+    }
+  }
+
   async updateAvatar(req, res, next) {
     const cloudinaryUploaded = [];
     try {
       const avatar = req.file;
       let { _id } = req.account;
-      const { avatar_url } = req.body;
 
       if (!isValidObjectId(_id)) {
         next({ status: 200, msg: "Các giá trị bắt buộc không được bỏ trống!" });
@@ -23,7 +83,7 @@ class AccountController {
       _id = ObjectId(_id);
 
       // Must have avatar to update
-      if (!avatar && !avatar_url) {
+      if (!avatar) {
         next({ status: 200, msg: "Các giá trị bắt buộc không được bỏ trống!" });
         return;
       }
@@ -37,8 +97,6 @@ class AccountController {
         });
         transformedData["avatar"] = public_id;
         cloudinaryUploaded.push(public_id);
-      } else if (avatar_url) {
-        transformedData["avatar"] = avatar_url;
       }
 
       const account = await Account.findByIdAndUpdate(
@@ -53,7 +111,10 @@ class AccountController {
 
       res.status(200).json({
         msg: `Cập nhật avatar [${_id}] thành công!`,
-        account,
+        account: {
+          _id,
+          avatar: account.avatar,
+        },
       });
     } catch (error) {
       // Remove images were uploaded to cloudinary when insert failed
@@ -194,6 +255,11 @@ class AccountController {
   async getProfile(req, res, next) {
     try {
       let { _id } = req.account;
+
+      // Prioritize params
+      if (req.params._id) {
+        _id = req.params._id;
+      }
 
       if (!isValidObjectId(_id)) {
         next({ status: 200, msg: "Các giá trị bắt buộc không được bỏ trống!" });

@@ -101,6 +101,51 @@ const onClientLeaveForming = (io, socket) => {
   });
 };
 
+const onClientTransferOwnerForming = (io, socket) => {
+  socket.on("conquer:client-server(transfer-owner-forming)", (data) => {
+    try {
+      const { mode, resource, room, newOwner } = data;
+      const roomFTR = roomBuilder(mode, resource);
+
+      const roomWithNewOwner = roomFTR.transferRoomOwner(
+        room._id,
+        newOwner._id
+      );
+
+      // Inform all client that rooms have changed
+      const rooms = roomFTR.findRooms();
+      io.emit("conquer:server-client(forming)", Object.values(rooms));
+
+      io.in(roomWithNewOwner._id).emit(
+        "conquer:server-client(in-room-forming)",
+        roomWithNewOwner
+      );
+    } catch (error) {
+      socket.emit(
+        "[ERROR]conquer:server-client(transfer-owner-forming)",
+        error.message
+      );
+    }
+  });
+};
+
+const onClientRemoveClientForming = (io, socket) => {
+  socket.on("conquer:client-server(remove-client-forming)", (data) => {
+    try {
+      const { client } = data;
+
+      io.to(client.socketId).emit(
+        "conquer:server-client(removed-from-forming)"
+      );
+    } catch (error) {
+      socket.emit(
+        "[ERROR]conquer:server-client(remove-client-forming)",
+        error.message
+      );
+    }
+  });
+};
+
 const onClientStartForming = (io, socket) => {
   socket.on("conquer:client-server(start-forming)", (data) => {
     try {
@@ -235,6 +280,10 @@ module.exports = (io, socket) => {
   onClientForming(io, socket);
 
   onClientLeaveForming(io, socket);
+
+  onClientTransferOwnerForming(io, socket);
+
+  onClientRemoveClientForming(io, socket);
 
   onClientStartForming(io, socket);
 

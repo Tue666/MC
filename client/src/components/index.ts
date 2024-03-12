@@ -11,5 +11,6 @@ export { default as Loading } from './Loading.component';
 export { default as Logo } from './Logo.component';
 export { default as MainHeader } from './MainHeader.component';
 export { default as MathContent } from './MathContent.component';
+export { default as QuantityInput } from './QuantityInput.component';
 export { default as Rank } from './Rank.component';
 export { default as TouchableBox } from './TouchableBox.component';

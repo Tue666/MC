@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Dimensions, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
+import { Dimensions, Image, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { Text, useTheme } from 'react-native-paper';
 import { TouchableBox } from '../../../components';
 import { ConstantConfig, ResourceConfig } from '../../../configs';
@@ -45,66 +45,82 @@ const Conquer = (props: ConquerProps) => {
 		setRefreshing(false);
 	};
 	return (
-		<ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefreshScreen} />}>
-			<View style={[stackStyles.rowWrap]}>
-				{Object.entries(resources).map(([resourceAllowed, permissionAllowed]) => {
-					// Stop render out of arrangement
-					if (ROW_INDEX >= RESOURCE_ARRANGEMENT.length) return;
-
-					const { _id, name, description, difficulty } = permissionAllowed;
-					const resource = RESOURCES[_id];
-					const idleMode = resource?.idleMode || 'SINGLE';
-					const difficultLevel = getDifficultLevel(difficulty, resourceDifficulty);
-					const { label, bgColor, textColor } =
-						resourceDifficulty[difficultLevel as keyof typeof resourceDifficulty];
-					const resourcesInRow = RESOURCE_ARRANGEMENT[ROW_INDEX].length;
-					const resourceWidth =
-						(CONTAINER_WIDTH - MAIN_LAYOUT.SCREENS.CONQUER.RESOURCE.MARGIN * 2 * resourcesInRow) *
-						RESOURCE_ARRANGEMENT[ROW_INDEX][COLUMN_INDEX];
-
-					// Continue next column
-					COLUMN_INDEX++;
-					if (COLUMN_INDEX >= resourcesInRow) {
-						// Continue next row
-						ROW_INDEX++;
-						// Reset column
-						COLUMN_INDEX = 0;
-					}
-
-					return (
-						<TouchableBox
-							key={resourceAllowed}
-							disabled={!resource}
-							onPress={() => onPressResource({ resource: permissionAllowed, idleMode })}
-							onLongPress={() => onLongPressResource(name, description)}
-							style={[
-								styles.resource,
-								{ backgroundColor: resource ? bgColor : theme.colors.outline, width: resourceWidth },
-							]}
-							soundName="button_click.mp3"
-						>
-							<Text style={[{ color: resource ? textColor : theme.colors.outlineVariant }]}>
-								{!resource && (
-									<Text variant="labelSmall" style={[{ color: resource ? textColor : theme.colors.outlineVariant }]}>
-										(Khóa)
-									</Text>
-								)}{' '}
-								{name}
-							</Text>
-							{label && (
-								<Text variant="labelSmall" style={[{ color: resource ? textColor : theme.colors.outlineVariant }]}>
-									({label})
-								</Text>
-							)}
-						</TouchableBox>
-					);
-				})}
+		<View style={[globalStyles.container]}>
+			<View style={[stackStyles.center, styles.top]}>
+				<Image
+					source={require('../../../assets/images/conquer.png')}
+					style={[
+						{
+							width: MAIN_LAYOUT.SCREENS.ICON_SIZE,
+							height: MAIN_LAYOUT.SCREENS.ICON_SIZE,
+						},
+					]}
+				/>
 			</View>
-		</ScrollView>
+			<ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefreshScreen} />}>
+				<View style={[stackStyles.rowWrap]}>
+					{Object.entries(resources).map(([resourceAllowed, permissionAllowed]) => {
+						// Stop render out of arrangement
+						if (ROW_INDEX >= RESOURCE_ARRANGEMENT.length) return;
+
+						const { _id, name, description, difficulty } = permissionAllowed;
+						const resource = RESOURCES[_id];
+						const idleMode = resource?.idleMode || 'SINGLE';
+						const difficultLevel = getDifficultLevel(difficulty, resourceDifficulty);
+						const { label, bgColor, textColor } =
+							resourceDifficulty[difficultLevel as keyof typeof resourceDifficulty];
+						const resourcesInRow = RESOURCE_ARRANGEMENT[ROW_INDEX].length;
+						const resourceWidth =
+							(CONTAINER_WIDTH - MAIN_LAYOUT.SCREENS.CONQUER.RESOURCE.MARGIN * 2 * resourcesInRow) *
+							RESOURCE_ARRANGEMENT[ROW_INDEX][COLUMN_INDEX];
+
+						// Continue next column
+						COLUMN_INDEX++;
+						if (COLUMN_INDEX >= resourcesInRow) {
+							// Continue next row
+							ROW_INDEX++;
+							// Reset column
+							COLUMN_INDEX = 0;
+						}
+
+						return (
+							<TouchableBox
+								key={resourceAllowed}
+								disabled={!resource}
+								onPress={() => onPressResource({ resource: permissionAllowed, idleMode })}
+								onLongPress={() => onLongPressResource(name, description)}
+								style={[
+									styles.resource,
+									{ backgroundColor: resource ? bgColor : theme.colors.outline, width: resourceWidth },
+								]}
+								soundName="button_click.mp3"
+							>
+								<Text style={[{ color: resource ? textColor : theme.colors.outlineVariant }]}>
+									{!resource && (
+										<Text variant="labelSmall" style={[{ color: resource ? textColor : theme.colors.outlineVariant }]}>
+											(Khóa)
+										</Text>
+									)}{' '}
+									{name}
+								</Text>
+								{label && (
+									<Text variant="labelSmall" style={[{ color: resource ? textColor : theme.colors.outlineVariant }]}>
+										({label})
+									</Text>
+								)}
+							</TouchableBox>
+						);
+					})}
+				</View>
+			</ScrollView>
+		</View>
 	);
 };
 
 const styles = StyleSheet.create({
+	top: {
+		margin: MAIN_LAYOUT.SCREENS.MARGIN,
+	},
 	resource: {
 		alignItems: 'center',
 		margin: MAIN_LAYOUT.SCREENS.CONQUER.RESOURCE.MARGIN,

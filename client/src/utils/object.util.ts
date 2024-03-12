@@ -8,6 +8,19 @@ class ObjectUtil {
 
 		return object;
 	}
+
+	static toFormData(object: Object): FormData {
+		const formData = new FormData();
+
+		Object.entries(object).forEach(([key, value]) => {
+			if (value) {
+				if (value instanceof Array) value.map((e) => formData.append(key, e));
+				else formData.append(key, value);
+			}
+		});
+
+		return formData;
+	}
 }
 
 export default ObjectUtil;

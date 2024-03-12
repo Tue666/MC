@@ -12,6 +12,7 @@ const Account = new Schema(
     phone_number: { type: String, required: true, unique: true },
     is_phone_verified: { type: Boolean, default: false },
     name: { type: String, default: StringUtil.randomGenerate(10) },
+    cover: { type: String, default: null },
     avatar: { type: String, default: null },
     password: { type: String, required: true },
     deleted_at: { type: Date, default: null },

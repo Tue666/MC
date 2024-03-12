@@ -27,6 +27,10 @@ export const ROOM: RoomCons = {
 
 export const SPACE_GAP = 8;
 
+export const TOOLTIP = {
+	ICON_SIZE: 20,
+};
+
 export const MATHJAX = {
 	FONT_SIZE: '13px',
 };
@@ -44,11 +48,29 @@ export const DIALOG = {
 };
 
 export const MODAL = {
+	ACCOUNT: {
+		WIDTH: Dimensions.get('window').width - 50,
+		HEIGHT: Dimensions.get('window').height - 50,
+		COVER_HEIGHT: 150,
+		PADDING: 10,
+		MARGIN: 10,
+		BORDER_RADIUS: 15,
+	},
 	CREATE_FORMING: {
 		WIDTH: 320,
 		ICON_SIZE: 20,
 		PADDING: 25,
 		BORDER_RADIUS: 15,
+	},
+	ITEM: {
+		WIDTH: Dimensions.get('window').width - 50,
+		PADDING: 10,
+		MARGIN: 10,
+		BORDER_RADIUS: 15,
+		IMAGE_SIZE: 80,
+		BODY_HEIGHT: 200,
+		SHOP_ACTION_WIDTH: 150,
+		INVENTORY_ACTION_WIDTH: 150,
 	},
 	JOIN_FORMING: {
 		WIDTH: 320,
@@ -121,6 +143,8 @@ export const MAIN_LAYOUT = {
 		},
 	},
 	SCREENS: {
+		MARGIN: 5,
+		ICON_SIZE: 75,
 		ACCOUNT: {
 			MARGIN: 10,
 			PADDING: 10,
@@ -136,6 +160,9 @@ export const MAIN_LAYOUT = {
 				DETAIL_PADDING: 40,
 				RANK_WIDTH: 130,
 				RANK_HEIGHT: 130,
+			},
+			STATISTICS: {
+				NUMBER_ITEM_IN_ROW: 2,
 			},
 		},
 		CONQUER: {
@@ -180,6 +207,7 @@ export const MAIN_LAYOUT = {
 				},
 			},
 			FORMING: {
+				NUMBER_ITEM_IN_ROW: 2,
 				PADDING: 10,
 				MARGIN: 10,
 				ITEM: {
@@ -193,6 +221,24 @@ export const MAIN_LAYOUT = {
 			STATISTIC: {
 				ICON_SIZE: 400,
 				MARGIN_BOTTOM: 25,
+			},
+		},
+		SHOP: {
+			NUMBER_ITEM_IN_ROW: 3,
+			PADDING: 10,
+			MARGIN: 10,
+			BORDER_RADIUS: 10,
+			ITEM: {
+				ICON_SIZE: 20,
+			},
+		},
+		INVENTORY: {
+			NUMBER_ITEM_IN_ROW: 3,
+			PADDING: 10,
+			MARGIN: 10,
+			BORDER_RADIUS: 10,
+			ITEM: {
+				ICON_SIZE: 20,
 			},
 		},
 	},

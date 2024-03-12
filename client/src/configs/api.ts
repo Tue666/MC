@@ -1,6 +1,6 @@
 export const APP = {
 	server: {
-		host: 'http://192.168.1.5:5000',
+		host: 'http://192.168.1.8:5000',
 		path: 'api',
 	},
 	image_storage: {

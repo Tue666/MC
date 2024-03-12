@@ -4,7 +4,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AccountAPI, RoleAPI } from '../../apis';
 import { AppDispatch, RootState } from '../store';
 import { IAccount, IOperation, IResource, IRole } from '../../types';
-import { JWTUtil, openDialog } from '../../utils';
+import { JWTUtil, openDialog, openSnackbar } from '../../utils';
 
 const mergeRoles = (
 	roles: IRole.Role[]
@@ -66,6 +66,20 @@ export const slice = createSlice({
 			state.profile = profile;
 			state.resources = resources;
 		},
+		updateCoverSuccess(
+			state: AccountState,
+			action: PayloadAction<IAccount.UpdateCoverResponse['account']>
+		) {
+			const { cover } = action.payload;
+			state.profile = { ...state.profile, cover };
+		},
+		updateAvatarSuccess(
+			state: AccountState,
+			action: PayloadAction<IAccount.UpdateAvatarResponse['account']>
+		) {
+			const { avatar } = action.payload;
+			state.profile = { ...state.profile, avatar };
+		},
 		clearAccount(state: AccountState) {
 			state.profile = {} as AccountState['profile'];
 			state.resources = {} as Resources;
@@ -96,7 +110,56 @@ export const initAccount = () => async (dispatch: AppDispatch) => {
 		openDialog({
 			title: 'Lỗi',
 			content: `${(error as AxiosError).response?.data}`,
-			closable: false,
 		});
 	}
 };
+
+export const updateCover =
+	(updateCoverBody: IAccount.UpdateCoverBody) => async (dispatch: AppDispatch) => {
+		try {
+			const { account, error } = await AccountAPI.updateCover(updateCoverBody);
+			if (error) {
+				openDialog({
+					title: 'Lỗi',
+					content: error,
+				});
+				return;
+			}
+
+			dispatch(slice.actions.updateCoverSuccess(account));
+			openSnackbar({
+				content: 'Cập nhật ảnh thành công',
+			});
+		} catch (error) {
+			openDialog({
+				title: 'Lỗi',
+				content: `${(error as AxiosError).response?.data}`,
+			});
+		}
+	};
+
+export const updateAvatar =
+	(updateAvatarBody: IAccount.UpdateAvatarBody) => async (dispatch: AppDispatch) => {
+		try {
+			const { account, error } = await AccountAPI.updateAvatar(updateAvatarBody);
+			if (error) {
+				console.log(error);
+				openDialog({
+					title: 'Lỗi',
+					content: error,
+				});
+				return;
+			}
+
+			dispatch(slice.actions.updateAvatarSuccess(account));
+			openSnackbar({
+				content: 'Cập nhật ảnh thành công',
+			});
+		} catch (error) {
+			console.log(error);
+			openDialog({
+				title: 'Lỗi',
+				content: `${(error as AxiosError).response?.data}`,
+			});
+		}
+	};

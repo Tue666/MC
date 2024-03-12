@@ -10,7 +10,7 @@ import { globalStyles, stackStyles } from '../../styles';
 import { MainTabList } from '../../types';
 import { AccountStack } from './account';
 import { ConquerStack } from './conquer';
-import { Ranking, Shop } from '.';
+import { Inventory, Shop } from '.';
 
 const { MAIN_LAYOUT } = ConstantConfig;
 
@@ -99,12 +99,14 @@ const MainTab = () => {
 				)}
 			</Tab.Screen>
 			<Tab.Screen
-				name="Ranking"
-				options={{ tabBarIcon: ({ color, size }) => <Icon name="leaderboard" color={color} size={size} /> }}
+				name="Inventory"
+				options={{
+					tabBarIcon: ({ color, size }) => <Icon name="backpack" color={color} size={size} />,
+				}}
 			>
 				{() => (
 					<MainLayout>
-						<Ranking />
+						<Inventory />
 					</MainLayout>
 				)}
 			</Tab.Screen>

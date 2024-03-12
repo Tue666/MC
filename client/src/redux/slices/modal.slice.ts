@@ -1,12 +1,26 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { CreateFormingProps, JoinFormingProps, WinnerProps } from '../../components/modal';
+import {
+	AccountProps,
+	CreateFormingProps,
+	ItemProps,
+	JoinFormingProps,
+	WinnerProps,
+} from '../../components/modal';
 import { RootState } from '../store';
 
-export type ModalComponent = 'DEFAULT' | 'CREATE_FORMING' | 'JOIN_FORMING' | 'WINNER';
+export type ModalComponent =
+	| 'DEFAULT'
+	| 'ACCOUNT'
+	| 'CREATE_FORMING'
+	| 'ITEM'
+	| 'JOIN_FORMING'
+	| 'WINNER';
 
 export interface ModalProps {
 	DEFAULT: {};
+	ACCOUNT: AccountProps;
 	CREATE_FORMING: CreateFormingProps;
+	ITEM: ItemProps;
 	JOIN_FORMING: JoinFormingProps;
 	WINNER: WinnerProps;
 }

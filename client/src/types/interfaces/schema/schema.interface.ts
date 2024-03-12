@@ -11,6 +11,7 @@ export interface AccountSchema extends TimestampsSchema, SoftDeleteSchema {
 	phone_number: string;
 	is_phone_verified: boolean;
 	name: string;
+	cover: string;
 	avatar: string;
 	password: string;
 	roles: RoleSchema['_id'][];

@@ -8,7 +8,6 @@ import { stackStyles, typographyStyles } from '../styles';
 const { CIRCLE_BORDER } = ConstantConfig;
 
 export interface CircleBorderProps extends ViewProps {
-	top?: ReactNode;
 	label?: string;
 	animated?: boolean;
 	numberOfLines?: number;
@@ -16,7 +15,15 @@ export interface CircleBorderProps extends ViewProps {
 }
 
 const CircleBorder = (props: CircleBorderProps) => {
-	const { children, style, top, label, animated = false, numberOfLines = 2, innerStyle = {} } = props;
+	const {
+		children,
+		style,
+		label,
+		animated = false,
+		numberOfLines = 2,
+		innerStyle = {},
+		...rest
+	} = props;
 	const theme = useTheme();
 	const padding = useSharedValue(CIRCLE_BORDER.PADDING);
 	const borderWidth = useSharedValue(CIRCLE_BORDER.BORDER_WIDTH);
@@ -37,12 +44,7 @@ const CircleBorder = (props: CircleBorderProps) => {
 		borderWidth.value = withTiming(CIRCLE_BORDER.BORDER_WIDTH);
 	}, [animated]);
 	return (
-		<View style={[stackStyles.center, style]}>
-			{top && (
-				<Text numberOfLines={numberOfLines} style={[styles.text, typographyStyles.center]}>
-					{top}
-				</Text>
-			)}
+		<View style={[stackStyles.center, style]} {...rest}>
 			<Animated.View
 				style={[
 					styles.border,
