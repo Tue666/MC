@@ -49,8 +49,8 @@ export const DIALOG = {
 
 export const MODAL = {
 	ACCOUNT: {
-		WIDTH: Dimensions.get('window').width - 50,
-		HEIGHT: Dimensions.get('window').height - 50,
+		WIDTH: Dimensions.get('window').width - 20,
+		HEIGHT: Dimensions.get('window').height - 20,
 		COVER_HEIGHT: 150,
 		PADDING: 10,
 		MARGIN: 10,
@@ -105,7 +105,7 @@ export const SNACKBAR = {
 export const CIRCLE_BORDER = {
 	PADDING: 5,
 	MARGIN: 10,
-	MARGIN_VERTICAL: 25,
+	MARGIN_VERTICAL: 30,
 	BORDER_WIDTH: 5,
 };
 
@@ -143,6 +143,7 @@ export const MAIN_LAYOUT = {
 		},
 	},
 	SCREENS: {
+		PADDING: 5,
 		MARGIN: 5,
 		ICON_SIZE: 75,
 		ACCOUNT: {
@@ -194,6 +195,10 @@ export const MAIN_LAYOUT = {
 				AVATAR: {
 					ICON_SIZE: 220,
 				},
+				RANK: {
+					ICON_SIZE: 100,
+					POSITION: -20,
+				},
 			},
 			FIND_ROOM: {
 				PADDING: 10,
@@ -211,15 +216,18 @@ export const MAIN_LAYOUT = {
 				PADDING: 10,
 				MARGIN: 10,
 				ITEM: {
-					ICON_SIZE: 30,
+					ICON_SIZE: 60,
 				},
 				BOTTOM: {
-					ICON_SIZE: 70,
-					HEIGHT: 270,
+					ICON_SIZE: 100,
+					HEIGHT: 300,
 				},
 			},
 			STATISTIC: {
-				ICON_SIZE: 400,
+				NUMBER_ITEM_IN_ROW: 2,
+				ICON_SIZE: 300,
+				PADDING: 10,
+				MARGIN: 10,
 				MARGIN_BOTTOM: 25,
 			},
 		},

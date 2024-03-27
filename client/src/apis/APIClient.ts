@@ -36,7 +36,8 @@ const APIClient = () => {
 
 				await JWTUtil.setToken(newAccessToken);
 				originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
-				return axios(originalRequest);
+				const res = await axios(originalRequest);
+				return res.data;
 			}
 
 			// Forbidden

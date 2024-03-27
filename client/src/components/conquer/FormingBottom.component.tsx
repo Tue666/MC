@@ -6,36 +6,29 @@ import { AccountState } from '../../redux/slices/account.slice';
 import { globalStyles, stackStyles, typographyStyles } from '../../styles';
 import { IRoom } from '../../types';
 import { openDialog } from '../../utils';
-import { Avatar, Box, Button, Rank } from '..';
+import { Avatar, Box, Button } from '..';
 
-const { CIRCLE_BORDER, MAIN_LAYOUT } = ConstantConfig;
-
-const AVATAR_SIZE =
-	MAIN_LAYOUT.SCREENS.CONQUER.FORMING.BOTTOM.ICON_SIZE +
-	CIRCLE_BORDER.PADDING * 2 +
-	CIRCLE_BORDER.BORDER_WIDTH * 2 +
-	MAIN_LAYOUT.SCREENS.CONQUER.FORMING.PADDING / 2;
+const { MAIN_LAYOUT } = ConstantConfig;
 
 interface FormingBottomProps {
 	isOwner: boolean;
 	profile: AccountState['profile'];
+	minToStart: IRoom.Room['minToStart'];
 	clientCount: IRoom.Room['maxCapacity'];
 	maxCapacity: IRoom.Room['maxCapacity'];
-	minCapacityToStart: IRoom.Room['maxCapacity'];
 	onLeaveForming: () => void;
 	onStart: () => void;
 }
 
 const FormingBottom = (props: FormingBottomProps) => {
-	const { isOwner, profile, clientCount, maxCapacity, minCapacityToStart, onLeaveForming, onStart } =
-		props;
+	const { isOwner, profile, minToStart, clientCount, maxCapacity, onLeaveForming, onStart } = props;
 	const theme = useTheme();
 
 	const onPressStart = () => {
-		if (clientCount < minCapacityToStart) {
+		if (clientCount < minToStart) {
 			openDialog({
 				title: '[Bắt đầu] Số lượng không hợp lệ',
-				content: `Cần ít nhất ${minCapacityToStart} người để bắt đầu trận đấu`,
+				content: `Cần ít nhất ${minToStart} người để bắt đầu trận đấu`,
 				actions: [{ label: 'Đồng ý' }],
 			});
 			return;
@@ -50,26 +43,20 @@ const FormingBottom = (props: FormingBottomProps) => {
 	return (
 		<Box style={[styles.container, stackStyles.row]}>
 			<View style={[styles.wrap, globalStyles.container, globalStyles.fh, stackStyles.center]}>
-				<View style={[{ position: 'relative' }]}>
+				<Avatar avatar={profile.avatar} size={MAIN_LAYOUT.SCREENS.CONQUER.FORMING.BOTTOM.ICON_SIZE} />
+				<View style={[stackStyles.row]}>
 					{isOwner && (
 						<Icon
 							name="star-rate"
-							size={MAIN_LAYOUT.SCREENS.CONQUER.FORMING.ITEM.ICON_SIZE}
+							size={MAIN_LAYOUT.SCREENS.CONQUER.FORMING.ITEM.ICON_SIZE / 4}
 							color={theme.colors.tertiary}
-							style={[
-								styles.owner,
-								{ right: AVATAR_SIZE / 2 - MAIN_LAYOUT.SCREENS.CONQUER.FORMING.ITEM.ICON_SIZE / 2 },
-							]}
+							style={[styles.owner]}
 						/>
 					)}
-					<Avatar
-						label={profile.name}
-						avatar={profile.avatar}
-						size={MAIN_LAYOUT.SCREENS.CONQUER.FORMING.BOTTOM.ICON_SIZE}
-						innerStyle={[{ marginTop: 0 }]}
-					/>
+					<Text variant="labelSmall" numberOfLines={1} style={[{ fontWeight: 'bold' }]}>
+						{profile.name}
+					</Text>
 				</View>
-				<Rank size={MAIN_LAYOUT.SCREENS.CONQUER.FORMING.BOTTOM.ICON_SIZE} />
 			</View>
 			<View style={[styles.wrap, globalStyles.container, globalStyles.fh, stackStyles.center]}>
 				<Text
@@ -119,8 +106,7 @@ const styles = StyleSheet.create({
 		padding: MAIN_LAYOUT.SCREENS.CONQUER.FORMING.PADDING,
 	},
 	owner: {
-		position: 'absolute',
-		bottom: '100%',
+		marginRight: MAIN_LAYOUT.SCREENS.CONQUER.FORMING.MARGIN / 2,
 	},
 });
 

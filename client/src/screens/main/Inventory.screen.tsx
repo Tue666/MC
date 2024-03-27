@@ -1,10 +1,16 @@
-import { FlatList, Image, StyleSheet, View } from 'react-native';
-import { useTheme } from 'react-native-paper';
+import { Dimensions, FlatList, Image, StyleSheet, View } from 'react-native';
+import { Divider, useTheme } from 'react-native-paper';
 import { ConstantConfig } from '../../configs';
 import { globalStyles, stackStyles } from '../../styles';
-import { InventoryItem } from '../../components';
+import { Box, InventoryItem } from '../../components';
 
 const { MAIN_LAYOUT } = ConstantConfig;
+
+const WIDTH_SIZE = Dimensions.get('window').width;
+const CONTAINER_WIDTH = WIDTH_SIZE - MAIN_LAYOUT.PADDING * 2;
+const ITEM_WIDTH =
+	(CONTAINER_WIDTH - 5 * 2 * MAIN_LAYOUT.SCREENS.SHOP.NUMBER_ITEM_IN_ROW) *
+	(1 / MAIN_LAYOUT.SCREENS.SHOP.NUMBER_ITEM_IN_ROW);
 
 export interface IInventoryItem {
 	_id: string;
@@ -18,9 +24,9 @@ export interface IInventoryItem {
 
 const INVENTORY_ITEMS = Array.from({ length: 20 }, (_, index) => ({
 	_id: (index + 1).toString(),
-	title: `Rương ẩn LV.${index + 1}`,
+	title: `Rương ẩn LV.999999`,
 	image: 'https://res.cloudinary.com/tipegallery/image/upload/app/mystery-chest.png',
-	requirement: `Cần đạt LV.${index + 1} để sử dụng`,
+	requirement: `Cần đạt LV.999999 để sử dụng`,
 	maxPurchase: index + 1,
 	price: index + 1,
 	description:
@@ -28,9 +34,11 @@ const INVENTORY_ITEMS = Array.from({ length: 20 }, (_, index) => ({
 }));
 
 const Inventory = () => {
+	const theme = useTheme();
+
 	return (
 		<View style={[globalStyles.container]}>
-			<View style={[stackStyles.center, styles.top]}>
+			<Box style={[stackStyles.center, styles.top, { backgroundColor: theme.colors.tertiary }]}>
 				<Image
 					source={require('../../assets/images/inventory.png')}
 					style={[
@@ -40,10 +48,11 @@ const Inventory = () => {
 						},
 					]}
 				/>
-			</View>
+			</Box>
+			<Divider />
 			<FlatList
 				data={INVENTORY_ITEMS}
-				renderItem={({ item }) => <InventoryItem item={item} />}
+				renderItem={({ item }) => <InventoryItem width={ITEM_WIDTH} item={item} />}
 				keyExtractor={(item) => item._id}
 				numColumns={MAIN_LAYOUT.SCREENS.INVENTORY.NUMBER_ITEM_IN_ROW}
 			/>
@@ -53,6 +62,7 @@ const Inventory = () => {
 
 const styles = StyleSheet.create({
 	top: {
+		padding: MAIN_LAYOUT.SCREENS.PADDING,
 		margin: MAIN_LAYOUT.SCREENS.MARGIN,
 	},
 });

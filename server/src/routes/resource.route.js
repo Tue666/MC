@@ -5,7 +5,7 @@ const {
   ResourceController,
 } = require("../app/controllers/resource.controller");
 
-router.patch("/", ResourceController.partialUpdate.bind(ResourceController));
+router.patch("/", ResourceController.update);
 router.post("/", ResourceController.create);
 
 module.exports = router;

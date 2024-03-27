@@ -1,46 +1,42 @@
-const { roomBuilder } = require("../../../app/controllers/room/room.factory");
-const {
-  QuestionController,
-} = require("../../../app/controllers/question.controller");
+const { roomBuilder } = require("../../../app/services/room/room.service");
 const ValidateUtil = require("../../../utils/validate.util");
-const { ROOM } = require("../../../config/constant");
 
-const onLoadingQuestion = (io, socket) => {
+const onLoadingQuestion = (io, socket, params) => {
+  const { informRoomChanged } = params;
+
   socket.on(
     "conquer[quick-match]:client-server(loading-question)",
     async (data) => {
       try {
         const { mode, resource, room, questionQueryParams = {} } = data;
-        const roomFTR = roomBuilder(mode, resource);
+        const roomService = roomBuilder(mode, resource);
+        const resourceInstance = roomService.getResourceInstance();
 
-        if (!roomFTR.canLoadingQuestion(room._id)) return;
+        if (!resourceInstance.canLoadingQuestion(room._id)) return;
 
-        const randomQuestions = await QuestionController.findRandomQuestions({
-          resources: resource,
-          ...questionQueryParams,
-        });
+        const { roomWithMatch, questions } =
+          await resourceInstance.loadingQuestion(room, questionQueryParams);
 
-        if (randomQuestions.length > 0) {
-          const question = randomQuestions[0];
-
-          roomFTR.updateRoom(room._id, {
-            state: ROOM.STATE.playing,
-            question,
-          });
-        } else {
-          const resetRoom = roomFTR.endPlay(room._id);
+        if (questions.length <= 0) {
+          const resetRoom = roomService.resetPlay(roomWithMatch._id);
 
           if (resetRoom) {
+            // Inform all client that rooms have changed
+            informRoomChanged(io, mode, resource);
+
             io.in(resetRoom._id).emit(
               "conquer:server-client(in-room-forming)",
               resetRoom
             );
+          } else {
+            socket.leave(roomWithMatch._id);
           }
         }
 
-        io.in(room._id).emit(
+        io.in(roomWithMatch._id).emit(
           "conquer[quick-match]:server-client(loading-question)",
-          randomQuestions
+          roomWithMatch,
+          questions
         );
       } catch (error) {
         socket.emit(
@@ -53,13 +49,16 @@ const onLoadingQuestion = (io, socket) => {
 };
 
 const onClientRaiseHand = (io, socket) => {
-  socket.on("conquer[quick-match]:client-server(raise-hand)", (data) => {
+  socket.on("conquer[quick-match]:client-server(raise-hand)", async (data) => {
     try {
       const { mode, resource, room, client } = data;
-      const roomFTR = roomBuilder(mode, resource);
-      const resourceInstance = roomFTR.getResourceInstance();
+      const roomService = roomBuilder(mode, resource);
+      const resourceInstance = roomService.getResourceInstance();
 
-      const hasFirstRaised = resourceInstance.raisedHand(room._id, client._id);
+      const hasFirstRaised = await resourceInstance.raisedHand(
+        room._id,
+        client._id
+      );
       if (hasFirstRaised) return;
 
       io.in(room._id).emit(
@@ -104,40 +103,53 @@ const onSelectedAnswer = (io, socket) => {
   });
 };
 
-const onSubmitAnswers = (io, socket) => {
-  socket.on("conquer[quick-match]:client-server(submit-answers)", (data) => {
-    try {
-      const { mode, resource, room } = data;
-      const roomFTR = roomBuilder(mode, resource);
+const onSubmitAnswers = (io, socket, params) => {
+  const { informRoomChanged } = params;
 
-      io.in(room._id).emit(
-        "conquer[quick-match]:server-client(submit-answers)",
-        data
-      );
+  socket.on(
+    "conquer[quick-match]:client-server(submit-answers)",
+    async (data) => {
+      try {
+        console.log("submit answers socket");
+        const { mode, resource, room, answered, raisedHandId } = data;
+        const roomService = roomBuilder(mode, resource);
 
-      const resetRoom = roomFTR.endPlay(room._id);
+        const match = await roomService.endPlay(room, answered, raisedHandId);
 
-      if (resetRoom) {
-        io.in(resetRoom._id).emit(
-          "conquer:server-client(in-room-forming)",
-          resetRoom
+        io.in(room._id).emit(
+          "conquer[quick-match]:server-client(submit-answers)",
+          match
+        );
+
+        const resetRoom = roomService.resetPlay(room._id);
+
+        if (resetRoom) {
+          // Inform all client that rooms have changed
+          informRoomChanged(io, mode, resource);
+
+          io.in(resetRoom._id).emit(
+            "conquer:server-client(in-room-forming)",
+            resetRoom
+          );
+        } else {
+          socket.leave(room._id);
+        }
+      } catch (error) {
+        socket.emit(
+          "[ERROR]conquer[quick-match]:server-client(submit-answers)",
+          error.message
         );
       }
-    } catch (error) {
-      socket.emit(
-        "[ERROR]conquer[quick-match]:server-client(submit-answers)",
-        error.message
-      );
     }
-  });
+  );
 };
 
-module.exports = (io, socket) => {
-  onLoadingQuestion(io, socket);
+module.exports = (io, socket, params) => {
+  onLoadingQuestion(io, socket, params);
 
   onClientRaiseHand(io, socket);
 
   onSelectedAnswer(io, socket);
 
-  onSubmitAnswers(io, socket);
+  onSubmitAnswers(io, socket, params);
 };

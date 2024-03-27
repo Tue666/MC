@@ -1,73 +1,29 @@
-const { QUESTION_TYPES, Question } = require("../models/question.model");
-const ValidateUtil = require("../../utils/validate.util");
-const StringUtil = require("../../utils/string.util");
+const { QuestionService } = require("../services/question.service");
 
 class QuestionController {
+  async findByRandom(req, res, next) {
+    try {
+      const questions = await QuestionService.findByRandom(req.body);
+
+      res.status(200).json({
+        questions,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async create(req, res, next) {
     try {
-      let { content, type, values, answers, ...rest } = req.body;
-
-      const okRequiredFields = ValidateUtil.ensureRequiredFields(
-        content,
-        type,
-        values,
-        answers
-      );
-      if (!okRequiredFields) {
-        next({ status: 200, msg: "Các giá trị bắt buộc không được bỏ trống!" });
-        return;
-      }
-
-      const okIncludeOne = ValidateUtil.ensureIncludeOne(
-        type,
-        Object.values(QUESTION_TYPES)
-      );
-      if (!okIncludeOne) {
-        next({
-          status: 200,
-          msg: `Loại câu hỏi [${type}] không tồn tại. Hãy thử lại với: ${Object.values(
-            QUESTION_TYPES
-          ).join(", ")}.`,
-        });
-        return;
-      }
-
-      const question = new Question({
-        content,
-        type,
-        values,
-        answers,
-        ...rest,
-      });
-      await question.save();
+      const question = await QuestionService.create(req.body);
 
       res.status(201).json({
         msg: `Tạo câu hỏi thành công!`,
         question,
       });
     } catch (error) {
-      next({ status: 500, msg: error.message });
+      next(error);
     }
-  }
-
-  async findRandomQuestions(queryParams) {
-    let { size, resources } = queryParams;
-
-    size = size ? parseInt(size) : 1;
-
-    const queries = {};
-
-    if (resources !== null && resources !== undefined) {
-      resources = StringUtil.toArray(resources);
-      queries["resources"] = { $in: resources };
-    }
-
-    const questions = await Question.aggregate([
-      { $match: queries },
-      { $sample: { size } },
-    ]);
-
-    return questions;
   }
 }
 

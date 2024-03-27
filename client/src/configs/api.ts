@@ -1,6 +1,7 @@
 export const APP = {
 	server: {
-		host: 'http://192.168.1.8:5000',
+		// host: 'https://mc-rpfw.onrender.com',
+		host: 'http://192.168.1.10:5000',
 		path: 'api',
 	},
 	image_storage: {

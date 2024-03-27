@@ -45,10 +45,12 @@ const Dialog = () => {
 				)}
 				{content && contentScrollable && (
 					<RNPDialog.ScrollArea
-						style={{
-							maxHeight: DIALOG.SCROLL_CONTENT.MAX_HEIGHT as DimensionValue,
-							padding: DIALOG.SCROLL_CONTENT.PADDING,
-						}}
+						style={[
+							{
+								maxHeight: DIALOG.SCROLL_CONTENT.MAX_HEIGHT as DimensionValue,
+								padding: DIALOG.SCROLL_CONTENT.PADDING,
+							},
+						]}
 					>
 						<ScrollView>
 							<RenderHTML

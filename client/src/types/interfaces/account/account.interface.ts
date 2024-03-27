@@ -1,6 +1,6 @@
 import { Asset } from 'react-native-image-picker';
 import { Response } from '../common';
-import { AccountSchema, AdministratorSchema, StudentSchema } from '../schema';
+import { AccountSchema, AdministratorSchema, Point, StudentSchema } from '../schema';
 import { Tokens } from './auth.interface';
 
 export interface Account extends AccountSchema {}
@@ -11,6 +11,7 @@ export interface Administrator extends AdministratorSchema {}
 
 export interface ProfileResponse extends Response {
 	profile: Omit<Account, 'password'>;
+	point: Point;
 }
 
 export interface UpdateCoverBody {
@@ -44,3 +45,7 @@ export interface SignUpBody extends Pick<Account, 'phone_number' | 'password' | 
 }
 
 export interface SignUpResponse extends Response {}
+
+export interface VerifyTokenResponse {
+	verified: boolean;
+}

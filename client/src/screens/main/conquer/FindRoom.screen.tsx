@@ -21,22 +21,13 @@ export const onCreateForming = (params: CreateFormingProps) => {
 	});
 };
 
+export const onJoinForming = (room: IRoom.Room) => {};
+
 export const onQuickJoinForming = (params: JoinFormingProps) => {
 	openModal<'JOIN_FORMING'>({
 		component: 'JOIN_FORMING',
 		params,
 	});
-};
-
-export const validateRoom = (room: IRoom.Room) => {
-	let error = null;
-	const { maxCapacity, clients } = room;
-
-	if (clients.length >= maxCapacity) {
-		error = 'Số lượng thành viên đã đầy';
-	}
-
-	return error;
 };
 
 interface OutRoomForming {
@@ -47,12 +38,12 @@ interface OutRoomForming {
 
 const FindRoom = (props: ConquerFindRoomProps) => {
 	const { navigation, route } = props;
-	const { resource, roomMode, idleMode, maxCapacity } = route.params;
+	const { resource, roomMode, idleMode, minToStart, maxCapacity } = route.params;
 	const isFocused = useIsFocused();
 	const isRoomChanging = useRef<boolean | null>(false);
 	const [rooms, setRooms] = useState<IRoom.Room[] | null>([]);
 	const { profile } = useAppSelector(selectAccount);
-	const socketClient = useSocketClient();
+	const { socketClient } = useSocketClient();
 
 	useEffect(() => {
 		const onFormingEvent = (rooms: IRoom.Room[]) => {
@@ -91,7 +82,7 @@ const FindRoom = (props: ConquerFindRoomProps) => {
 				return;
 			}
 
-			navigation.navigate('Forming', { resource, room, roomMode, idleMode, maxCapacity });
+			navigation.navigate('Forming', { resource, room, roomMode, idleMode, minToStart });
 			closeModal();
 		};
 		socketClient?.on('conquer:server-client(out-room-forming)', onOutRoomFormingEvent);
@@ -115,23 +106,13 @@ const FindRoom = (props: ConquerFindRoomProps) => {
 			resource,
 			roomMode,
 			idleMode,
+			minToStart,
 			maxCapacity,
 		});
 	};
 	const onJoinForming = (room: IRoom.Room) => {
 		const { _id } = room;
 
-		const error = validateRoom(room);
-		if (error) {
-			openDialog({
-				title: '[Vào phòng] Thất bại',
-				content: error,
-				actions: [{ label: 'Đồng ý' }],
-			});
-			return;
-		}
-
-		// The same as onJoinForming [client/src/components/modal/JoinForming.component.tsx]
 		socketClient?.emit('conquer:client-server(forming)', {
 			mode: roomMode,
 			resource: resource._id,

@@ -1,4 +1,5 @@
 const { Schema, Types, model } = require("mongoose");
+const { EXPERIENCE_MILESTONE } = require("../../config/constant");
 const StringUtil = require("../../utils/string.util");
 
 const { ObjectId } = Types;
@@ -15,6 +16,29 @@ const Account = new Schema(
     cover: { type: String, default: null },
     avatar: { type: String, default: null },
     password: { type: String, required: true },
+    gold_point: {
+      type: {
+        _id: false,
+        value: { type: Number },
+      },
+      default: {
+        value: 0,
+      },
+    },
+    experience_point: {
+      type: {
+        _id: false,
+        value: { type: Number },
+        maxValue: { type: Number },
+        level: { type: Number },
+      },
+      default: {
+        value: 0,
+        maxValue: EXPERIENCE_MILESTONE[1].maxValue,
+        level: EXPERIENCE_MILESTONE[1].level,
+      },
+    },
+    matches: { type: [ObjectId], ref: "Match", default: [] },
     deleted_at: { type: Date, default: null },
     deleted_by: {
       type: {

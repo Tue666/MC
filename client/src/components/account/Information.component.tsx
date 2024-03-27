@@ -4,20 +4,23 @@ import { AVATAR_SIZE } from '../../screens/main/account/Account.screen';
 import { ConstantConfig } from '../../configs';
 import { stackStyles } from '../../styles';
 import { IAccount } from '../../types';
-import { Box, Rank } from '..';
+import { Box, Name, Rank } from '..';
 
 const { MAIN_LAYOUT } = ConstantConfig;
 
-interface InformationProps extends Pick<IAccount.Account, 'name' | 'created_at'> {}
+interface InformationProps
+	extends Pick<IAccount.Account, 'name' | 'experience_point' | 'created_at'> {}
 
 const Information = (props: InformationProps) => {
-	const { name, created_at } = props;
+	const { name, experience_point, created_at } = props;
+	const { value, maxValue, level } = experience_point;
 
 	return (
 		<Box style={[styles.container, stackStyles.row]}>
 			<View style={[styles.detail]}>
-				<Text variant="titleSmall" style={[{ fontWeight: 'bold' }]}>
-					{name}
+				<Name>{name}</Name>
+				<Text variant="labelSmall" style={[{ fontWeight: 'bold' }]}>
+					Cấp độ: {level} ({value}/{maxValue})
 				</Text>
 				<Text variant="labelSmall" style={[{ fontWeight: 'bold' }]}>
 					Chưa Xếp hạng
@@ -42,13 +45,10 @@ const styles = StyleSheet.create({
 		paddingTop: AVATAR_SIZE / 2 + MAIN_LAYOUT.SCREENS.ACCOUNT.PADDING,
 		paddingHorizontal: MAIN_LAYOUT.SCREENS.ACCOUNT.PADDING,
 		paddingBottom: MAIN_LAYOUT.SCREENS.ACCOUNT.PADDING,
-		borderTopLeftRadius: 0,
-		borderTopRightRadius: 0,
-		borderBottomLeftRadius: MAIN_LAYOUT.SCREENS.ACCOUNT.BORDER_RADIUS,
-		borderBottomRightRadius: MAIN_LAYOUT.SCREENS.ACCOUNT.BORDER_RADIUS,
+		borderRadius: 0,
 	},
 	detail: {
-		width: '65%',
+		width: '62%',
 		paddingRight: MAIN_LAYOUT.SCREENS.ACCOUNT.INFORMATION.DETAIL_PADDING,
 	},
 	rank: {

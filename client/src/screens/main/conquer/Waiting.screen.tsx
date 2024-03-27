@@ -15,7 +15,6 @@ import { openDialog } from '../../../utils';
 
 const { MAIN_LAYOUT, ROOM } = ConstantConfig;
 
-const DEFAULT_MAX_CAPACITY = 3;
 const MAX_WAITING_TIME = 300;
 
 const Waiting = (props: ConquerWaitingProps) => {
@@ -27,7 +26,7 @@ const Waiting = (props: ConquerWaitingProps) => {
 	const [joinedRoom, setJoinedRoom] = useState<IRoom.Room | null>(null);
 	const matchingRef = useRef<boolean | null>(false);
 	const { profile } = useAppSelector(selectAccount);
-	const socketClient = useSocketClient();
+	const { socketClient } = useSocketClient();
 
 	useEffect(() => {
 		if (isFocused) {
@@ -111,7 +110,7 @@ const Waiting = (props: ConquerWaitingProps) => {
 		socketClient?.emit('conquer:client-server(matching)', {
 			mode: ROOM.MODE.auto,
 			resource: resource._id,
-			room: { maxCapacity: DEFAULT_MAX_CAPACITY },
+			room: { minToStart: resource.min_to_start },
 			client: profile,
 		});
 		setIsMatching(true);
@@ -121,7 +120,8 @@ const Waiting = (props: ConquerWaitingProps) => {
 			resource,
 			roomMode: ROOM.MODE.normal,
 			idleMode,
-			maxCapacity: DEFAULT_MAX_CAPACITY,
+			minToStart: resource.min_to_start,
+			maxCapacity: resource.max_capacity,
 		});
 
 		socketClient?.emit('conquer:client-server(find-forming)', {
@@ -136,7 +136,7 @@ const Waiting = (props: ConquerWaitingProps) => {
 				<Animated.View entering={FadeInUp}>
 					<SingleWaiting
 						avatar={profile.avatar}
-						animated={isMatching}
+						playing={isMatching}
 						duration={MAX_WAITING_TIME}
 						onComplete={onCountdownComplete}
 					/>
@@ -154,7 +154,7 @@ const Waiting = (props: ConquerWaitingProps) => {
 					iconColor={isMatching ? theme.colors.onError : theme.colors.onPrimary}
 				>
 					{isMatching
-						? `Hủy (${joinedRoom?.clients?.length ?? 0}/${joinedRoom?.maxCapacity})`
+						? `Hủy (${joinedRoom?.clients?.length ?? 0}/${joinedRoom?.minToStart ?? resource.min_to_start})`
 						: 'Ghép ngẫu nhiên'}
 				</Button>
 			</Animated.View>

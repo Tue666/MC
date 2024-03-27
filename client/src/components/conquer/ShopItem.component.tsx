@@ -1,4 +1,4 @@
-import { Dimensions, Image, StyleSheet, View } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 import { Divider, Text, useTheme } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { ConstantConfig } from '../../configs';
@@ -9,19 +9,14 @@ import { TouchableBox } from '..';
 
 const { MAIN_LAYOUT } = ConstantConfig;
 
-const WIDTH_SIZE = Dimensions.get('window').width;
-const CONTAINER_WIDTH = WIDTH_SIZE - MAIN_LAYOUT.PADDING * 2;
-
 interface ShopItemProps {
+	width: number;
 	item: IShopItem;
 }
 
 const ShopItem = (props: ShopItemProps) => {
-	const { item } = props;
+	const { width, item } = props;
 	const theme = useTheme();
-	const itemWidth =
-		(CONTAINER_WIDTH - 5 * 2 * MAIN_LAYOUT.SCREENS.SHOP.NUMBER_ITEM_IN_ROW) *
-		(1 / MAIN_LAYOUT.SCREENS.SHOP.NUMBER_ITEM_IN_ROW);
 
 	const onPressItem = () => {
 		openModal<'ITEM'>({
@@ -35,7 +30,7 @@ const ShopItem = (props: ShopItemProps) => {
 	return (
 		<TouchableBox
 			onPress={onPressItem}
-			style={[styles.container, stackStyles.center, { width: itemWidth }]}
+			style={[styles.container, stackStyles.center, { width }]}
 			soundName="button_click.mp3"
 		>
 			<Image
@@ -43,7 +38,7 @@ const ShopItem = (props: ShopItemProps) => {
 				style={[
 					styles.image,
 					globalStyles.fw,
-					{ height: itemWidth - MAIN_LAYOUT.SCREENS.SHOP.PADDING * 2, objectFit: 'contain' },
+					{ height: width - MAIN_LAYOUT.SCREENS.SHOP.PADDING * 2, objectFit: 'contain' },
 				]}
 			/>
 			<Text variant="labelSmall" numberOfLines={1} style={[{ fontWeight: 'bold' }]}>

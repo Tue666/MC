@@ -3,7 +3,8 @@ const questionRouter = require("./question.route");
 const operationRouter = require("./operation.route");
 const resourceRouter = require("./resource.route");
 const roleRouter = require("./role.route");
-const roomRouter = require("./room.route");
+const matchRouter = require("./match.route");
+const quickMatchRouter = require("./quick-match.route");
 
 const initialRoutes = (app) => {
   app.use("/api/accounts", accountRouter);
@@ -11,7 +12,8 @@ const initialRoutes = (app) => {
   app.use("/api/operations", operationRouter);
   app.use("/api/resources", resourceRouter);
   app.use("/api/roles", roleRouter);
-  app.use("/api/rooms", roomRouter);
+  app.use("/api/matches", matchRouter);
+  app.use("/api/quick-matches", quickMatchRouter);
 };
 
 module.exports = initialRoutes;

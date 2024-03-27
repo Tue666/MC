@@ -50,7 +50,7 @@ class AccountAPI {
 		return APIClient.get(url);
 	}
 
-	static verifyToken(): Promise<boolean> {
+	static verifyToken(): Promise<IAccount.VerifyTokenResponse> {
 		const url = `/accounts/verify-token`;
 		return APIClient.get(url);
 	}

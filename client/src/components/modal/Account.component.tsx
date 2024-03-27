@@ -14,6 +14,10 @@ import { Achievement, Avatar, Cover, Information, Loading, Statistics } from '..
 
 const { MAIN_LAYOUT, MODAL } = ConstantConfig;
 const CONTAINER_WIDTH = MODAL.ACCOUNT.WIDTH - MODAL.ACCOUNT.PADDING * 2;
+const ITEM_WIDTH =
+	(CONTAINER_WIDTH -
+		MODAL.ACCOUNT.MARGIN * 2 * MAIN_LAYOUT.SCREENS.ACCOUNT.STATISTICS.NUMBER_ITEM_IN_ROW) *
+	(1 / MAIN_LAYOUT.SCREENS.ACCOUNT.STATISTICS.NUMBER_ITEM_IN_ROW);
 
 export interface AccountProps {
 	_id: IAccount.Account['_id'];
@@ -22,10 +26,6 @@ export interface AccountProps {
 const Account = (props: AccountProps) => {
 	const { _id } = props;
 	const [profile, setProfile] = useState<AccountState['profile'] | null>(null);
-	const itemWidth =
-		(CONTAINER_WIDTH -
-			MODAL.ACCOUNT.MARGIN * 2 * MAIN_LAYOUT.SCREENS.ACCOUNT.STATISTICS.NUMBER_ITEM_IN_ROW) *
-		(1 / MAIN_LAYOUT.SCREENS.ACCOUNT.STATISTICS.NUMBER_ITEM_IN_ROW);
 
 	useEffect(() => {
 		const getProfile = async () => {
@@ -66,17 +66,22 @@ const Account = (props: AccountProps) => {
 					<View>
 						<Cover cover={profile.cover} style={[{ height: MODAL.ACCOUNT.COVER_HEIGHT }]} />
 						<Avatar
-							size={MAIN_LAYOUT.SCREENS.ACCOUNT.AVATAR.ICON_SIZE}
+							noRank
 							avatar={profile.avatar}
+							size={MAIN_LAYOUT.SCREENS.ACCOUNT.AVATAR.ICON_SIZE}
 							style={[styles.avatar]}
 						/>
-						<Information name={profile.name} created_at={profile.created_at} />
+						<Information
+							name={profile.name}
+							experience_point={profile.experience_point}
+							created_at={profile.created_at}
+						/>
 					</View>
 					<View style={[styles.space]}>
 						<Text variant="titleMedium" style={[{ fontWeight: 'bold' }]}>
 							Thống kê
 						</Text>
-						<Statistics width={itemWidth} />
+						<Statistics width={ITEM_WIDTH} />
 					</View>
 					<View style={[styles.space]}>
 						<Text variant="titleMedium" style={[{ fontWeight: 'bold' }]}>

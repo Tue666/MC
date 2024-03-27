@@ -27,8 +27,9 @@ class JWTUtil {
 	static async isValidToken(accessToken: IAccount.Tokens['AC_T'] | null): Promise<boolean> {
 		if (accessToken === null || accessToken === undefined) return false;
 
-		JWTUtil.setToken(accessToken);
-		return AccountAPI.verifyToken();
+		await JWTUtil.setToken(accessToken);
+		const { verified } = await AccountAPI.verifyToken();
+		return verified;
 	}
 
 	static setHeader(key: string, value: string): void {

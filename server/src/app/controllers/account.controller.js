@@ -1,217 +1,69 @@
-const { isValidObjectId, Types } = require("mongoose");
-const { Account, Student, ACCOUNT_TYPES } = require("../models/account.model");
-const BcryptUtil = require("../../utils/bcrypt.util");
-const CloudinaryUtil = require("../../utils/cloundinary.util");
-const JWTUtil = require("../../utils/jwt.util");
-const ValidateUtil = require("../../utils/validate.util");
-
-const { ObjectId } = Types;
+const { AccountService } = require("../services/account.service");
 
 class AccountController {
   async updateCover(req, res, next) {
-    const cloudinaryUploaded = [];
     try {
       const cover = req.file;
       let { _id } = req.account;
 
-      if (!isValidObjectId(_id)) {
-        next({ status: 200, msg: "Các giá trị bắt buộc không được bỏ trống!" });
-        return;
-      }
-
-      _id = ObjectId(_id);
-
-      // Must have cover to update
-      if (!cover) {
-        next({ status: 200, msg: "Các giá trị bắt buộc không được bỏ trống!" });
-        return;
-      }
-
-      const transformedData = {};
-
-      // Transform cover into path
-      if (cover) {
-        const { public_id } = await CloudinaryUtil.upload(cover.path, {
-          folder: "account/cover",
-        });
-        transformedData["cover"] = public_id;
-        cloudinaryUploaded.push(public_id);
-      }
-
-      const account = await Account.findByIdAndUpdate(
-        _id,
-        {
-          $set: transformedData,
-        },
-        {
-          new: true,
-        }
-      );
+      const account = await AccountService.updateWithFile(_id, [
+        { field: "cover", value: cover },
+      ]);
 
       res.status(200).json({
-        msg: `Cập nhật cover [${_id}] thành công!`,
+        msg: `Cập nhật cover [${account._id}] thành công!`,
         account: {
           _id,
           cover: account.cover,
         },
       });
     } catch (error) {
-      // Remove images were uploaded to cloudinary when insert failed
-      if (cloudinaryUploaded.length > 0) {
-        await Promise.all(
-          cloudinaryUploaded.map(async (image) => {
-            await CloudinaryUtil.destroy(image);
-          })
-        );
-      }
-
-      next({ status: 500, msg: error.message });
+      next(error);
     }
   }
 
   async updateAvatar(req, res, next) {
-    const cloudinaryUploaded = [];
     try {
       const avatar = req.file;
       let { _id } = req.account;
 
-      if (!isValidObjectId(_id)) {
-        next({ status: 200, msg: "Các giá trị bắt buộc không được bỏ trống!" });
-        return;
-      }
-
-      _id = ObjectId(_id);
-
-      // Must have avatar to update
-      if (!avatar) {
-        next({ status: 200, msg: "Các giá trị bắt buộc không được bỏ trống!" });
-        return;
-      }
-
-      const transformedData = {};
-
-      // Transform avatar into path
-      if (avatar) {
-        const { public_id } = await CloudinaryUtil.upload(avatar.path, {
-          folder: "account/avatar",
-        });
-        transformedData["avatar"] = public_id;
-        cloudinaryUploaded.push(public_id);
-      }
-
-      const account = await Account.findByIdAndUpdate(
-        _id,
-        {
-          $set: transformedData,
-        },
-        {
-          new: true,
-        }
-      );
+      const account = await AccountService.updateWithFile(_id, [
+        { field: "avatar", value: avatar },
+      ]);
 
       res.status(200).json({
-        msg: `Cập nhật avatar [${_id}] thành công!`,
+        msg: `Cập nhật avatar [${account._id}] thành công!`,
         account: {
           _id,
           avatar: account.avatar,
         },
       });
     } catch (error) {
-      // Remove images were uploaded to cloudinary when insert failed
-      if (cloudinaryUploaded.length > 0) {
-        await Promise.all(
-          cloudinaryUploaded.map(async (image) => {
-            await CloudinaryUtil.destroy(image);
-          })
-        );
-      }
-
-      next({ status: 500, msg: error.message });
+      next(error);
     }
   }
 
   async signIn(req, res, next) {
     try {
-      const { phone_number, password } = req.body;
-
-      const okRequiredFields = ValidateUtil.ensureRequiredFields(
-        phone_number,
-        password
-      );
-      if (!okRequiredFields) {
-        next({ status: 200, msg: "Các giá trị bắt buộc không được bỏ trống!" });
-        return;
-      }
-
-      const account = await Account.findOne({ phone_number }).select({
-        password: 1,
-      });
-      if (!account) {
-        next({ status: 200, msg: "Thông tin tài khoản không chính xác!" });
-        return;
-      }
-
-      const isRightPassword = await BcryptUtil.compare(
-        password,
-        account.password
-      );
-      if (!isRightPassword) {
-        next({ status: 200, msg: "Thông tin tài khoản không chính xác!" });
-        return;
-      }
-
-      const { _id, account_type } = account;
-      const { accessToken } = JWTUtil.generateToken({
-        _id,
-        account_type,
-      });
+      const accessToken = await AccountService.signIn(req.body);
 
       res.status(200).json({
         accessToken,
       });
     } catch (error) {
-      next({ status: 500, msg: error.message });
+      next(error);
     }
   }
 
   async signUp(req, res, next) {
     try {
-      const { phone_number, password, passwordConfirm, name } = req.body;
-
-      const okRequiredFields = ValidateUtil.ensureRequiredFields(
-        phone_number,
-        password,
-        passwordConfirm
-      );
-      if (!okRequiredFields) {
-        next({ status: 200, msg: "Các giá trị bắt buộc không được bỏ trống!" });
-        return;
-      }
-
-      const accountExisted = await Account.findOne({ phone_number });
-      if (accountExisted) {
-        next({ status: 200, msg: "Tài khoản đã tồn tại!" });
-        return;
-      }
-
-      if (password !== passwordConfirm) {
-        next({ status: 200, msg: "Mật khẩu không khớp!" });
-        return;
-      }
-
-      const hashedPassword = await BcryptUtil.hash(password);
-      const account = new Student({
-        phone_number,
-        password: hashedPassword,
-        name,
-      });
-      await account.save();
+      const account = await AccountService.signUp(req.body);
 
       res.status(201).json({
-        msg: "Tạo tài khoản [STUDENT] thành công",
+        msg: `Tạo tài khoản [${account.account_type}] thành công`,
       });
     } catch (error) {
-      next({ status: 500, msg: error.message });
+      next(error);
     }
   }
 
@@ -221,34 +73,25 @@ class AccountController {
       authorizationHeader && authorizationHeader.split(" ")[1];
 
     try {
-      const tokenDecoded = JWTUtil.verifyToken(accessToken, {
-        ignoreExpiration: true,
-      });
-      const account = await Account.findOne({ _id: tokenDecoded._id });
-      if (!account) {
-        next({ status: 200, msg: "Thông tin tài khoản không chính xác!" });
-        return;
-      }
-
-      const { _id, account_type } = account;
-      const { accessToken: refreshedAccessToken } = JWTUtil.generateToken({
-        _id,
-        account_type,
-      });
+      const refreshedAccessToken = await AccountService.refreshToken(
+        accessToken
+      );
 
       res.status(200).json({
         accessToken: refreshedAccessToken,
       });
     } catch (error) {
-      next({ status: 500, msg: error.message });
+      next(error);
     }
   }
 
   async verifyToken(req, res, next) {
     try {
-      res.status(200).json(true);
+      res.status(200).json({
+        verified: true,
+      });
     } catch (error) {
-      next({ status: 500, msg: error.message });
+      next(error);
     }
   }
 
@@ -261,35 +104,11 @@ class AccountController {
         _id = req.params._id;
       }
 
-      if (!isValidObjectId(_id)) {
-        next({ status: 200, msg: "Các giá trị bắt buộc không được bỏ trống!" });
-        return;
-      }
+      const profile = await AccountService.getProfile(_id);
 
-      _id = ObjectId(_id);
-      const account = await Account.findOne({ _id }).select({
-        password: 0,
-      });
-
-      let extraProfile = {};
-      const accountType = account.account_type;
-      switch (accountType) {
-        case ACCOUNT_TYPES.administrator:
-          // Get extra profile of administrator if needed
-          break;
-        case ACCOUNT_TYPES.student:
-          // Get extra profile of student if needed
-          break;
-        default:
-          break;
-      }
-
-      res.status(200).json({
-        profile: account,
-        ...extraProfile,
-      });
+      res.status(200).json(profile);
     } catch (error) {
-      next({ status: 500, msg: error.message });
+      next(error);
     }
   }
 }

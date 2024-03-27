@@ -1,5 +1,7 @@
 class StringUtil {
   static toStringID(value) {
+    if (!value) return;
+
     return StringUtil.removeVietnamese(value).replace(/ /g, "_").toUpperCase();
   }
 

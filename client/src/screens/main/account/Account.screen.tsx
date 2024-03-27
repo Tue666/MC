@@ -1,10 +1,10 @@
 import { ReactNode } from 'react';
 import { Dimensions, ScrollView, StyleSheet, View } from 'react-native';
-import { Text, useTheme } from 'react-native-paper';
+import { useTheme } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Tooltip from 'rn-tooltip';
 import { Asset } from 'react-native-image-picker';
-import { Achievement, Avatar, Button, Cover, Information, Statistics } from '../../../components';
+import { Avatar, Button, Cover, Information, Segment } from '../../../components';
 import { ConstantConfig } from '../../../configs';
 import { useImagePicker } from '../../../hooks';
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
@@ -44,9 +44,9 @@ const Account = (props: AccountProps) => {
 				}}
 				popover={
 					<View style={[stackStyles.center]}>
-						<Button mode="contained" onPress={onPressViewImage} soundName="button_click.mp3">
+						{/* <Button mode="contained" onPress={onPressViewImage} soundName="button_click.mp3">
 							Xem ảnh
-						</Button>
+						</Button> */}
 						<Button mode="contained" onPress={() => onPressTakePhoto(mode)} soundName="button_click.mp3">
 							Chụp ảnh
 						</Button>
@@ -63,9 +63,9 @@ const Account = (props: AccountProps) => {
 	const onPressSetting = () => {
 		navigation.navigate('Setting');
 	};
-	const onPressViewImage = () => {
-		console.log('view image');
-	};
+	// const onPressViewImage = () => {
+	// 	console.log('view image');
+	// };
 	const onPressTakePhoto = async (mode: UpdateMode) => {
 		try {
 			const result = await launchCamera({ mediaType: 'photo' });
@@ -139,24 +139,17 @@ const Account = (props: AccountProps) => {
 				<View>{renderTooltip(<Cover cover={profile.cover} />, 'COVER')}</View>
 				<View style={[styles.avatar]}>
 					{renderTooltip(
-						<Avatar size={MAIN_LAYOUT.SCREENS.ACCOUNT.AVATAR.ICON_SIZE} avatar={profile.avatar} />,
+						<Avatar noRank avatar={profile.avatar} size={MAIN_LAYOUT.SCREENS.ACCOUNT.AVATAR.ICON_SIZE} />,
 						'AVATAR'
 					)}
 				</View>
-				<Information name={profile.name} created_at={profile.created_at} />
+				<Information
+					name={profile.name}
+					experience_point={profile.experience_point}
+					created_at={profile.created_at}
+				/>
 			</View>
-			<View style={[styles.space]}>
-				<Text variant="titleMedium" style={[{ fontWeight: 'bold' }]}>
-					Thống kê
-				</Text>
-				<Statistics />
-			</View>
-			<View style={[styles.space]}>
-				<Text variant="titleMedium" style={[{ fontWeight: 'bold' }]}>
-					Thành tựu
-				</Text>
-				<Achievement />
-			</View>
+			<Segment />
 		</ScrollView>
 	);
 };
@@ -173,10 +166,6 @@ const styles = StyleSheet.create({
 		top: MAIN_LAYOUT.SCREENS.ACCOUNT.AVATAR.COVER_HEIGHT - AVATAR_SIZE / 2,
 		left: CONTAINER_WIDTH / 2 - AVATAR_SIZE / 2,
 		zIndex: 9999,
-	},
-	space: {
-		marginTop: MAIN_LAYOUT.SCREENS.ACCOUNT.MARGIN * 2,
-		padding: MAIN_LAYOUT.SCREENS.ACCOUNT.PADDING,
 	},
 });
 

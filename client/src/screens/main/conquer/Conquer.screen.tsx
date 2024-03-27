@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Dimensions, Image, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
-import { Text, useTheme } from 'react-native-paper';
-import { TouchableBox } from '../../../components';
+import { Divider, Text, useTheme } from 'react-native-paper';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { Box, TouchableBox } from '../../../components';
 import { ConstantConfig, ResourceConfig } from '../../../configs';
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
 import { initAccount, selectAccount } from '../../../redux/slices/account.slice';
@@ -46,7 +47,7 @@ const Conquer = (props: ConquerProps) => {
 	};
 	return (
 		<View style={[globalStyles.container]}>
-			<View style={[stackStyles.center, styles.top]}>
+			<Box style={[stackStyles.center, styles.top, { backgroundColor: theme.colors.primary }]}>
 				<Image
 					source={require('../../../assets/images/conquer.png')}
 					style={[
@@ -56,7 +57,8 @@ const Conquer = (props: ConquerProps) => {
 						},
 					]}
 				/>
-			</View>
+			</Box>
+			<Divider />
 			<ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefreshScreen} />}>
 				<View style={[stackStyles.rowWrap]}>
 					{Object.entries(resources).map(([resourceAllowed, permissionAllowed]) => {
@@ -95,14 +97,10 @@ const Conquer = (props: ConquerProps) => {
 								]}
 								soundName="button_click.mp3"
 							>
-								<Text style={[{ color: resource ? textColor : theme.colors.outlineVariant }]}>
-									{!resource && (
-										<Text variant="labelSmall" style={[{ color: resource ? textColor : theme.colors.outlineVariant }]}>
-											(Khóa)
-										</Text>
-									)}{' '}
-									{name}
-								</Text>
+								<View style={[stackStyles.row]}>
+									{!resource && <Icon name="lock" color={resource ? textColor : theme.colors.outlineVariant} />}
+									<Text style={[{ color: resource ? textColor : theme.colors.outlineVariant }]}>{name}</Text>
+								</View>
 								{label && (
 									<Text variant="labelSmall" style={[{ color: resource ? textColor : theme.colors.outlineVariant }]}>
 										({label})
@@ -119,6 +117,7 @@ const Conquer = (props: ConquerProps) => {
 
 const styles = StyleSheet.create({
 	top: {
+		padding: MAIN_LAYOUT.SCREENS.PADDING,
 		margin: MAIN_LAYOUT.SCREENS.MARGIN,
 	},
 	resource: {

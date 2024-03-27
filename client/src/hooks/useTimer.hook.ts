@@ -1,12 +1,10 @@
 import { useEffect, useState } from 'react';
+import { NumberUtil, TimeSelect } from '../utils';
 
-const useTimer = (timer: number) => {
+const useTimer = (timer: number, select?: TimeSelect[]) => {
 	const [countdown, setCountdown] = useState(timer);
 	const isExpired = countdown <= 0;
-	const days = Math.floor(countdown / (24 * 3600));
-	const hours = Math.floor((countdown % (24 * 3600)) / 3600);
-	const minutes = Math.floor((countdown % 3600) / 60);
-	const seconds = countdown % 60;
+	const time = NumberUtil.toTime(countdown, select);
 
 	useEffect(() => {
 		if (isExpired) return;
@@ -18,7 +16,7 @@ const useTimer = (timer: number) => {
 		return () => clearInterval(interval);
 	}, [countdown]);
 
-	return { countdown, isExpired, days, hours, minutes, seconds };
+	return { countdown, isExpired, ...time };
 };
 
 export default useTimer;

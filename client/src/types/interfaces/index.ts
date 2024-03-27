@@ -1,6 +1,7 @@
 export * as ISchema from './schema';
 export * as ICommon from './common';
 export * as IAccount from './account';
+export * as IMatch from './match';
 export * as IQuestion from './question';
 export * as IRoom from './room';
 export * as IOperation from './operation';

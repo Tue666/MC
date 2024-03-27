@@ -16,12 +16,12 @@ import {
 
 const App = () => {
 	return (
-		<SocketClientProvider>
+		<NavigationContainer>
 			<ReduxProvider store={store}>
-				<SettingProvider>
-					<ThemeProvider>
-						<AuthenticationProvider>
-							<NavigationContainer>
+				<SocketClientProvider>
+					<SettingProvider>
+						<ThemeProvider>
+							<AuthenticationProvider>
 								<Main />
 								<DialogUtilConfiguration />
 								<Dialog />
@@ -29,12 +29,12 @@ const App = () => {
 								<Snackbar />
 								<ModalUtilConfiguration />
 								<Modal />
-							</NavigationContainer>
-						</AuthenticationProvider>
-					</ThemeProvider>
-				</SettingProvider>
+							</AuthenticationProvider>
+						</ThemeProvider>
+					</SettingProvider>
+				</SocketClientProvider>
 			</ReduxProvider>
-		</SocketClientProvider>
+		</NavigationContainer>
 	);
 };
 

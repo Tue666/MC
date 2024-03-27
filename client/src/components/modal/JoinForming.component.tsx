@@ -25,7 +25,7 @@ const JoinForming = (props: JoinFormingProps) => {
 	const [password, setPassword] = useState('');
 	const [hiddenPassword, setHiddenPassword] = useState(true);
 	const { profile } = useAppSelector(selectAccount);
-	const socketClient = useSocketClient();
+	const { socketClient } = useSocketClient();
 
 	const onChangeRoomId = (text: string) => {
 		setRoomId(text);
@@ -37,7 +37,6 @@ const JoinForming = (props: JoinFormingProps) => {
 		if (!roomId) return;
 		if (_id && !password) return;
 
-		// The same as onJoinForming [client/src/screens/main/conquer/FindRoom.screen.tsx]
 		socketClient?.emit('conquer:client-server(forming)', {
 			mode: roomMode,
 			resource: resource._id,

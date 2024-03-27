@@ -24,9 +24,9 @@ const Cover = (props: CoverProps) => {
 						uri: `${APP.image_storage.url}/${cover}`,
 					}}
 					style={[
+						styles.container,
 						{
 							width: '100%',
-							height: MAIN_LAYOUT.SCREENS.ACCOUNT.AVATAR.COVER_HEIGHT,
 							objectFit: 'fill',
 						},
 					]}

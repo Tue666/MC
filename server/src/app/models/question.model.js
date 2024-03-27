@@ -17,7 +17,8 @@ const Question = new Schema(
     },
     resources: { type: [String], ref: "Resource", default: [] },
     description: { type: String, default: "" },
-    values: { type: [Number], default: [] },
+    values: { type: [Number], required: true },
+    answer_time: { type: Number, required: true },
     answers: {
       type: [
         {
@@ -25,8 +26,10 @@ const Question = new Schema(
           content: { type: String, required: true },
         },
       ],
-      default: [],
+      required: true,
     },
+    gold_point: { type: Number, default: 0 },
+    experience_point: { type: Number, default: 0 },
     deleted_at: { type: Date, default: null },
     deleted_by: {
       type: {

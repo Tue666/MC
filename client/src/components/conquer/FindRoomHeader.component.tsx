@@ -10,7 +10,7 @@ const { MAIN_LAYOUT } = ConstantConfig;
 
 const FindRoomHeader = (props: ConquerFindRoomProps) => {
 	const { route } = props;
-	const { resource, roomMode, idleMode, maxCapacity } = route.params;
+	const { resource, roomMode, idleMode, minToStart, maxCapacity } = route.params;
 	const theme = useTheme();
 
 	const onPressQuickJoinForming = () => {
@@ -24,6 +24,7 @@ const FindRoomHeader = (props: ConquerFindRoomProps) => {
 			resource,
 			roomMode,
 			idleMode,
+			minToStart,
 			maxCapacity,
 		});
 	};

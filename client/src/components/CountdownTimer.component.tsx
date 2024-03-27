@@ -4,27 +4,20 @@ import { MD3TypescaleKey, Text } from 'react-native-paper';
 import { ConstantConfig } from '../configs';
 import { useTimer } from '../hooks';
 import { stackStyles } from '../styles';
+import { TimeSelect } from '../utils';
 
 const { COUNT_DOWN_TIMER } = ConstantConfig;
 
-export type Timer = 'D' | 'H' | 'M';
-
 export interface CountdownTimerProps extends ViewProps {
-	timer: number; // In second
-	timerSelected: Timer[];
+	timer: number;
+	select: TimeSelect[];
 	timerVariant?: MD3TypescaleKey;
 	onExpired?: () => void;
 }
 
 const CountdownTimer = (props: CountdownTimerProps) => {
-	const {
-		timer,
-		timerSelected = ['D', 'H', 'M'],
-		timerVariant = 'headlineSmall',
-		onExpired,
-		...rest
-	} = props;
-	const { isExpired, days, hours, minutes, seconds } = useTimer(timer);
+	const { timer, select, timerVariant = 'headlineSmall', onExpired, ...rest } = props;
+	const { isExpired, days, hours, minutes, seconds } = useTimer(timer, select);
 
 	useEffect(() => {
 		if (isExpired) onExpired && onExpired();
@@ -34,32 +27,32 @@ const CountdownTimer = (props: CountdownTimerProps) => {
 
 	return (
 		<View style={[stackStyles.row]} {...rest}>
-			{timerSelected.includes('D') && (
+			{days && (
 				<Fragment>
 					<View style={[styles.timer]}>
-						<Text variant={timerVariant}>{days < 10 ? `0${days}` : days}</Text>
+						<Text variant={timerVariant}>{days.text}</Text>
 					</View>
 					<Text variant={timerVariant}>:</Text>
 				</Fragment>
 			)}
-			{timerSelected.includes('H') && (
+			{hours && (
 				<Fragment>
 					<View style={[styles.timer]}>
-						<Text variant={timerVariant}>{hours < 10 ? `0${hours}` : hours}</Text>
+						<Text variant={timerVariant}>{hours.text}</Text>
 					</View>
 					<Text variant={timerVariant}>:</Text>
 				</Fragment>
 			)}
-			{timerSelected.includes('M') && (
+			{minutes && (
 				<Fragment>
 					<View style={[styles.timer]}>
-						<Text variant={timerVariant}>{minutes < 10 ? `0${minutes}` : minutes}</Text>
+						<Text variant={timerVariant}>{minutes.text}</Text>
 					</View>
 					<Text variant={timerVariant}>:</Text>
 				</Fragment>
 			)}
 			<View style={[styles.timer]}>
-				<Text variant={timerVariant}>{seconds < 10 ? `0${seconds}` : seconds}</Text>
+				<Text variant={timerVariant}>{seconds.text}</Text>
 			</View>
 		</View>
 	);

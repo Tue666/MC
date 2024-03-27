@@ -3,19 +3,23 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Text, useTheme } from 'react-native-paper';
 import { ConstantConfig } from '../configs';
 import { useSetting } from '../hooks';
+import { useAppSelector } from '../redux/hooks';
+import { selectAccount } from '../redux/slices/account.slice';
 import { globalStyles, stackStyles } from '../styles';
+import { Point } from '.';
 
 const { MAIN_LAYOUT } = ConstantConfig;
 
 const MainHeader = () => {
 	const theme = useTheme();
+	const { profile } = useAppSelector(selectAccount);
 	const { themeMode, onChangeTheme } = useSetting();
 
 	return (
 		<View style={[styles.header, globalStyles.paper, globalStyles.shadow, stackStyles.row]}>
 			<View style={[stackStyles.row]}>
-				<Icon name="paid" size={MAIN_LAYOUT.HEADER.ICON_SIZE} color={theme.colors.tertiary} />
-				<Text variant="labelSmall"> 0</Text>
+				<Point type="gold_point" size={MAIN_LAYOUT.HEADER.ICON_SIZE} />
+				<Text variant="labelSmall"> {profile.gold_point.value}</Text>
 			</View>
 			<Icon
 				name={themeMode === 'light' ? 'dark-mode' : 'light-mode'}

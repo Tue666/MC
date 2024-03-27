@@ -14,7 +14,7 @@ import { openDialog } from '../../../utils';
 
 const { MAIN_LAYOUT, VIBRATIONS } = ConstantConfig;
 
-const MAX_PREPARING_TIME = 15;
+const MAX_PREPARING_TIME = 10;
 
 const Preparing = (props: ConquerPreparingProps) => {
 	const { navigation, route } = props;
@@ -26,7 +26,7 @@ const Preparing = (props: ConquerPreparingProps) => {
 	const prepareRef = useRef<boolean | null>(false);
 	const countdownExpiredRef = useRef<boolean | null>(false);
 	const { profile } = useAppSelector(selectAccount);
-	const socketClient = useSocketClient();
+	const { socketClient } = useSocketClient();
 
 	useEffect(() => {
 		SoundManager.playSound('prepare.mp3');
@@ -115,7 +115,7 @@ const Preparing = (props: ConquerPreparingProps) => {
 				<Animated.View entering={FadeInUp}>
 					<SingleWaiting
 						avatar={profile.avatar}
-						animated={true}
+						playing={true}
 						duration={MAX_PREPARING_TIME}
 						onComplete={onCountdownComplete}
 					/>

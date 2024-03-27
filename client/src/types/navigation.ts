@@ -1,7 +1,7 @@
 import { StackScreenProps } from '@react-navigation/stack';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { Resources } from '../redux/slices/account.slice';
-import { IQuestion, IRoom, ISchema } from '.';
+import { IMatch, IQuestion, IResource, IRoom, ISchema } from '.';
 
 export type MainTabList = {
 	ConquerStack: undefined;
@@ -46,6 +46,7 @@ export type ConquerStackList = {
 		resource: Resources[keyof Resources];
 		roomMode: ISchema.RoomMode;
 		idleMode: ConquerIdleMode;
+		minToStart: IRoom.Room['minToStart'];
 		maxCapacity: IRoom.Room['maxCapacity'];
 	};
 	Forming: {
@@ -53,7 +54,7 @@ export type ConquerStackList = {
 		room: IRoom.Room;
 		roomMode: ISchema.RoomMode;
 		idleMode: ConquerIdleMode;
-		maxCapacity: IRoom.Room['maxCapacity'];
+		minToStart: IRoom.Room['minToStart'];
 	};
 	Preparing: {
 		resource: Resources[keyof Resources];
@@ -67,8 +68,10 @@ export type ConquerStackList = {
 		roomMode: ISchema.RoomMode;
 	};
 	Statistic: {
-		client: IRoom.Room['clients'][number];
-		isCorrect: boolean;
+		client: IMatch.Match['clients'][number];
+		isClientAnswerCorrect: boolean;
+		match: IMatch.Match;
+		room: IRoom.Room;
 	};
 	QuickMatch: {
 		resource: Resources[keyof Resources];

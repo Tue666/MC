@@ -13,6 +13,8 @@ const Resource = new Schema(
     description: { type: String, default: "" },
     priority: { type: Number, default: 0 },
     difficulty: { type: Number, default: 0 },
+    min_to_start: { type: Number, default: 0 },
+    max_capacity: { type: Number, default: 0 },
     operations: { type: [String], ref: "Operation", default: [] },
     status: {
       type: String,

@@ -4,7 +4,7 @@ import { Loading } from '../../../components';
 import { useSocketClient } from '../../../hooks';
 import { useAppSelector } from '../../../redux/hooks';
 import { selectAccount } from '../../../redux/slices/account.slice';
-import { ConquerLoadingQuestionProps, IQuestion } from '../../../types';
+import { ConquerLoadingQuestionProps, IQuestion, IRoom } from '../../../types';
 import { openDialog } from '../../../utils';
 
 const LoadingQuestion = (props: ConquerLoadingQuestionProps) => {
@@ -12,7 +12,7 @@ const LoadingQuestion = (props: ConquerLoadingQuestionProps) => {
 	const { resource, room, roomMode } = route.params;
 	const popAction = StackActions.pop(2);
 	const { profile } = useAppSelector(selectAccount);
-	const socketClient = useSocketClient();
+	const { socketClient } = useSocketClient();
 
 	useEffect(() => {
 		const isOwner = room.owner === profile._id;
@@ -31,7 +31,7 @@ const LoadingQuestion = (props: ConquerLoadingQuestionProps) => {
 		});
 	};
 	useEffect(() => {
-		const onLoadingQuestionEvent = (questions: IQuestion.Question[]) => {
+		const onLoadingQuestionEvent = (roomWithMatch: IRoom.Room, questions: IQuestion.Question[]) => {
 			if (!questions.length) {
 				navigation.dispatch(popAction);
 				openDialog({
@@ -43,7 +43,7 @@ const LoadingQuestion = (props: ConquerLoadingQuestionProps) => {
 			}
 
 			const question = questions[0];
-			navigation.navigate('QuickMatch', { resource, room, roomMode, question });
+			navigation.navigate('QuickMatch', { resource, room: roomWithMatch, roomMode, question });
 		};
 		socketClient?.on('conquer[quick-match]:server-client(loading-question)', onLoadingQuestionEvent);
 

@@ -2,9 +2,9 @@ const mongoose = require("mongoose");
 const { dbConfig } = require(".");
 
 const connect = async () => {
-  const { mongoDbUri } = dbConfig;
+  const { mongo_db_uri } = dbConfig;
   try {
-    await mongoose.connect(mongoDbUri, () => {
+    await mongoose.connect(mongo_db_uri, () => {
       console.log("DB connection successful");
     });
   } catch (error) {

@@ -5,7 +5,7 @@ const {
   OperationController,
 } = require("../app/controllers/operation.controller");
 
-router.patch("/", OperationController.partialUpdate.bind(OperationController));
+router.patch("/", OperationController.update);
 router.post("/", OperationController.create);
 
 module.exports = router;

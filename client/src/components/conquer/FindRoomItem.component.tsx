@@ -43,7 +43,6 @@ const FindRoomItem = (props: FindRoomItemProps) => {
 						return (
 							<Avatar
 								key={index}
-								hiddenBorder
 								avatar={member.avatar}
 								size={MAIN_LAYOUT.SCREENS.CONQUER.FIND_ROOM.ITEM.SUB_ICON_SIZE}
 								style={[{ margin: MAIN_LAYOUT.SCREENS.CONQUER.FIND_ROOM.MARGIN / 5 }]}

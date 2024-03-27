@@ -5,42 +5,48 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { SoundManager } from '../../../../audios';
 import {
 	Avatar,
-	CircleBorder,
-	CountdownTimer,
+	CountdownCircle,
 	SingleModeAnswer,
 	SingleModeQuestion,
 } from '../../../../components';
+import { SingleModeAnswerHandleRef } from '../../../../components/conquer/SingleModeAnswer.component';
 import { ConstantConfig } from '../../../../configs';
 import { useSocketClient } from '../../../../hooks';
 import { useAppSelector } from '../../../../redux/hooks';
 import { selectAccount } from '../../../../redux/slices/account.slice';
 import { stackStyles } from '../../../../styles';
 import { ConquerQuickMatchProps, IRoom } from '../../../../types';
-import { openDialog } from '../../../../utils';
+import { HelperUtil, openDialog } from '../../../../utils';
 
 const { MAIN_LAYOUT } = ConstantConfig;
 
-const COUNT_DOWN_TIME = 10;
-const ANSWER_TIME = 10;
 const IN_ANSWER_TEXT = 'Đang trả lời...';
 
-export type State = 'IN_COUNTDOWN_TIME' | 'IN_RAISE_HAND_TIME' | 'IN_ANSWER_TIME';
+export type State = 'IN_COUNTDOWN_TIME' | 'IN_ANSWER_TIME';
 
 const QuickMatch = (props: ConquerQuickMatchProps) => {
 	const { navigation, route } = props;
 	const { resource, room: joinedRoom, roomMode, question } = route.params;
+	const answerTime = (joinedRoom.endTime - joinedRoom.startTime) / 1000;
+	const remainingAnswerTime = (joinedRoom.endTime - HelperUtil.getCurrentTime()) / 1000;
+	const raisedHand = joinedRoom.clients.find((client) => client._id === joinedRoom.firstRaisedHand);
 	const theme = useTheme();
-	const raiseHandRef = useRef<boolean | null>(false);
+	const answerComRef = useRef<SingleModeAnswerHandleRef | null>(null);
+	const raiseHandRef = useRef<boolean | null>(raisedHand ? true : false);
 	const scrollViewRef = useRef<ScrollView | null>(null);
-	const [state, setState] = useState<State>('IN_COUNTDOWN_TIME');
-	const [firstRaisedHand, setFirstRaisedHand] = useState<IRoom.Room['clients'][number] | null>(null);
+	const [state, setState] = useState<State>(raisedHand ? 'IN_ANSWER_TIME' : 'IN_COUNTDOWN_TIME');
+	const [playingCountdown, setPlayingCountdown] = useState(true);
+	const [firstRaisedHand, setFirstRaisedHand] = useState<IRoom.Room['clients'][number] | null>(
+		raisedHand || null
+	);
 	const { profile } = useAppSelector(selectAccount);
-	const socketClient = useSocketClient();
+	const { socketClient } = useSocketClient();
 
 	useEffect(() => {
 		SoundManager.playSound('quick_match_bg.mp3', { repeat: true });
 
 		return () => {
+			answerComRef.current = null;
 			raiseHandRef.current = null;
 			scrollViewRef.current = null;
 		};
@@ -67,9 +73,6 @@ const QuickMatch = (props: ConquerQuickMatchProps) => {
 			socketClient?.off('[ERROR]conquer[quick-match]:server-client(raise-hand)', onErrorRaiseHandEvent);
 		};
 	}, []);
-	const onCountdownExpired = () => {
-		setState('IN_RAISE_HAND_TIME');
-	};
 	const onPressRaiseHand = () => {
 		if (raiseHandRef.current) return;
 
@@ -82,49 +85,60 @@ const QuickMatch = (props: ConquerQuickMatchProps) => {
 			client: profile,
 		});
 	};
-
+	const onChangePlayingCountdown = (playing: boolean) => {
+		setPlayingCountdown(playing);
+	};
+	const onCountdownComplete = () => {
+		answerComRef.current?.processResults();
+	};
 	return (
 		<View style={[stackStyles.center]}>
 			<ScrollView ref={scrollViewRef}>
 				<SingleModeQuestion content={question.content} />
 				<View style={[styles.raise, stackStyles.center]}>
-					{state !== 'IN_ANSWER_TIME' && (
-						<CircleBorder>
-							{state === 'IN_COUNTDOWN_TIME' && (
-								<CountdownTimer timer={COUNT_DOWN_TIME} timerSelected={['M']} onExpired={onCountdownExpired} />
+					<TouchableOpacity>
+						<CountdownCircle
+							playing={playingCountdown}
+							duration={answerTime}
+							initialRemainingTime={remainingAnswerTime}
+							size={MAIN_LAYOUT.SCREENS.CONQUER.RAISE_HAND.ICON_SIZE}
+							onComplete={onCountdownComplete}
+						>
+							{state !== 'IN_ANSWER_TIME' && (
+								<Icon
+									name="notifications-active"
+									size={MAIN_LAYOUT.SCREENS.CONQUER.RAISE_HAND.ICON_SIZE}
+									color={theme.colors.tertiary}
+									onPress={onPressRaiseHand}
+								/>
 							)}
-							{state === 'IN_RAISE_HAND_TIME' && (
-								<TouchableOpacity>
-									<Icon
-										name="notifications-active"
-										size={MAIN_LAYOUT.SCREENS.CONQUER.RAISE_HAND.ICON_SIZE}
-										color={theme.colors.tertiary}
-										onPress={onPressRaiseHand}
-									/>
-								</TouchableOpacity>
+							{state === 'IN_ANSWER_TIME' && (
+								<Avatar
+									noBorder
+									avatar={firstRaisedHand?.avatar}
+									size={MAIN_LAYOUT.SCREENS.CONQUER.RAISE_HAND.ICON_SIZE}
+								/>
 							)}
-						</CircleBorder>
-					)}
+						</CountdownCircle>
+					</TouchableOpacity>
 					{state === 'IN_ANSWER_TIME' && (
 						<>
-							<Avatar
-								label={firstRaisedHand?.name ?? ''}
-								avatar={firstRaisedHand?.avatar}
-								size={MAIN_LAYOUT.SCREENS.CONQUER.RAISE_HAND.ICON_SIZE}
-							/>
+							<Text variant="labelSmall" numberOfLines={1} style={[{ fontWeight: 'bold' }]}>
+								{firstRaisedHand?.name}
+							</Text>
 							<Text variant="labelSmall">{IN_ANSWER_TEXT}</Text>
 						</>
 					)}
 				</View>
 				<Divider />
 				<SingleModeAnswer
+					ref={answerComRef}
 					navigation={navigation}
 					route={route}
-					answerTime={ANSWER_TIME}
 					question={question}
-					firstRaisedHand={firstRaisedHand}
-					isInAnswerTime={state === 'IN_ANSWER_TIME'}
-					isAllowedAnswer={firstRaisedHand?._id === profile._id}
+					clientId={profile._id}
+					raisedHandId={firstRaisedHand?._id}
+					onChangePlayingCountdown={onChangePlayingCountdown}
 				/>
 			</ScrollView>
 		</View>

@@ -1,7 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
 import { Text, TextInput as RNPTextInput, IconButton, useTheme } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { AxiosError } from 'axios';
@@ -10,15 +8,9 @@ import { ConstantConfig } from '../../configs';
 import { createFormingValidation } from '../../configs/form-validation';
 import { useSocketClient } from '../../hooks';
 import { useAppSelector } from '../../redux/hooks';
-import { Resources, selectAccount } from '../../redux/slices/account.slice';
+import { selectAccount } from '../../redux/slices/account.slice';
 import { globalStyles, stackStyles } from '../../styles';
-import {
-	ConquerIdleMode,
-	ConquerStackList,
-	ConquerStackListParams,
-	IRoom,
-	ISchema,
-} from '../../types';
+import { ConquerStackListParams } from '../../types';
 import { closeModal, openDialog } from '../../utils';
 import { Button, TextInput } from '..';
 
@@ -27,21 +19,20 @@ const { MODAL, SPACE_GAP } = ConstantConfig;
 export interface CreateFormingProps extends ConquerStackListParams<'FindRoom'> {}
 
 const CreateForming = (props: CreateFormingProps) => {
-	const { resource, roomMode, idleMode, maxCapacity } = props;
-	const navigation = useNavigation<StackNavigationProp<ConquerStackList>>();
+	const { resource, roomMode, minToStart, maxCapacity } = props;
 	const theme = useTheme();
 	const [hasPassword, setHasPassword] = useState(false);
 	const [hiddenPassword, setHiddenPassword] = useState(true);
 	const { profile } = useAppSelector(selectAccount);
-	const socketClient = useSocketClient();
+	const { socketClient } = useSocketClient();
 	const formik = useFormik({
 		initialValues: {
 			name: '',
 			description: '',
-			maxCapacity,
+			maxCapacity: minToStart,
 			password: undefined,
 		},
-		validationSchema: createFormingValidation(maxCapacity),
+		validationSchema: createFormingValidation(minToStart, maxCapacity),
 		onSubmit: async (values, { resetForm }) => {
 			try {
 				if (!hasPassword) values.password = undefined;
@@ -63,26 +54,6 @@ const CreateForming = (props: CreateFormingProps) => {
 	});
 	const { values, touched, errors, isSubmitting, handleSubmit, handleChange } = formik;
 
-	useEffect(() => {
-		const onOutRoomFormingEvent = (room: IRoom.Room) => {
-			closeModal();
-			navigation.navigate('Forming', { resource, room, roomMode, idleMode, maxCapacity });
-		};
-		socketClient?.on('conquer:server-client(out-room-forming)', onOutRoomFormingEvent);
-
-		const onErrorFormingEvent = (error: string) => {
-			openDialog({
-				title: '[Tìm phòng] Lỗi',
-				content: error,
-			});
-		};
-		socketClient?.on('[ERROR]conquer:server-client(forming)', onErrorFormingEvent);
-
-		return () => {
-			socketClient?.off('conquer:server-client(out-room-forming)', onOutRoomFormingEvent);
-			socketClient?.off('[ERROR]conquer:server-client(forming)', onErrorFormingEvent);
-		};
-	}, []);
 	const onPressCreate = () => {
 		handleSubmit();
 	};

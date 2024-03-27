@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { Dimensions, ScrollView, View } from 'react-native';
 import { SoundManager } from '../../../audios';
 import { FormingBottom, FormingItem } from '../../../components';
 import { ConstantConfig } from '../../../configs';
@@ -10,18 +10,25 @@ import { globalStyles, stackStyles } from '../../../styles';
 import { ConquerFormingProps, IRoom } from '../../../types';
 import { openDialog } from '../../../utils';
 
-const { ROOM } = ConstantConfig;
+const { MAIN_LAYOUT, ROOM } = ConstantConfig;
+
+const WIDTH_SIZE = Dimensions.get('window').width;
+const CONTAINER_WIDTH =
+	WIDTH_SIZE - MAIN_LAYOUT.PADDING * 2 - MAIN_LAYOUT.SCREENS.ACCOUNT.PADDING * 2;
+const ITEM_WIDTH =
+	(CONTAINER_WIDTH - 5 * 2 * MAIN_LAYOUT.SCREENS.CONQUER.FORMING.NUMBER_ITEM_IN_ROW) *
+	(1 / MAIN_LAYOUT.SCREENS.CONQUER.FORMING.NUMBER_ITEM_IN_ROW);
 
 const Forming = (props: ConquerFormingProps) => {
 	const { navigation, route } = props;
-	const { resource, room, roomMode, idleMode, maxCapacity: minCapacityToStart } = route.params;
+	const { resource, room, roomMode, idleMode, minToStart } = route.params;
 	const startFormingRef = useRef<boolean | null>(false);
 	const [joinedRoom, setJoinedRoom] = useState(room);
 	const { owner, maxCapacity, clients } = joinedRoom;
 	const connectClients = clients.filter((client) => client.state === ROOM.CLIENT_STATE.connect);
 	const { profile } = useAppSelector(selectAccount);
 	const isOwner = profile._id === owner;
-	const socketClient = useSocketClient();
+	const { socketClient } = useSocketClient();
 
 	useEffect(() => {
 		const onInRoomFormingEvent = (room: IRoom.Room) => {
@@ -82,6 +89,7 @@ const Forming = (props: ConquerFormingProps) => {
 			openDialog({
 				title: 'Oh',
 				content: 'Bạn đã bị đá khỏi phòng',
+				actions: [{ label: 'Đồng ý' }],
 			});
 		};
 		socketClient?.on('conquer:server-client(removed-from-forming)', onRemovedFromFormingEvent);
@@ -155,6 +163,7 @@ const Forming = (props: ConquerFormingProps) => {
 							return (
 								<FormingItem
 									key={index}
+									width={ITEM_WIDTH}
 									clientId={profile._id}
 									roomOwner={owner}
 									client={client}
@@ -168,9 +177,9 @@ const Forming = (props: ConquerFormingProps) => {
 			<FormingBottom
 				isOwner={isOwner}
 				profile={profile}
+				minToStart={minToStart}
 				clientCount={connectClients.length}
 				maxCapacity={maxCapacity}
-				minCapacityToStart={minCapacityToStart}
 				onLeaveForming={onLeaveForming}
 				onStart={onStart}
 			/>

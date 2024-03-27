@@ -3,7 +3,7 @@ import { AxiosError } from 'axios';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AccountAPI, RoleAPI } from '../../apis';
 import { AppDispatch, RootState } from '../store';
-import { IAccount, IOperation, IResource, IRole } from '../../types';
+import { IAccount, IOperation, IResource, IRole, ISchema } from '../../types';
 import { JWTUtil, openDialog, openSnackbar } from '../../utils';
 
 const mergeRoles = (
@@ -49,11 +49,13 @@ export type Resources = {
 
 export interface AccountState {
 	profile: IAccount.ProfileResponse['profile'];
+	point: ISchema.Point;
 	resources: Resources;
 }
 
 const initialState: AccountState = {
 	profile: {} as AccountState['profile'],
+	point: {} as ISchema.Point,
 	resources: {} as Resources,
 };
 
@@ -61,10 +63,18 @@ export const slice = createSlice({
 	name: 'account',
 	initialState,
 	reducers: {
-		initAccount(state: AccountState, action: PayloadAction<AccountState>) {
-			const { profile, resources } = action.payload;
+		initAccountSuccess(state: AccountState, action: PayloadAction<AccountState>) {
+			const { profile, point, resources } = action.payload;
 			state.profile = profile;
+			state.point = point;
 			state.resources = resources;
+		},
+		updateProfileSuccess(state: AccountState, action: PayloadAction<Partial<AccountState['profile']>>) {
+			const newProfile = {
+				...state.profile,
+				...action.payload,
+			};
+			state.profile = newProfile;
 		},
 		updateCoverSuccess(
 			state: AccountState,
@@ -88,21 +98,22 @@ export const slice = createSlice({
 });
 
 const { reducer, actions } = slice;
-export const { clearAccount } = actions;
+export const { updateProfileSuccess, clearAccount } = actions;
 export const selectAccount = (state: RootState) => state.account;
 export default reducer;
 
 export const initAccount = () => async (dispatch: AppDispatch) => {
 	try {
-		const { profile } = await AccountAPI.getProfile();
+		const { profile, point } = await AccountAPI.getProfile();
 		const { roles } = await RoleAPI.findByIds({ _ids: profile?.roles || [] });
 		const { mergedPermissions, mergedResources } = mergeRoles(roles);
 		const encodePermissions = base64.encode(JSON.stringify(mergedPermissions));
 		JWTUtil.setHeader(JWTUtil.ACCESS_RESOURCES_HEADER, encodePermissions);
 
 		dispatch(
-			slice.actions.initAccount({
+			slice.actions.initAccountSuccess({
 				profile,
+				point,
 				resources: mergedResources,
 			})
 		);

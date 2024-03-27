@@ -6,6 +6,7 @@ const PreventHardwareBackGuard = (props: PropsWithChildren) => {
 
 	useEffect(() => {
 		const backHandler = BackHandler.addEventListener('hardwareBackPress', () => true);
+
 		return () => backHandler.remove();
 	}, []);
 	return children;

@@ -1,11 +1,11 @@
 import { useEffect, useReducer, createContext, PropsWithChildren } from 'react';
-import { AxiosError } from 'axios';
 import { AccountAPI } from '../apis';
 import { SoundManager } from '../audios';
-import { useAppDispatch } from '../redux/hooks';
-import { clearAccount, initAccount } from '../redux/slices/account.slice';
+import { useAppDispatch, useAppSelector } from '../redux/hooks';
+import { clearAccount, initAccount, selectAccount } from '../redux/slices/account.slice';
+import { useSocketClient } from '../hooks';
 import { IAccount, ICommon } from '../types';
-import { JWTUtil, openDialog } from '../utils';
+import { JWTUtil } from '../utils';
 
 export interface AuthenticationState {
 	isInitialized: boolean;
@@ -68,8 +68,19 @@ const AuthenticationContext = createContext(initialState);
 const AuthenticationProvider = (props: PropsWithChildren) => {
 	const { children } = props;
 	const [state, dispatch] = useReducer(reducer, initialState);
+	const { profile } = useAppSelector(selectAccount);
 	const appDispatch = useAppDispatch();
+	const { socketClient } = useSocketClient();
 
+	useEffect(() => {
+		const handleRecoveryClient = () => {
+			if (!profile?._id) return;
+
+			socketClient?.emit('client-server(recovery-client)', profile._id);
+		};
+
+		handleRecoveryClient();
+	}, [profile?._id]);
 	useEffect(() => {
 		const initialize = async () => {
 			try {
@@ -77,7 +88,7 @@ const AuthenticationProvider = (props: PropsWithChildren) => {
 				const isAuthenticated = await JWTUtil.isValidToken(accessToken);
 				if (isAuthenticated) {
 					// Fetch necessary data here...
-					appDispatch(initAccount());
+					await appDispatch(initAccount());
 				}
 
 				SoundManager.initSounds();
@@ -87,13 +98,7 @@ const AuthenticationProvider = (props: PropsWithChildren) => {
 					payload: { isAuthenticated },
 				});
 			} catch (error) {
-				console.log(error);
 				await JWTUtil.setToken(null);
-				openDialog({
-					title: 'Lỗi',
-					content: `${(error as AxiosError).response?.data}`,
-					closable: false,
-				});
 				dispatch({
 					type: 'INITIALIZE',
 					payload: { isAuthenticated: false },
@@ -117,7 +122,7 @@ const AuthenticationProvider = (props: PropsWithChildren) => {
 		await JWTUtil.setToken(accessToken);
 
 		// Fetch necessary data here...
-		appDispatch(initAccount());
+		await appDispatch(initAccount());
 
 		dispatch({ type: 'LOGIN' });
 		callback();
@@ -137,12 +142,12 @@ const AuthenticationProvider = (props: PropsWithChildren) => {
 	};
 
 	const signOut = async (): Promise<void> => {
+		dispatch({ type: 'LOGOUT' });
+
 		await JWTUtil.setToken(null);
 
 		// Clear necessary data here...
 		appDispatch(clearAccount());
-
-		dispatch({ type: 'LOGOUT' });
 	};
 	return (
 		<AuthenticationContext.Provider
