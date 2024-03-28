@@ -2,9 +2,12 @@ import base64 from 'react-native-base64';
 import { AxiosError } from 'axios';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AccountAPI, RoleAPI } from '../../apis';
-import { AppDispatch, RootState } from '../store';
+import { ConstantConfig } from '../../configs';
 import { IAccount, IOperation, IResource, IRole, ISchema } from '../../types';
 import { JWTUtil, openDialog, openSnackbar } from '../../utils';
+import { AppDispatch, RootState } from '../store';
+
+const { MAX_MATCH_VISIBLE_PER_ACCOUNT } = ConstantConfig;
 
 const mergeRoles = (
 	roles: IRole.Role[]
@@ -70,6 +73,10 @@ export const slice = createSlice({
 			state.resources = resources;
 		},
 		updateProfileSuccess(state: AccountState, action: PayloadAction<Partial<AccountState['profile']>>) {
+			if (action.payload.matches) {
+				action.payload.matches = action.payload.matches.slice(0, MAX_MATCH_VISIBLE_PER_ACCOUNT);
+			}
+
 			const newProfile = {
 				...state.profile,
 				...action.payload,

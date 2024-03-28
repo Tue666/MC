@@ -2,37 +2,47 @@ import { ReactNode, useState } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Divider, useTheme } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { SoundManager } from '../../audios';
 import { ConstantConfig } from '../../configs';
-import { Achievement, Box, MatchHistory, Statistics } from '..';
+import { AccountState } from '../../redux/slices/account.slice';
 import { stackStyles } from '../../styles';
+import { Achievement, Box, MatchHistory, Statistics } from '..';
 
 const { BUTTON, MAIN_LAYOUT } = ConstantConfig;
+
+export interface SegmentRenderProps extends SegmentProps, Pick<Segment, 'label'> {}
 
 export interface Segment {
 	label: string;
 	icon: string;
-	onRender: (label: string) => ReactNode;
+	onRender: (props: SegmentRenderProps) => ReactNode;
 }
 
 const SEGMENTS: Segment[] = [
 	{
 		label: 'Thống kê',
 		icon: 'analytics',
-		onRender: (label: Segment['label']) => <Statistics label={label} />,
+		onRender: (props: SegmentRenderProps) => <Statistics {...props} />,
 	},
 	{
 		label: 'Lịch sử đấu',
 		icon: 'history-edu',
-		onRender: (label: Segment['label']) => <MatchHistory label={label} />,
+		onRender: (props: SegmentRenderProps) => <MatchHistory {...props} />,
 	},
 	{
 		label: 'Thành tựu',
 		icon: 'emoji-events',
-		onRender: (label: Segment['label']) => <Achievement label={label} />,
+		onRender: (props: SegmentRenderProps) => <Achievement {...props} />,
 	},
 ];
 
-const Segment = () => {
+interface SegmentProps {
+	width?: number;
+	profile: AccountState['profile'];
+}
+
+const Segment = (props: SegmentProps) => {
+	const { width, profile } = props;
 	const [segmentIndex, setSegmentIndex] = useState(0);
 	const segment = SEGMENTS[segmentIndex];
 	const theme = useTheme();
@@ -40,6 +50,7 @@ const Segment = () => {
 	const onChangeSegmentIndex = (newIndex: number) => {
 		if (newIndex === segmentIndex) return;
 
+		SoundManager.playSound('button_click.mp3');
 		setSegmentIndex(newIndex);
 	};
 	return (
@@ -62,7 +73,13 @@ const Segment = () => {
 					})}
 				</View>
 			</Box>
-			<View style={[styles.segment]}>{segment.onRender(segment.label)}</View>
+			<View style={[styles.segment]}>
+				{segment.onRender({
+					label: segment.label,
+					profile,
+					width,
+				})}
+			</View>
 		</View>
 	);
 };

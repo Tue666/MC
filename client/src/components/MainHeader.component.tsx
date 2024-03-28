@@ -18,8 +18,12 @@ const MainHeader = () => {
 	return (
 		<View style={[styles.header, globalStyles.paper, globalStyles.shadow, stackStyles.row]}>
 			<View style={[stackStyles.row]}>
-				<Point type="gold_point" size={MAIN_LAYOUT.HEADER.ICON_SIZE} />
-				<Text variant="labelSmall"> {profile.gold_point.value}</Text>
+				<Point
+					type="gold_point"
+					value={profile.gold_point.value}
+					variance="balance"
+					size={MAIN_LAYOUT.HEADER.ICON_SIZE}
+				/>
 			</View>
 			<Icon
 				name={themeMode === 'light' ? 'dark-mode' : 'light-mode'}

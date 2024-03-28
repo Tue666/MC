@@ -1,5 +1,5 @@
 import { Modal as RNPModal } from 'react-native-paper';
-import { Account, CreateForming, Item, JoinForming, Winner } from '../modal';
+import { Account, CreateForming, Item, JoinForming, QuickMatchHistory, Winner } from '../modal';
 import { useModal } from '../../hooks';
 import { useAppSelector } from '../../redux/hooks';
 import { ModalProps, selectModal } from '../../redux/slices/modal.slice';
@@ -11,6 +11,7 @@ const components = {
 	CREATE_FORMING: (props: ModalProps['CREATE_FORMING']) => <CreateForming {...props} />,
 	ITEM: (props: ModalProps['ITEM']) => <Item {...props} />,
 	JOIN_FORMING: (props: ModalProps['JOIN_FORMING']) => <JoinForming {...props} />,
+	QUICK_MATCH_HISTORY: (props: ModalProps['QUICK_MATCH_HISTORY']) => <QuickMatchHistory {...props} />,
 	WINNER: (props: ModalProps['WINNER']) => <Winner {...props} />,
 };
 

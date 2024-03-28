@@ -125,6 +125,18 @@ class QuickMatchService {
     return quickMatches;
   }
 
+  async findById(params) {
+    const { _id } = params;
+
+    const queries = {
+      _id: ObjectId(_id),
+    };
+
+    const quickMatch = await QuickMatchRepository.findById(queries);
+
+    return quickMatch;
+  }
+
   async create(body) {
     const { owner, question, ...rest } = body;
 

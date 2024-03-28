@@ -47,6 +47,27 @@ const onFindForming = (io, socket) => {
   });
 };
 
+const onRefreshForming = (io, socket) => {
+  socket.on("conquer:client-server(refresh-forming)", (data) => {
+    try {
+      const { mode, resource } = data;
+      const roomService = roomBuilder(mode, resource);
+
+      const query = (room) => room.state === ROOM.STATE.forming;
+      const rooms = roomService.findRooms(query);
+      io.to(socket.id).emit(
+        "conquer:server-client(forming)",
+        Object.values(rooms)
+      );
+    } catch (error) {
+      socket.emit(
+        "[ERROR]conquer:server-client(refresh-forming)",
+        error.message
+      );
+    }
+  });
+};
+
 const onClientForming = (io, socket) => {
   socket.on("conquer:client-server(forming)", (data) => {
     try {
@@ -279,6 +300,8 @@ module.exports = (io, socket) => {
   onFindRooms(io, socket);
 
   onFindForming(io, socket);
+
+  onRefreshForming(io, socket);
 
   onClientForming(io, socket);
 

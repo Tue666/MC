@@ -1,6 +1,6 @@
 import { Asset } from 'react-native-image-picker';
 import { Response } from '../common';
-import { AccountSchema, AdministratorSchema, Point, StudentSchema } from '../schema';
+import { AccountSchema, AdministratorSchema, MatchSchema, Point, StudentSchema } from '../schema';
 import { Tokens } from './auth.interface';
 
 export interface Account extends AccountSchema {}
@@ -10,7 +10,9 @@ export interface Student extends StudentSchema {}
 export interface Administrator extends AdministratorSchema {}
 
 export interface ProfileResponse extends Response {
-	profile: Omit<Account, 'password'>;
+	profile: Omit<Account, 'password' | 'matches'> & {
+		matches: MatchSchema[];
+	};
 	point: Point;
 }
 

@@ -4,6 +4,7 @@ import { useTheme } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Tooltip from 'rn-tooltip';
 import { Asset } from 'react-native-image-picker';
+import { SoundManager } from '../../../audios';
 import { Avatar, Button, Cover, Information, Segment } from '../../../components';
 import { ConstantConfig } from '../../../configs';
 import { useImagePicker } from '../../../hooks';
@@ -61,6 +62,7 @@ const Account = (props: AccountProps) => {
 		);
 	};
 	const onPressSetting = () => {
+		SoundManager.playSound('button_click.mp3');
 		navigation.navigate('Setting');
 	};
 	// const onPressViewImage = () => {
@@ -149,7 +151,7 @@ const Account = (props: AccountProps) => {
 					created_at={profile.created_at}
 				/>
 			</View>
-			<Segment />
+			<Segment profile={profile} />
 		</ScrollView>
 	);
 };

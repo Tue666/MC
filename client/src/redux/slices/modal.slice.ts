@@ -4,6 +4,7 @@ import {
 	CreateFormingProps,
 	ItemProps,
 	JoinFormingProps,
+	QuickMatchHistoryProps,
 	WinnerProps,
 } from '../../components/modal';
 import { RootState } from '../store';
@@ -14,6 +15,7 @@ export type ModalComponent =
 	| 'CREATE_FORMING'
 	| 'ITEM'
 	| 'JOIN_FORMING'
+	| 'QUICK_MATCH_HISTORY'
 	| 'WINNER';
 
 export interface ModalProps {
@@ -22,6 +24,7 @@ export interface ModalProps {
 	CREATE_FORMING: CreateFormingProps;
 	ITEM: ItemProps;
 	JOIN_FORMING: JoinFormingProps;
+	QUICK_MATCH_HISTORY: QuickMatchHistoryProps;
 	WINNER: WinnerProps;
 }
 

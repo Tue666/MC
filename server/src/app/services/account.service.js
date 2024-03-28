@@ -225,6 +225,9 @@ class AccountService {
     const account = await AccountRepository.findOne({
       filters: { _id: ObjectId(_id) },
       select: { password: 0 },
+      populate: {
+        path: "matches",
+      },
     });
     if (!account) throw new APIError(200, "Không tìm thấy tài khoản!");
 

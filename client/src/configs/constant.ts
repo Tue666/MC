@@ -18,10 +18,13 @@ export const ROOM: RoomCons = {
 		preparing: 'PREPARING',
 		loading_question: 'LOADING_QUESTION',
 		playing: 'PLAYING',
+		end: 'END',
 	},
 	CLIENT_STATE: {
 		connect: 'CONNECT',
 		disconnect: 'DISCONNECT',
+		win: 'WIN',
+		lose: 'LOSE',
 	},
 };
 
@@ -48,6 +51,7 @@ export const DIALOG = {
 };
 
 export const MODAL = {
+	ICON_SIZE: 25,
 	ACCOUNT: {
 		WIDTH: Dimensions.get('window').width - 20,
 		HEIGHT: Dimensions.get('window').height - 20,
@@ -77,6 +81,15 @@ export const MODAL = {
 		ICON_SIZE: 20,
 		PADDING: 25,
 		BORDER_RADIUS: 15,
+	},
+	QUICK_MATCH_HISTORY: {
+		WIDTH: Dimensions.get('window').width - 20,
+		HEIGHT: 300,
+		PADDING: 10,
+		MARGIN: 10,
+		BORDER_RADIUS: 15,
+		AVATAR_SIZE: 50,
+		NUMBER_AVATAR_IN_ROW: 3,
 	},
 	WINNER: {
 		WIDTH: Dimensions.get('window').width - 100,
@@ -165,6 +178,9 @@ export const MAIN_LAYOUT = {
 			STATISTICS: {
 				NUMBER_ITEM_IN_ROW: 2,
 			},
+			MATCH_HISTORY: {
+				NUMBER_ITEM_IN_ROW: 3,
+			},
 		},
 		CONQUER: {
 			RESOURCE: {
@@ -251,6 +267,8 @@ export const MAIN_LAYOUT = {
 		},
 	},
 };
+
+export const MAX_MATCH_VISIBLE_PER_ACCOUNT = 20;
 
 export const VIBRATIONS = {
 	0: 200,

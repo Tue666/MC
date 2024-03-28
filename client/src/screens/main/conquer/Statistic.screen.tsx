@@ -34,11 +34,16 @@ const Statistic = (props: ConquerStatisticProps) => {
 	const time = `${hours && `${hours.text}:`}${minutes && `${minutes.text}:`}${seconds.text}`;
 	const { point_differences } = client;
 	const theme = useTheme();
-	const { resources } = useAppSelector(selectAccount);
+	const { profile, resources } = useAppSelector(selectAccount);
 	const dispatch = useAppDispatch();
 
 	useEffect(() => {
-		dispatch(updateProfileSuccess(point_differences));
+		dispatch(
+			updateProfileSuccess({
+				...point_differences,
+				matches: [match, ...profile.matches],
+			})
+		);
 		SoundManager.stopSound('quick_match_bg.mp3');
 
 		if (isClientAnswerCorrect) {
@@ -173,26 +178,8 @@ const Statistic = (props: ConquerStatisticProps) => {
 							<Text variant="labelSmall" style={[{ fontWeight: 'bold' }]}>
 								{label}:
 							</Text>
-							<View style={[stackStyles.row, { justifyContent: 'center' }]}>
-								<Point type={point as keyof ISchema.Point} size={MAIN_LAYOUT.HEADER.ICON_SIZE} />
-								{changed > 0 && (
-									<Text variant="labelSmall" style={[{ fontWeight: 'bold', color: theme.colors.secondary }]}>
-										{' '}
-										+{changed}
-									</Text>
-								)}
-								{changed < 0 && (
-									<Text variant="labelSmall" style={[{ fontWeight: 'bold', color: theme.colors.error }]}>
-										{' '}
-										{changed}
-									</Text>
-								)}
-								{changed === 0 && (
-									<Text variant="labelSmall" style={[{ fontWeight: 'bold' }]}>
-										{' '}
-										{changed}
-									</Text>
-								)}
+							<View style={[stackStyles.center]}>
+								<Point type={point as keyof ISchema.Point} value={changed} size={MAIN_LAYOUT.HEADER.ICON_SIZE} />
 							</View>
 						</Box>
 					);

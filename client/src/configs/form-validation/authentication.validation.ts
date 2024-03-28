@@ -12,4 +12,5 @@ export const signUpValidation = yup.object().shape({
 		.string()
 		.oneOf([yup.ref('password')], 'Mật khẩu không khớp!')
 		.required('Mật khẩu không được bỏ trống'),
+	name: yup.string().max(10, 'Tối đa 10 ký tự'),
 });

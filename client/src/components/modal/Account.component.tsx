@@ -1,23 +1,20 @@
 import { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { Text } from 'react-native-paper';
+import { useTheme } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { AxiosError } from 'axios';
 import { AccountAPI } from '../../apis';
+import { SoundManager } from '../../audios';
 import { ConstantConfig } from '../../configs';
 import { AccountState } from '../../redux/slices/account.slice';
 import { AVATAR_SIZE } from '../../screens/main/account/Account.screen';
 import { globalStyles } from '../../styles';
 import { IAccount } from '../../types';
 import { closeModal, openDialog } from '../../utils';
-import { Achievement, Avatar, Cover, Information, Loading, Statistics } from '..';
+import { Avatar, Cover, Information, Loading, Segment } from '..';
 
 const { MAIN_LAYOUT, MODAL } = ConstantConfig;
 const CONTAINER_WIDTH = MODAL.ACCOUNT.WIDTH - MODAL.ACCOUNT.PADDING * 2;
-const ITEM_WIDTH =
-	(CONTAINER_WIDTH -
-		MODAL.ACCOUNT.MARGIN * 2 * MAIN_LAYOUT.SCREENS.ACCOUNT.STATISTICS.NUMBER_ITEM_IN_ROW) *
-	(1 / MAIN_LAYOUT.SCREENS.ACCOUNT.STATISTICS.NUMBER_ITEM_IN_ROW);
 
 export interface AccountProps {
 	_id: IAccount.Account['_id'];
@@ -26,6 +23,7 @@ export interface AccountProps {
 const Account = (props: AccountProps) => {
 	const { _id } = props;
 	const [profile, setProfile] = useState<AccountState['profile'] | null>(null);
+	const theme = useTheme();
 
 	useEffect(() => {
 		const getProfile = async () => {
@@ -34,7 +32,7 @@ const Account = (props: AccountProps) => {
 				if (error) {
 					closeModal();
 					openDialog({
-						title: '[Tìm thông tin] Lỗi',
+						title: '[Xem thông tin] Lỗi',
 						content: error,
 						actions: [{ label: 'Đồng ý' }],
 					});
@@ -52,12 +50,17 @@ const Account = (props: AccountProps) => {
 
 		getProfile();
 	}, [_id]);
+	const onPressCloseModal = () => {
+		SoundManager.playSound('button_click.mp3');
+		closeModal();
+	};
 	return (
-		<View style={[styles.container, globalStyles.paper, globalStyles.shadow]}>
+		<View style={[styles.container, globalStyles.bg, globalStyles.shadow]}>
 			<Icon
 				name="close"
-				size={MAIN_LAYOUT.SCREENS.ACCOUNT.SETTING.ICON_SIZE}
-				onPress={closeModal}
+				size={MODAL.ICON_SIZE}
+				color={theme.colors.onSurface}
+				onPress={onPressCloseModal}
 				style={[styles.close]}
 			/>
 			{!profile && <Loading />}
@@ -77,18 +80,7 @@ const Account = (props: AccountProps) => {
 							created_at={profile.created_at}
 						/>
 					</View>
-					<View style={[styles.space]}>
-						<Text variant="titleMedium" style={[{ fontWeight: 'bold' }]}>
-							Thống kê
-						</Text>
-						<Statistics width={ITEM_WIDTH} />
-					</View>
-					<View style={[styles.space]}>
-						<Text variant="titleMedium" style={[{ fontWeight: 'bold' }]}>
-							Thành tựu
-						</Text>
-						<Achievement />
-					</View>
+					<Segment profile={profile} width={MODAL.ACCOUNT.WIDTH} />
 				</ScrollView>
 			)}
 		</View>
@@ -114,10 +106,6 @@ const styles = StyleSheet.create({
 		top: MODAL.ACCOUNT.COVER_HEIGHT - MODAL.ACCOUNT.PADDING * 2 - AVATAR_SIZE / 2,
 		left: CONTAINER_WIDTH / 2 - AVATAR_SIZE / 2,
 		zIndex: 9999,
-	},
-	space: {
-		marginTop: MODAL.ACCOUNT.MARGIN * 2,
-		padding: MODAL.ACCOUNT.PADDING,
 	},
 });
 

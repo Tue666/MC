@@ -62,12 +62,27 @@ export interface MatchSchema extends TimestampsSchema {
 	_id: string;
 	mode: RoomMode;
 	resource: ResourceSchema['_id'];
-	reference_id: unknown;
+	reference_id: string;
 	state: RoomState;
 	start_time: number;
 	end_time: number;
 	playing_time: number;
 	clients: MatchClientSchema[];
+}
+
+// =========================================================================================
+// ===================================== QUICK MATCH SCHEMA ================================
+
+export interface QuickMatchSchema {
+	_id: string;
+	room: string;
+	name: string;
+	description: string;
+	min_to_start: ResourceSchema['min_to_start'];
+	max_capacity: ResourceSchema['max_capacity'];
+	owner: AccountSchema['_id'];
+	question: QuestionSchema['_id'];
+	first_raised_hand: AccountSchema['_id'];
 }
 
 // =========================================================================================

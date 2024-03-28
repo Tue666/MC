@@ -1,16 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
-import { Dimensions, ScrollView, View } from 'react-native';
+import { Dimensions, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Divider, Text, useTheme } from 'react-native-paper';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import { SoundManager } from '../../../audios';
-import { FormingBottom, FormingItem } from '../../../components';
+import { Box, FormingBottom, FormingItem } from '../../../components';
 import { ConstantConfig } from '../../../configs';
 import { useSocketClient } from '../../../hooks';
 import { useAppSelector } from '../../../redux/hooks';
 import { selectAccount } from '../../../redux/slices/account.slice';
 import { globalStyles, stackStyles } from '../../../styles';
 import { ConquerFormingProps, IRoom } from '../../../types';
-import { openDialog } from '../../../utils';
+import { openDialog, openSnackbar } from '../../../utils';
 
-const { MAIN_LAYOUT, ROOM } = ConstantConfig;
+const { BOX, MAIN_LAYOUT, ROOM } = ConstantConfig;
 
 const WIDTH_SIZE = Dimensions.get('window').width;
 const CONTAINER_WIDTH =
@@ -28,6 +30,7 @@ const Forming = (props: ConquerFormingProps) => {
 	const connectClients = clients.filter((client) => client.state === ROOM.CLIENT_STATE.connect);
 	const { profile } = useAppSelector(selectAccount);
 	const isOwner = profile._id === owner;
+	const theme = useTheme();
 	const { socketClient } = useSocketClient();
 
 	useEffect(() => {
@@ -119,6 +122,12 @@ const Forming = (props: ConquerFormingProps) => {
 			);
 		};
 	}, []);
+	const onPressCopyRoomId = () => {
+		SoundManager.playSound('button_click.mp3');
+		openSnackbar({
+			content: 'Copy ID phòng thành công',
+		});
+	};
 	const onLeaveForming = () => {
 		socketClient?.emit('conquer:client-server(leave-forming)', {
 			mode: roomMode,
@@ -156,6 +165,37 @@ const Forming = (props: ConquerFormingProps) => {
 	};
 	return (
 		<View style={[globalStyles.container]}>
+			<Box style={[styles.header]}>
+				<View style={[stackStyles.row]}>
+					<Text
+						variant="labelMedium"
+						style={[
+							globalStyles.bg,
+							styles.headerText,
+							{
+								borderRadius: BOX.BORDER_RADIUS,
+								flex: 1,
+								marginRight: MAIN_LAYOUT.SCREENS.CONQUER.FORMING.MARGIN / 2,
+							},
+						]}
+					>
+						{joinedRoom._id}
+					</Text>
+					<TouchableOpacity onPress={onPressCopyRoomId}>
+						<Icon name="content-copy" size={20} color={theme.colors.onSurface} />
+					</TouchableOpacity>
+				</View>
+				<Divider style={[{ marginVertical: MAIN_LAYOUT.SCREENS.CONQUER.FORMING.MARGIN / 2 }]} />
+				<View style={[stackStyles.row]}>
+					{joinedRoom.password && <Icon name="lock" color={theme.colors.onSurface} />}
+					<Text variant="labelMedium" style={[styles.headerText]}>
+						Phòng:
+					</Text>
+					<Text variant="labelMedium" numberOfLines={1} style={[styles.headerText, { fontWeight: 'bold' }]}>
+						{joinedRoom.name}
+					</Text>
+				</View>
+			</Box>
 			<ScrollView>
 				<View style={[stackStyles.rowWrap]}>
 					{clients?.length &&
@@ -186,5 +226,14 @@ const Forming = (props: ConquerFormingProps) => {
 		</View>
 	);
 };
+
+const styles = StyleSheet.create({
+	header: {
+		padding: MAIN_LAYOUT.SCREENS.CONQUER.FORMING.PADDING,
+	},
+	headerText: {
+		padding: MAIN_LAYOUT.SCREENS.CONQUER.FORMING.PADDING / 2,
+	},
+});
 
 export default Forming;
