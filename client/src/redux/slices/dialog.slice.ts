@@ -29,6 +29,7 @@ export const slice = createSlice({
 	reducers: {
 		renderDialog: (state: DialogState, action: PayloadAction<DialogState>) => {
 			const { isOpen, closable, icon, title, content, contentScrollable, actions } = action.payload;
+
 			state.isOpen = isOpen;
 			state.closable = closable;
 			state.icon = icon;
@@ -39,6 +40,7 @@ export const slice = createSlice({
 		},
 		disappearDialog: (state: DialogState) => {
 			const { isOpen, closable, icon, title, content, contentScrollable, actions } = initialState;
+
 			state.isOpen = isOpen;
 			state.closable = closable;
 			state.icon = icon;

@@ -2,7 +2,7 @@ import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
 import { AVATAR_SIZE } from '../../screens/main/account/Account.screen';
 import { ConstantConfig } from '../../configs';
-import { stackStyles } from '../../styles';
+import { globalStyles, stackStyles, typographyStyles } from '../../styles';
 import { IAccount } from '../../types';
 import { Box, Name, Rank } from '..';
 
@@ -18,21 +18,21 @@ const Information = (props: InformationProps) => {
 	return (
 		<Box style={[styles.container, stackStyles.row]}>
 			<View style={[styles.detail]}>
-				<Name>{name}</Name>
-				<Text variant="labelSmall" style={[{ fontWeight: 'bold' }]}>
+				<Name variant="titleSmall">{name}</Name>
+				<Text variant="labelSmall" style={[typographyStyles.bold]}>
 					Cấp độ: {level} ({value}/{maxValue})
 				</Text>
-				<Text variant="labelSmall" style={[{ fontWeight: 'bold' }]}>
+				<Text variant="labelSmall" style={[typographyStyles.bold]}>
 					Chưa Xếp hạng
 				</Text>
 				<Text
 					variant="labelSmall"
-					style={[{ fontStyle: 'italic', marginTop: MAIN_LAYOUT.SCREENS.ACCOUNT.MARGIN / 2 }]}
+					style={[typographyStyles.italic, { marginTop: MAIN_LAYOUT.SCREENS.ACCOUNT.MARGIN / 2 }]}
 				>
 					Đã tham gia vào {created_at}
 				</Text>
 			</View>
-			<View style={[styles.rank, stackStyles.center]}>
+			<View style={[globalStyles.container, stackStyles.center]}>
 				<Rank />
 			</View>
 		</Box>
@@ -50,9 +50,6 @@ const styles = StyleSheet.create({
 	detail: {
 		width: '62%',
 		paddingRight: MAIN_LAYOUT.SCREENS.ACCOUNT.INFORMATION.DETAIL_PADDING,
-	},
-	rank: {
-		flex: 1,
 	},
 });
 

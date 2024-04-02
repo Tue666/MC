@@ -175,7 +175,7 @@ const CreateForming = (props: CreateFormingProps) => {
 				<Button
 					mode="outlined"
 					onPress={onPressCancel}
-					style={[{ flex: 1, margin: SPACE_GAP }]}
+					style={[globalStyles.container, { margin: SPACE_GAP }]}
 					soundName="button_click.mp3"
 				>
 					Hủy
@@ -185,7 +185,7 @@ const CreateForming = (props: CreateFormingProps) => {
 					loading={isSubmitting}
 					disabled={isSubmitting}
 					onPress={onPressCreate}
-					style={[{ flex: 1, margin: SPACE_GAP }]}
+					style={[globalStyles.container, { margin: SPACE_GAP }]}
 					soundName="button_click.mp3"
 				>
 					Tạo

@@ -21,7 +21,7 @@ const Cover = (props: CoverProps) => {
 			<View style={[styles.container, style]}>
 				<Image
 					source={{
-						uri: `${APP.image_storage.url}/${cover}`,
+						uri: `${APP.image_storage.host}/${APP.image_storage.path}/${cover}`,
 					}}
 					style={[
 						styles.container,

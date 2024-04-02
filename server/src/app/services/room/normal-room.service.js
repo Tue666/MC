@@ -344,11 +344,14 @@ class NormalRoomService {
       prepared: false,
     });
 
-    const match = await MatchService.updateClientState({
-      _id: room.matchId,
-      clientId: client._id,
-      state: ROOM.CLIENT_STATE.disconnect,
-    });
+    let match = null;
+    if (room.matchId) {
+      match = await MatchService.updateClientState({
+        _id: room.matchId,
+        clientId: client._id,
+        state: ROOM.CLIENT_STATE.disconnect,
+      });
+    }
 
     const originRoom = { ...room };
     let disconnectRoom = room;
@@ -400,7 +403,7 @@ class NormalRoomService {
     return disconnectRoom;
   }
 
-  buildDisconnectHandler(state, disconnectRoom, client) {
+  buildDisconnectHandler() {
     const handlers = {
       [ROOM.STATE.forming]: this.handleFormingDisconnect.bind(this),
       [ROOM.STATE.preparing]: this.handlePreparingDisconnect.bind(this),
@@ -408,9 +411,7 @@ class NormalRoomService {
         this.handleLoadingQuestionDisconnect.bind(this),
     };
 
-    if (!handlers[state]) return disconnectRoom;
-
-    return handlers[state](disconnectRoom, client);
+    return handlers;
   }
 
   async disconnecting(roomId, socketId) {
@@ -421,7 +422,10 @@ class NormalRoomService {
     );
 
     const { state } = disconnectRoom;
-    const room = this.buildDisconnectHandler(state, disconnectRoom, client);
+    const disconnectHandlers = this.buildDisconnectHandler();
+    const room = disconnectHandlers[state]
+      ? disconnectHandlers[state](disconnectRoom, client)
+      : disconnectRoom;
 
     return { originRoom, room, client };
   }

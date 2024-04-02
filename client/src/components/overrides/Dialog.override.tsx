@@ -1,11 +1,11 @@
-import { DimensionValue, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
+import { DimensionValue, ScrollView, useWindowDimensions } from 'react-native';
 import { Button, Portal, Dialog as RNPDialog, Text, useTheme } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import RenderHTML from 'react-native-render-html';
 import { ConstantConfig } from '../../configs';
 import { useAppSelector } from '../../redux/hooks';
 import { selectDialog } from '../../redux/slices/dialog.slice';
-import { globalStyles } from '../../styles';
+import { globalStyles, typographyStyles } from '../../styles';
 import { closeDialog } from '../../utils';
 
 const { DIALOG } = ConstantConfig;
@@ -28,7 +28,7 @@ const Dialog = () => {
 				{icon && <RNPDialog.Icon icon={() => <Icon name={icon} size={DIALOG.ICON_SIZE} />} />}
 				{title && (
 					<RNPDialog.Title>
-						<Text variant="titleMedium" style={[styles.title]}>
+						<Text variant="titleMedium" style={[typographyStyles.bold]}>
 							{title}
 						</Text>
 					</RNPDialog.Title>
@@ -78,11 +78,5 @@ const Dialog = () => {
 		</Portal>
 	);
 };
-
-const styles = StyleSheet.create({
-	title: {
-		fontWeight: 'bold',
-	},
-});
 
 export default Dialog;

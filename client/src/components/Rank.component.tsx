@@ -22,7 +22,7 @@ const Rank = (props: RankProps) => {
 				color={theme.colors.primary}
 			/> */}
 			<Image
-				source={{ uri: `${APP.image_storage.url}/app/rank_v.png` }}
+				source={{ uri: `${APP.image_storage.host}/${APP.image_storage.path}/app/rank.png` }}
 				style={[
 					{
 						width: size || MAIN_LAYOUT.SCREENS.ACCOUNT.INFORMATION.RANK_WIDTH,

@@ -45,6 +45,10 @@ class NumberUtil {
 
 		return time;
 	}
+
+	static toNumberWithDots(value: number) {
+		return value.toLocaleString().replace(/,/g, '.');
+	}
 }
 
 export default NumberUtil;

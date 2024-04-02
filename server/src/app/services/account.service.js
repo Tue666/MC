@@ -135,7 +135,7 @@ class AccountService {
         }
 
         const uploaded = await CloudinaryUtil.upload(value, {
-          folder: `account/${field}`,
+          folder: `cm/account/${field}`,
         });
 
         update[field] = Array.isArray(value) ? uploaded : uploaded[0];

@@ -1,6 +1,7 @@
 const { QuestionService } = require("../../services/question.service");
 const { MatchService } = require("../../services/match.service");
 const { QuickMatchService } = require("../../services/quick-match.service");
+const { ConversationService } = require("../../services/conversation.service");
 const { ROOM } = require("../../../config/constant");
 const TimeUtil = require("../../../utils/time.util");
 
@@ -16,6 +17,7 @@ class QuickMatchRepository {
     //     maxCapacity: 50,
     //     owner: '1',
     //     password: null,
+    //     conversationId: null,
     //     matchId: null,
     //     referenceId: null,
     //     startTime: 1,
@@ -127,9 +129,9 @@ class QuickMatchRepository {
   }
 
   buildRoomId() {
-    return `${this.mode}${ROOM.ID_CONNECTOR}${this.resource}${
-      ROOM.ID_CONNECTOR
-    }${TimeUtil.getCurrentTime()}`;
+    const currentTime = TimeUtil.getCurrentTime();
+
+    return `${this.mode}${ROOM.ID_CONNECTOR}${this.resource}${ROOM.ID_CONNECTOR}${currentTime}`;
   }
 
   createRoom(roomInf) {
@@ -178,6 +180,8 @@ class QuickMatchRepository {
 
   deleteRoom(roomId) {
     if (!this.rooms[roomId]) return;
+
+    ConversationService.clearConversation(this.rooms[roomId].conversationId);
 
     delete this.rooms[roomId];
   }
@@ -268,7 +272,7 @@ class QuickMatchRepository {
     const cloneRoom = { ...this.rooms[roomId] };
 
     if (this.rooms[roomId].clients.length <= 0) {
-      delete this.rooms[roomId];
+      this.deleteRoom(roomId);
     }
 
     return cloneRoom;

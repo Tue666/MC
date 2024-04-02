@@ -3,6 +3,7 @@ import { Text, useTheme } from 'react-native-paper';
 import { Button, Support } from '../../../components';
 import { ConstantConfig } from '../../../configs';
 import { useAuthentication } from '../../../hooks';
+import { typographyStyles } from '../../../styles';
 import { SettingProps } from '../../../types';
 
 const { MAIN_LAYOUT } = ConstantConfig;
@@ -14,7 +15,7 @@ const Setting = (props: SettingProps) => {
 	return (
 		<ScrollView>
 			<View style={[styles.space]}>
-				<Text variant="titleMedium" style={[{ fontWeight: 'bold' }]}>
+				<Text variant="titleMedium" style={[typographyStyles.bold]}>
 					Hỗ trợ
 				</Text>
 				<Support />

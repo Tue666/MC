@@ -6,6 +6,7 @@ import { SoundManager } from '../../../../audios';
 import {
 	Avatar,
 	CountdownCircle,
+	Name,
 	SingleModeAnswer,
 	SingleModeQuestion,
 } from '../../../../components';
@@ -123,9 +124,7 @@ const QuickMatch = (props: ConquerQuickMatchProps) => {
 					</TouchableOpacity>
 					{state === 'IN_ANSWER_TIME' && (
 						<>
-							<Text variant="labelSmall" numberOfLines={1} style={[{ fontWeight: 'bold' }]}>
-								{firstRaisedHand?.name}
-							</Text>
+							<Name>{firstRaisedHand?.name}</Name>
 							<Text variant="labelSmall">{IN_ANSWER_TEXT}</Text>
 						</>
 					)}

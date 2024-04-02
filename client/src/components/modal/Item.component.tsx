@@ -4,7 +4,8 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import RenderHTML from 'react-native-render-html';
 import { ConstantConfig } from '../../configs';
 import { IShopItem } from '../../screens/main/Shop.screen';
-import { globalStyles, stackStyles } from '../../styles';
+import { globalStyles, stackStyles, typographyStyles } from '../../styles';
+import { NumberUtil } from '../../utils';
 import { InventoryItemAction, ShopItemAction } from '..';
 
 const { MAIN_LAYOUT, MODAL } = ConstantConfig;
@@ -26,11 +27,11 @@ const Item = (props: ItemProps) => {
 		<View style={[styles.container, globalStyles.paper, globalStyles.shadow]}>
 			<View style={[styles.header, stackStyles.row, { backgroundColor: theme.colors.tertiary }]}>
 				<Image source={{ uri: item.image }} style={[styles.image]} />
-				<View style={[{ flex: 1 }]}>
-					<Text variant="labelLarge" style={[{ fontWeight: 'bold' }]}>
+				<View style={[globalStyles.container]}>
+					<Text variant="labelLarge" style={[typographyStyles.bold]}>
 						{title}
 					</Text>
-					<Text variant="labelSmall" style={[{ fontStyle: 'italic' }]}>
+					<Text variant="labelSmall" style={[typographyStyles.italic]}>
 						Hiếm
 					</Text>
 					<Text variant="labelSmall">{requirement}</Text>
@@ -55,7 +56,7 @@ const Item = (props: ItemProps) => {
 					<Divider style={[styles.divider]} />
 					<View style={[{ alignItems: 'flex-end' }]}>
 						<View style={[stackStyles.row]}>
-							<Text variant="labelSmall">Giá: {price} </Text>
+							<Text variant="labelSmall">Giá: {NumberUtil.toNumberWithDots(price)} </Text>
 							<Icon name="paid" size={MAIN_LAYOUT.SCREENS.SHOP.ITEM.ICON_SIZE} color={theme.colors.tertiary} />
 						</View>
 					</View>

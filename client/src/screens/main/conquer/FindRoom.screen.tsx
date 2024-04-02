@@ -60,11 +60,11 @@ const FindRoom = (props: ConquerFindRoomProps) => {
 		};
 	}, [isFocused]);
 	useEffect(() => {
-		const onOutRoomFormingEvent = (joinedRoom: OutRoomForming) => {
-			const { room, statusCode, error } = joinedRoom;
+		const onOutRoomFormingErrorEvent = (result: OutRoomForming) => {
+			const { room, statusCode, error } = result;
 
 			// The room has password and client must provide it
-			if (error && statusCode === 401) {
+			if (statusCode === 401) {
 				onQuickJoinForming({
 					resource,
 					roomMode,
@@ -73,16 +73,16 @@ const FindRoom = (props: ConquerFindRoomProps) => {
 				return;
 			}
 
-			if (error) {
-				openDialog({
-					title: '[Vào phòng] Thất bại',
-					content: error,
-					actions: [{ label: 'Đồng ý' }],
-				});
-				return;
-			}
+			openDialog({
+				title: '[Vào phòng] Thất bại',
+				content: error,
+				actions: [{ label: 'Đồng ý' }],
+			});
+		};
+		socketClient?.on('conquer:server-client(out-room-forming-error)', onOutRoomFormingErrorEvent);
 
-			navigation.navigate('Forming', { resource, room, roomMode, idleMode, minToStart });
+		const onOutRoomFormingEvent = (joinedRoom: IRoom.Room) => {
+			navigation.navigate('Forming', { resource, room: joinedRoom, roomMode, idleMode, minToStart });
 			closeModal();
 		};
 		socketClient?.on('conquer:server-client(out-room-forming)', onOutRoomFormingEvent);
@@ -97,6 +97,8 @@ const FindRoom = (props: ConquerFindRoomProps) => {
 
 		return () => {
 			isRoomChanging.current = null;
+
+			socketClient?.off('conquer:server-client(out-room-forming-error)', onOutRoomFormingErrorEvent);
 			socketClient?.off('conquer:server-client(out-room-forming)', onOutRoomFormingEvent);
 			socketClient?.off('[ERROR]conquer:server-client(forming)', onErrorFormingEvent);
 		};

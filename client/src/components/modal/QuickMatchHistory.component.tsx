@@ -8,9 +8,9 @@ import { SoundManager } from '../../audios';
 import { APIConfig, ConstantConfig } from '../../configs';
 import { AccountState } from '../../redux/slices/account.slice';
 import { IQuickMatch, ISchema } from '../../types';
-import { globalStyles, stackStyles } from '../../styles';
+import { globalStyles, stackStyles, typographyStyles } from '../../styles';
 import { NumberUtil, closeModal, openDialog } from '../../utils';
-import { Avatar, Loading, MathContent, Point } from '..';
+import { Avatar, Loading, MathContent, Name, Point } from '..';
 
 const { APP } = APIConfig;
 const { ROOM, MODAL } = ConstantConfig;
@@ -107,7 +107,9 @@ const QuickMatchHistory = (props: QuickMatchHistoryProps) => {
 							<View style={[stackStyles.center]}>
 								<Image
 									source={{
-										uri: `${APP.image_storage.url}/app/${isWinner ? 'victory' : 'defeat'}.png`,
+										uri: `${APP.image_storage.host}/${APP.image_storage.path}/app/${
+											isWinner ? 'victory' : 'defeat'
+										}.png`,
 									}}
 									style={[
 										{
@@ -119,14 +121,14 @@ const QuickMatchHistory = (props: QuickMatchHistoryProps) => {
 								/>
 							</View>
 							<View style={[{ padding: MODAL.QUICK_MATCH_HISTORY.PADDING }]}>
-								<Text variant="labelSmall" style={[{ fontWeight: 'bold' }]}>
+								<Text variant="labelSmall" style={[typographyStyles.bold]}>
 									Đấu: {resources[resource].name}
 								</Text>
-								<Text variant="labelSmall" style={[{ fontWeight: 'bold' }]}>
+								<Text variant="labelSmall" style={[typographyStyles.bold]}>
 									Thời gian đấu: {time}
 								</Text>
 								<View style={[{ alignSelf: 'flex-end' }]}>
-									<Text variant="labelSmall" style={[{ fontStyle: 'italic' }]}>
+									<Text variant="labelSmall" style={[typographyStyles.italic]}>
 										{created_at}
 									</Text>
 								</View>
@@ -139,17 +141,17 @@ const QuickMatchHistory = (props: QuickMatchHistoryProps) => {
 													<View key={index} style={[stackStyles.row]}>
 														<Text
 															variant="labelSmall"
-															style={[{ fontWeight: 'bold', width: MODAL.QUICK_MATCH_HISTORY.AVATAR_SIZE * 2 }]}
+															style={[typographyStyles.bold, { width: MODAL.QUICK_MATCH_HISTORY.AVATAR_SIZE * 2 }]}
 														>
 															{value.label}
 														</Text>
-														<Text variant="labelSmall" style={[{ fontWeight: 'bold' }]}>
+														<Text variant="labelSmall" style={[typographyStyles.bold]}>
 															:
 														</Text>
 														{(value as any)?.maxValue && (
 															<Text
 																variant="labelSmall"
-																style={[{ fontWeight: 'bold', marginHorizontal: MODAL.QUICK_MATCH_HISTORY.MARGIN / 2 }]}
+																style={[typographyStyles.bold, { marginHorizontal: MODAL.QUICK_MATCH_HISTORY.MARGIN / 2 }]}
 															>
 																Cấp {(value as any)?.level} ({value.value}/{(value as any)?.maxValue})
 															</Text>
@@ -157,16 +159,16 @@ const QuickMatchHistory = (props: QuickMatchHistoryProps) => {
 														{!(value as any)?.maxValue && (
 															<Text
 																variant="labelSmall"
-																style={[{ fontWeight: 'bold', marginHorizontal: MODAL.QUICK_MATCH_HISTORY.MARGIN / 2 }]}
+																style={[typographyStyles.bold, { marginHorizontal: MODAL.QUICK_MATCH_HISTORY.MARGIN / 2 }]}
 															>
 																{value.value}
 															</Text>
 														)}
-														<Text variant="labelSmall" style={[{ fontWeight: 'bold' }]}>
+														<Text variant="labelSmall" style={[typographyStyles.bold]}>
 															(
 														</Text>
 														<Point type={point as keyof ISchema.Point} value={value.changed} size={MODAL.ICON_SIZE} />
-														<Text variant="labelSmall" style={[{ fontWeight: 'bold' }]}>
+														<Text variant="labelSmall" style={[typographyStyles.bold]}>
 															)
 														</Text>
 													</View>
@@ -179,7 +181,7 @@ const QuickMatchHistory = (props: QuickMatchHistoryProps) => {
 								<View>
 									<TouchableOpacity onPress={onToggleHiddenClients}>
 										<View style={[stackStyles.row]}>
-											<Text variant="labelLarge" style={[{ fontWeight: 'bold' }]}>
+											<Text variant="labelLarge" style={[typographyStyles.bold]}>
 												{isHiddenClients ? 'Tham gia' : 'Thu gọn'}
 											</Text>
 											<Icon
@@ -189,7 +191,7 @@ const QuickMatchHistory = (props: QuickMatchHistoryProps) => {
 											/>
 										</View>
 										{isHiddenClients && (
-											<Text variant="labelSmall" style={[{ fontStyle: 'italic' }]}>
+											<Text variant="labelSmall" style={[typographyStyles.italic]}>
 												Nhấn để xem lại thành viên tham gia trận đấu
 											</Text>
 										)}
@@ -198,14 +200,14 @@ const QuickMatchHistory = (props: QuickMatchHistoryProps) => {
 										<View>
 											{raisedHandClient && (
 												<View style={[stackStyles.center, { marginBottom: MODAL.QUICK_MATCH_HISTORY.MARGIN * 2 }]}>
-													<Text variant="labelLarge" style={[{ fontWeight: 'bold' }]}>
+													<Text variant="labelLarge" style={[typographyStyles.bold]}>
 														Rung chuông sớm nhất
 													</Text>
 													<View style={[stackStyles.center]}>
 														<Avatar avatar={raisedHandClient.avatar} size={MODAL.QUICK_MATCH_HISTORY.AVATAR_SIZE * 2} />
-														<Text numberOfLines={2} variant="titleSmall" style={[{ fontWeight: 'bold', textAlign: 'center' }]}>
+														<Name numberOfLines={2} variant="titleSmall" style={[{ textAlign: 'center' }]}>
 															{raisedHandClient.name}
-														</Text>
+														</Name>
 													</View>
 												</View>
 											)}
@@ -218,9 +220,9 @@ const QuickMatchHistory = (props: QuickMatchHistoryProps) => {
 																style={[stackStyles.center, { width: ITEM_WIDTH, margin: MODAL.QUICK_MATCH_HISTORY.MARGIN }]}
 															>
 																<Avatar avatar={client.avatar} size={MODAL.QUICK_MATCH_HISTORY.AVATAR_SIZE} />
-																<Text numberOfLines={2} variant="titleSmall" style={[{ fontWeight: 'bold', textAlign: 'center' }]}>
+																<Name numberOfLines={2} style={[{ textAlign: 'center' }]}>
 																	{client.name}
-																</Text>
+																</Name>
 															</View>
 														);
 													})}
@@ -233,7 +235,7 @@ const QuickMatchHistory = (props: QuickMatchHistoryProps) => {
 								<View>
 									<TouchableOpacity onPress={onToggleHiddenQuestion}>
 										<View style={[stackStyles.row]}>
-											<Text variant="labelLarge" style={[{ fontWeight: 'bold' }]}>
+											<Text variant="labelLarge" style={[typographyStyles.bold]}>
 												{isHiddenQuestion ? 'Câu hỏi' : 'Thu gọn'}
 											</Text>
 											<Icon
@@ -243,7 +245,7 @@ const QuickMatchHistory = (props: QuickMatchHistoryProps) => {
 											/>
 										</View>
 										{isHiddenQuestion && (
-											<Text variant="labelSmall" style={[{ fontStyle: 'italic' }]}>
+											<Text variant="labelSmall" style={[typographyStyles.italic]}>
 												Nhấn để xem lại câu hỏi
 											</Text>
 										)}

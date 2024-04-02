@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
 	AccountProps,
+	ConversationProps,
 	CreateFormingProps,
 	ItemProps,
 	JoinFormingProps,
@@ -12,6 +13,7 @@ import { RootState } from '../store';
 export type ModalComponent =
 	| 'DEFAULT'
 	| 'ACCOUNT'
+	| 'CONVERSATION'
 	| 'CREATE_FORMING'
 	| 'ITEM'
 	| 'JOIN_FORMING'
@@ -21,6 +23,7 @@ export type ModalComponent =
 export interface ModalProps {
 	DEFAULT: {};
 	ACCOUNT: AccountProps;
+	CONVERSATION: ConversationProps;
 	CREATE_FORMING: CreateFormingProps;
 	ITEM: ItemProps;
 	JOIN_FORMING: JoinFormingProps;
@@ -50,6 +53,7 @@ export const slice = createSlice({
 			action: PayloadAction<ModalState<ModalComponent>>
 		) => {
 			const { isOpen, closable, component, params } = action.payload;
+
 			state.isOpen = isOpen;
 			state.closable = closable;
 			state.component = component;
@@ -57,6 +61,7 @@ export const slice = createSlice({
 		},
 		disappearModal: (state: ModalState<'DEFAULT'>) => {
 			const { isOpen, closable, component, params } = initialState;
+
 			state.isOpen = isOpen;
 			state.closable = closable;
 			state.component = component;

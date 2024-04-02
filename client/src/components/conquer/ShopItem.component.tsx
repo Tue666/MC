@@ -3,8 +3,8 @@ import { Divider, Text, useTheme } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { ConstantConfig } from '../../configs';
 import { IShopItem } from '../../screens/main/Shop.screen';
-import { globalStyles, stackStyles } from '../../styles';
-import { openModal } from '../../utils';
+import { globalStyles, stackStyles, typographyStyles } from '../../styles';
+import { NumberUtil, openModal } from '../../utils';
 import { TouchableBox } from '..';
 
 const { MAIN_LAYOUT } = ConstantConfig;
@@ -41,13 +41,13 @@ const ShopItem = (props: ShopItemProps) => {
 					{ height: width - MAIN_LAYOUT.SCREENS.SHOP.PADDING * 2, objectFit: 'contain' },
 				]}
 			/>
-			<Text variant="labelSmall" numberOfLines={1} style={[{ fontWeight: 'bold' }]}>
+			<Text variant="labelSmall" numberOfLines={1} style={[typographyStyles.bold]}>
 				{item.title}
 			</Text>
 			<Divider style={[styles.divider, globalStyles.fw]} />
 			<View style={[stackStyles.row]}>
 				<Text variant="labelSmall" numberOfLines={1}>
-					{item.price}{' '}
+					{NumberUtil.toNumberWithDots(item.price)}{' '}
 				</Text>
 				<Icon name="paid" size={MAIN_LAYOUT.SCREENS.SHOP.ITEM.ICON_SIZE} color={theme.colors.tertiary} />
 			</View>

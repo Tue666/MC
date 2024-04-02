@@ -6,7 +6,7 @@ import { AccountState } from '../../redux/slices/account.slice';
 import { globalStyles, stackStyles, typographyStyles } from '../../styles';
 import { IRoom } from '../../types';
 import { openDialog } from '../../utils';
-import { Avatar, Box, Button } from '..';
+import { Avatar, Box, Button, Name } from '..';
 
 const { MAIN_LAYOUT } = ConstantConfig;
 
@@ -36,7 +36,6 @@ const FormingBottom = (props: FormingBottomProps) => {
 
 		onStart();
 	};
-	const onPressChat = () => {};
 	const onPressLeaveForming = () => {
 		onLeaveForming();
 	};
@@ -53,20 +52,18 @@ const FormingBottom = (props: FormingBottomProps) => {
 							style={[styles.owner]}
 						/>
 					)}
-					<Text variant="labelSmall" numberOfLines={1} style={[{ fontWeight: 'bold' }]}>
-						{profile.name}
-					</Text>
+					<Name>{profile.name}</Name>
 				</View>
 			</View>
 			<View style={[styles.wrap, globalStyles.container, globalStyles.fh, stackStyles.center]}>
 				<Text
 					variant="titleSmall"
 					numberOfLines={1}
-					style={[typographyStyles.center, { fontWeight: 'bold' }]}
+					style={[typographyStyles.center, typographyStyles.bold]}
 				>
 					Đấu Nhanh
 				</Text>
-				<Text variant="headlineLarge" style={[{ fontWeight: 'bold' }]}>
+				<Text variant="headlineLarge" style={[typographyStyles.bold]}>
 					{clientCount}/{maxCapacity}
 				</Text>
 				<View style={[styles.action, globalStyles.fw]}>
@@ -75,9 +72,6 @@ const FormingBottom = (props: FormingBottomProps) => {
 							Bắt đầu
 						</Button>
 					)}
-					<Button disabled mode="contained" onPress={onPressChat} soundName="button_click.mp3">
-						Trò chuyện
-					</Button>
 					<Button
 						mode="contained"
 						buttonColor={theme.colors.error}

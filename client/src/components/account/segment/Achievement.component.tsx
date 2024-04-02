@@ -3,7 +3,7 @@ import { Text, useTheme } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { SegmentRenderProps } from '../Segment.component';
 import { ConstantConfig } from '../../../configs';
-import { stackStyles } from '../../../styles';
+import { stackStyles, typographyStyles } from '../../../styles';
 import { Box } from '../..';
 
 const { MAIN_LAYOUT } = ConstantConfig;
@@ -17,7 +17,7 @@ const Achievement = (props: AchievementProps) => {
 
 	return (
 		<View>
-			<Text variant="titleMedium" style={[{ fontWeight: 'bold' }]}>
+			<Text variant="titleMedium" style={[typographyStyles.bold]}>
 				{label}
 			</Text>
 			{achievements.length > 0 && (
@@ -25,10 +25,10 @@ const Achievement = (props: AchievementProps) => {
 					{[...Array(5)].map((_, index) => {
 						return (
 							<Box key={index} style={[styles.achievement]}>
-								<Text variant="labelSmall" style={[{ fontWeight: 'bold' }]}>
+								<Text variant="labelSmall" style={[typographyStyles.bold]}>
 									Huyền thoại ??
 								</Text>
-								<Text variant="labelSmall" numberOfLines={2} style={[{ fontStyle: 'italic' }]}>
+								<Text variant="labelSmall" numberOfLines={2} style={[typographyStyles.italic]}>
 									Chiến thắng liên tục 100 lần chế độ ???. Chiến thắng liên tục 100 lần chế độ ???. Chiến thắng liên
 									tục 100 lần chế độ ???
 								</Text>

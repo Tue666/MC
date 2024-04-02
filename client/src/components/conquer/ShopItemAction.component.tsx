@@ -3,8 +3,8 @@ import { StyleSheet, View } from 'react-native';
 import { Text, useTheme } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { ConstantConfig } from '../../configs';
-import { stackStyles } from '../../styles';
-import { closeModal, openDialog } from '../../utils';
+import { globalStyles, stackStyles, typographyStyles } from '../../styles';
+import { NumberUtil, closeModal, openDialog } from '../../utils';
 import { Button, QuantityInput } from '..';
 
 const { MAIN_LAYOUT, MODAL } = ConstantConfig;
@@ -28,15 +28,15 @@ const ShopItemAction = (props: ShopItemActionProps) => {
 	};
 	return (
 		<View style={[stackStyles.row]}>
-			<View style={[{ flex: 1 }]}>
+			<View style={[globalStyles.container]}>
 				<View style={[stackStyles.center]}>
-					<Text variant="labelMedium" style={[{ fontWeight: 'bold' }]}>
+					<Text variant="labelMedium" style={[typographyStyles.bold]}>
 						Số lượng:
 					</Text>
 					<QuantityInput limit={maxPurchase} input={quantity} setInput={setQuantity} />
 					<View style={[stackStyles.row]}>
-						<Text variant="labelSmall" style={[{ fontWeight: 'bold' }]}>
-							Tổng: {quantity * price}
+						<Text variant="labelSmall" style={[typographyStyles.bold]}>
+							Tổng: {NumberUtil.toNumberWithDots(quantity * price)}
 						</Text>
 						<Icon name="paid" size={MAIN_LAYOUT.SCREENS.SHOP.ITEM.ICON_SIZE} color={theme.colors.tertiary} />
 					</View>

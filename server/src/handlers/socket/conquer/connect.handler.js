@@ -34,26 +34,25 @@ const findRecoveryRoom = (clientId) => {
   }
 };
 
+const handleRecoveryClient = async (io, socket, clientId) => {
+  const recovery = findRecoveryRoom(clientId);
+  if (!recovery) return;
+
+  const { mode, resource, room } = recovery;
+  const roomService = roomBuilder(mode, resource);
+  const roomHasClient = await roomService.connect(room, clientId, socket.id);
+  if (!roomHasClient) return;
+
+  const connection = { mode, resource, room: roomHasClient };
+
+  roomHandler(io, socket, connection);
+
+  socket.emit("server-client(recovery-client)", connection);
+};
 const onRecoveryClient = (io, socket) => {
   socket.on("client-server(recovery-client)", async (clientId) => {
     try {
-      const recovery = findRecoveryRoom(clientId);
-      if (!recovery) return;
-
-      const { mode, resource, room } = recovery;
-      const roomService = roomBuilder(mode, resource);
-      const roomHasClient = await roomService.connect(
-        room,
-        clientId,
-        socket.id
-      );
-      if (!roomHasClient) return;
-
-      const connection = { mode, resource, room: roomHasClient };
-
-      roomHandler(io, socket, connection);
-
-      socket.emit("server-client(recovery-client)", connection);
+      await handleRecoveryClient(io, socket, clientId);
     } catch (error) {
       console.log(`[Error] Connecting:`, error.message);
     }

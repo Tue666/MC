@@ -60,6 +60,14 @@ export const MODAL = {
 		MARGIN: 10,
 		BORDER_RADIUS: 15,
 	},
+	CONVERSATION: {
+		WIDTH: Dimensions.get('window').width - 20,
+		HEIGHT: 500,
+		PADDING: 10,
+		MARGIN: 10,
+		BORDER_RADIUS: 15,
+		ICON_SIZE: 150,
+	},
 	CREATE_FORMING: {
 		WIDTH: 320,
 		ICON_SIZE: 20,
@@ -236,7 +244,7 @@ export const MAIN_LAYOUT = {
 				},
 				BOTTOM: {
 					ICON_SIZE: 100,
-					HEIGHT: 300,
+					HEIGHT: 260,
 				},
 			},
 			STATISTIC: {

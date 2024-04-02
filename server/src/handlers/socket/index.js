@@ -7,14 +7,17 @@
 	- key	    		    : Definition of what information is being sent
 */
 
-const connectingHandler = require("./connecting.handler");
+const connectHandler = require("./connect.handler");
 const disconnectingHandler = require("./disconnecting.handler");
 const conquerHandler = require("./conquer");
+const conversationHandler = require("./conversation");
 
 module.exports = (io) => (socket) => {
-  connectingHandler(io, socket);
+  connectHandler(io, socket);
 
   disconnectingHandler(io, socket);
+
+  conversationHandler(io, socket);
 
   conquerHandler(io, socket);
 };

@@ -1,9 +1,9 @@
 import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
 import { ConstantConfig } from '../../configs';
-import { globalStyles, stackStyles } from '../../styles';
+import { globalStyles, stackStyles, typographyStyles } from '../../styles';
 import { IRoom } from '../../types';
-import { Avatar, TouchableBox } from '..';
+import { Avatar, Name, TouchableBox } from '..';
 
 const MAX_VISIBLE_MEMBER_NUMBER = 5;
 const { MAIN_LAYOUT } = ConstantConfig;
@@ -29,13 +29,11 @@ const FindRoomItem = (props: FindRoomItemProps) => {
 		>
 			<Avatar avatar={roomOwner?.avatar} size={MAIN_LAYOUT.SCREENS.CONQUER.FIND_ROOM.ITEM.ICON_SIZE} />
 			<View style={[styles.detail]}>
-				<Text variant="labelSmall" numberOfLines={1} style={[{ fontWeight: 'bold' }]}>
+				<Text variant="labelSmall" numberOfLines={1} style={[typographyStyles.bold]}>
 					{password ? `🔒 ${name}` : name} ({clients.length}/{maxCapacity})
 				</Text>
-				<Text variant="labelSmall" numberOfLines={1} style={[{ fontWeight: 'bold' }]}>
-					{roomOwner?.name}
-				</Text>
-				<Text variant="labelSmall" numberOfLines={1} style={[{ fontStyle: 'italic' }]}>
+				<Name>{roomOwner?.name}</Name>
+				<Text variant="labelSmall" numberOfLines={1} style={[typographyStyles.italic]}>
 					{description}
 				</Text>
 				<View style={[stackStyles.row]}>

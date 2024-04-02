@@ -8,6 +8,12 @@ const getTypographyStyles = (theme: MD3Theme) =>
 			color: theme.colors.primary,
 			fontWeight: 'bold',
 		},
+		bold: {
+			fontWeight: 'bold',
+		},
+		italic: {
+			fontStyle: 'italic',
+		},
 		center: {
 			textAlign: 'center',
 		},

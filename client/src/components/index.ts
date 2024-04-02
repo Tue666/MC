@@ -1,10 +1,12 @@
 export * from './account';
 export * from './conquer';
+export * from './conversation';
 export * from './overrides';
 
 export { default as Avatar } from './Avatar.component';
 export { default as Box } from './Box.component';
 export { default as CircleBorder } from './CircleBorder.component';
+export { default as Conversation } from './Conversation.component';
 export { default as CountdownCircle } from './CountdownCircle.component';
 export { default as CountdownProgress } from './CountdownProgress.component';
 export { default as CountdownTimer } from './CountdownTimer.component';

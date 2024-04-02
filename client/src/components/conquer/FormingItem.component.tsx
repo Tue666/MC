@@ -8,7 +8,7 @@ import { AccountState } from '../../redux/slices/account.slice';
 import { globalStyles, stackStyles } from '../../styles';
 import { IRoom } from '../../types';
 import { openModal } from '../../utils';
-import { Avatar, Box, Rank } from '..';
+import { Avatar, Box, Name, Rank } from '..';
 
 const { MAIN_LAYOUT, ROOM, TOOLTIP } = ConstantConfig;
 
@@ -123,9 +123,7 @@ const FormingItem = (props: FormingItemProps) => {
 									style={[styles.owner]}
 								/>
 							)}
-							<Text variant="labelSmall" numberOfLines={1} style={[{ fontWeight: 'bold' }]}>
-								{client.name}
-							</Text>
+							<Name>{client.name}</Name>
 						</View>
 					</View>
 				</View>

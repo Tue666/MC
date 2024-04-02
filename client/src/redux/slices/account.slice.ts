@@ -68,11 +68,12 @@ export const slice = createSlice({
 	reducers: {
 		initAccountSuccess(state: AccountState, action: PayloadAction<AccountState>) {
 			const { profile, point, resources } = action.payload;
+
 			state.profile = profile;
 			state.point = point;
 			state.resources = resources;
 		},
-		updateProfileSuccess(state: AccountState, action: PayloadAction<Partial<AccountState['profile']>>) {
+		updateProfile(state: AccountState, action: PayloadAction<Partial<AccountState['profile']>>) {
 			if (action.payload.matches) {
 				action.payload.matches = action.payload.matches.slice(0, MAX_MATCH_VISIBLE_PER_ACCOUNT);
 			}
@@ -81,6 +82,7 @@ export const slice = createSlice({
 				...state.profile,
 				...action.payload,
 			};
+
 			state.profile = newProfile;
 		},
 		updateCoverSuccess(
@@ -88,6 +90,7 @@ export const slice = createSlice({
 			action: PayloadAction<IAccount.UpdateCoverResponse['account']>
 		) {
 			const { cover } = action.payload;
+
 			state.profile = { ...state.profile, cover };
 		},
 		updateAvatarSuccess(
@@ -95,6 +98,7 @@ export const slice = createSlice({
 			action: PayloadAction<IAccount.UpdateAvatarResponse['account']>
 		) {
 			const { avatar } = action.payload;
+
 			state.profile = { ...state.profile, avatar };
 		},
 		clearAccount(state: AccountState) {
@@ -105,7 +109,7 @@ export const slice = createSlice({
 });
 
 const { reducer, actions } = slice;
-export const { updateProfileSuccess, clearAccount } = actions;
+export const { updateProfile, clearAccount } = actions;
 export const selectAccount = (state: RootState) => state.account;
 export default reducer;
 

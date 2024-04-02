@@ -2,13 +2,14 @@ import { useEffect, useRef, useState } from 'react';
 import { Dimensions, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Divider, Text, useTheme } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import Clipboard from '@react-native-clipboard/clipboard';
 import { SoundManager } from '../../../audios';
 import { Box, FormingBottom, FormingItem } from '../../../components';
 import { ConstantConfig } from '../../../configs';
 import { useSocketClient } from '../../../hooks';
 import { useAppSelector } from '../../../redux/hooks';
 import { selectAccount } from '../../../redux/slices/account.slice';
-import { globalStyles, stackStyles } from '../../../styles';
+import { globalStyles, stackStyles, typographyStyles } from '../../../styles';
 import { ConquerFormingProps, IRoom } from '../../../types';
 import { openDialog, openSnackbar } from '../../../utils';
 
@@ -35,6 +36,7 @@ const Forming = (props: ConquerFormingProps) => {
 
 	useEffect(() => {
 		const onInRoomFormingEvent = (room: IRoom.Room) => {
+			SoundManager.playSound('room_notification.mp3');
 			const { name, owner, clients } = room;
 
 			// The room has changed owner
@@ -88,7 +90,7 @@ const Forming = (props: ConquerFormingProps) => {
 		);
 
 		const onRemovedFromFormingEvent = () => {
-			onLeaveForming();
+			navigation.goBack();
 			openDialog({
 				title: 'Oh',
 				content: 'Bạn đã bị đá khỏi phòng',
@@ -124,6 +126,7 @@ const Forming = (props: ConquerFormingProps) => {
 	}, []);
 	const onPressCopyRoomId = () => {
 		SoundManager.playSound('button_click.mp3');
+		Clipboard.setString(joinedRoom._id);
 		openSnackbar({
 			content: 'Copy ID phòng thành công',
 		});
@@ -148,6 +151,9 @@ const Forming = (props: ConquerFormingProps) => {
 	};
 	const onRemoveFromForming = (client: IRoom.Room['clients'][number]) => {
 		socketClient?.emit('conquer:client-server(remove-client-forming)', {
+			mode: roomMode,
+			resource: resource._id,
+			room: joinedRoom,
 			client,
 		});
 	};
@@ -170,11 +176,11 @@ const Forming = (props: ConquerFormingProps) => {
 					<Text
 						variant="labelMedium"
 						style={[
+							globalStyles.container,
 							globalStyles.bg,
 							styles.headerText,
 							{
 								borderRadius: BOX.BORDER_RADIUS,
-								flex: 1,
 								marginRight: MAIN_LAYOUT.SCREENS.CONQUER.FORMING.MARGIN / 2,
 							},
 						]}
@@ -191,7 +197,7 @@ const Forming = (props: ConquerFormingProps) => {
 					<Text variant="labelMedium" style={[styles.headerText]}>
 						Phòng:
 					</Text>
-					<Text variant="labelMedium" numberOfLines={1} style={[styles.headerText, { fontWeight: 'bold' }]}>
+					<Text variant="labelMedium" numberOfLines={1} style={[styles.headerText, typographyStyles.bold]}>
 						{joinedRoom.name}
 					</Text>
 				</View>

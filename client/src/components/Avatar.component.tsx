@@ -35,7 +35,7 @@ const Avatar = (props: AvatarProps) => {
 					<RNPAvatar.Image
 						size={size || MAIN_LAYOUT.SCREENS.CONQUER.WAITING.AVATAR.ICON_SIZE}
 						source={{
-							uri: `${APP.image_storage.url}/${avatar}`,
+							uri: `${APP.image_storage.host}/${APP.image_storage.path}/${avatar}`,
 						}}
 					/>
 				)}

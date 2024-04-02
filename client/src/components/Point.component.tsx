@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { APIConfig, ConstantConfig } from '../configs';
 import { useAppSelector } from '../redux/hooks';
 import { selectAccount } from '../redux/slices/account.slice';
-import { stackStyles } from '../styles';
+import { stackStyles, typographyStyles } from '../styles';
 import { ISchema } from '../types';
 
 const { APP } = APIConfig;
@@ -39,26 +39,26 @@ const Point = (props: PointProps) => {
 			)}
 			{point[type].icon && (
 				<Image
-					source={{ uri: `${APP.image_storage.url}/${point[type].icon}` }}
+					source={{ uri: `${APP.image_storage.host}/${APP.image_storage.path}/${point[type].icon}` }}
 					style={[
 						{ width: size || BUTTON.ICON_SIZE, height: size || BUTTON.ICON_SIZE, objectFit: 'contain' },
 					]}
 				/>
 			)}
 			{valueVariance === 'increase' && (
-				<Text variant="labelSmall" style={[{ fontWeight: 'bold', color: theme.colors.secondary }]}>
+				<Text variant="labelSmall" style={[typographyStyles.bold, { color: theme.colors.secondary }]}>
 					{' '}
 					+{positiveValue}
 				</Text>
 			)}
 			{valueVariance === 'decrease' && (
-				<Text variant="labelSmall" style={[{ fontWeight: 'bold', color: theme.colors.error }]}>
+				<Text variant="labelSmall" style={[typographyStyles.bold, { color: theme.colors.error }]}>
 					{' '}
 					-{positiveValue}
 				</Text>
 			)}
 			{valueVariance === 'balance' && (
-				<Text variant="labelSmall" style={[{ fontWeight: 'bold' }]}>
+				<Text variant="labelSmall" style={[typographyStyles.bold]}>
 					{' '}
 					{positiveValue}
 				</Text>

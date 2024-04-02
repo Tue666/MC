@@ -2,7 +2,7 @@ import { Image, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
 import { ConstantConfig } from '../../configs';
 import { IInventoryItem } from '../../screens/main/Inventory.screen';
-import { globalStyles, stackStyles } from '../../styles';
+import { globalStyles, stackStyles, typographyStyles } from '../../styles';
 import { openModal } from '../../utils';
 import { TouchableBox } from '..';
 
@@ -39,7 +39,7 @@ const InventoryItem = (props: InventoryItemProps) => {
 					{ height: width - MAIN_LAYOUT.SCREENS.SHOP.PADDING * 2, objectFit: 'contain' },
 				]}
 			/>
-			<Text variant="labelSmall" numberOfLines={1} style={[{ fontWeight: 'bold' }]}>
+			<Text variant="labelSmall" numberOfLines={1} style={[typographyStyles.bold]}>
 				{item.title}
 			</Text>
 		</TouchableBox>

@@ -27,6 +27,7 @@ export const slice = createSlice({
 	reducers: {
 		renderSnackbar: (state: SnackbarState, action: PayloadAction<SnackbarState>) => {
 			const { isOpen, content, duration, icon, color, action: snackbarAction } = action.payload;
+
 			state.isOpen = isOpen;
 			state.content = content;
 			state.duration = duration;
@@ -36,6 +37,7 @@ export const slice = createSlice({
 		},
 		disappearSnackbar: (state: SnackbarState) => {
 			const { isOpen, content, duration, icon, color, action } = initialState;
+
 			state.isOpen = isOpen;
 			state.content = content;
 			state.duration = duration;

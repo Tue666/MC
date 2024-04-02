@@ -8,8 +8,10 @@ export type SoundName =
 	| 'incorrect.mp3'
 	| 'join.mp3'
 	| 'matching.mp3'
+	| 'message_notification.mp3'
 	| 'prepare.mp3'
 	| 'quick_match_bg.mp3'
+	| 'room_notification.mp3'
 	| 'victory_bg.mp3'
 	| 'victory_voice.mp3'
 	| 'waiting_bg.mp3'
@@ -23,8 +25,10 @@ export const SOUNDS: SoundName[] = [
 	'incorrect.mp3',
 	'join.mp3',
 	'matching.mp3',
+	'message_notification.mp3',
 	'prepare.mp3',
 	'quick_match_bg.mp3',
+	'room_notification.mp3',
 	'victory_bg.mp3',
 	'victory_voice.mp3',
 	'waiting_bg.mp3',

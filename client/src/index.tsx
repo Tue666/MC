@@ -1,7 +1,7 @@
 import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { Provider as ReduxProvider } from 'react-redux';
-import { Dialog, Modal, Snackbar } from './components';
+import { Conversation, Dialog, Modal, Snackbar } from './components';
 import { AuthenticationProvider } from './contexts/Authentication.context';
 import { SettingProvider } from './contexts/Setting.context';
 import { SocketClientProvider } from './contexts/SocketClient.context';
@@ -23,6 +23,7 @@ const App = () => {
 						<ThemeProvider>
 							<AuthenticationProvider>
 								<Main />
+								<Conversation />
 								<DialogUtilConfiguration />
 								<Dialog />
 								<SnackbarUtilConfiguration />

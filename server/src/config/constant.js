@@ -1,5 +1,13 @@
 const MAX_MATCH_VISIBLE_PER_ACCOUNT = 20;
 
+const CONVERSATION = {
+  ID_CONNECTOR: "@",
+};
+
+const MESSAGE = {
+  ID_CONNECTOR: "@",
+};
+
 const ROOM = {
   ID_CONNECTOR: "@",
   MODE: {
@@ -58,6 +66,8 @@ const EXPERIENCE_MILESTONE = {
 
 module.exports = {
   MAX_MATCH_VISIBLE_PER_ACCOUNT,
+  CONVERSATION,
+  MESSAGE,
   ROOM,
   POINTS,
   EXPERIENCE_MILESTONE,

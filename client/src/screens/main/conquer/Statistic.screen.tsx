@@ -9,8 +9,8 @@ import { SoundManager } from '../../../audios';
 import { Box, Button, Point } from '../../../components';
 import { ConstantConfig, ResourceConfig } from '../../../configs';
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
-import { selectAccount, updateProfileSuccess } from '../../../redux/slices/account.slice';
-import { globalStyles, stackStyles } from '../../../styles';
+import { selectAccount, updateProfile } from '../../../redux/slices/account.slice';
+import { globalStyles, stackStyles, typographyStyles } from '../../../styles';
 import { ConquerStatisticProps, ISchema } from '../../../types';
 import { NumberUtil } from '../../../utils';
 
@@ -39,7 +39,7 @@ const Statistic = (props: ConquerStatisticProps) => {
 
 	useEffect(() => {
 		dispatch(
-			updateProfileSuccess({
+			updateProfile({
 				...point_differences,
 				matches: [match, ...profile.matches],
 			})
@@ -159,12 +159,12 @@ const Statistic = (props: ConquerStatisticProps) => {
 				style={[styles.statistics, stackStyles.rowWrap]}
 			>
 				<Box style={[styles.point, { width: ITEM_WIDTH }]}>
-					<Text variant="labelSmall" style={[{ fontWeight: 'bold' }]}>
+					<Text variant="labelSmall" style={[typographyStyles.bold]}>
 						Thời gian chơi:
 					</Text>
 					<View style={[stackStyles.row, { justifyContent: 'center' }]}>
 						<Icon name="schedule" size={MAIN_LAYOUT.HEADER.ICON_SIZE} color={theme.colors.onSurface} />
-						<Text variant="labelSmall" style={[{ fontWeight: 'bold' }]}>
+						<Text variant="labelSmall" style={[typographyStyles.bold]}>
 							{' '}
 							{time}
 						</Text>
@@ -175,7 +175,7 @@ const Statistic = (props: ConquerStatisticProps) => {
 
 					return (
 						<Box key={index} style={[styles.point, { width: ITEM_WIDTH }]}>
-							<Text variant="labelSmall" style={[{ fontWeight: 'bold' }]}>
+							<Text variant="labelSmall" style={[typographyStyles.bold]}>
 								{label}:
 							</Text>
 							<View style={[stackStyles.center]}>

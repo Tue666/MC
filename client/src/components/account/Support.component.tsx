@@ -1,22 +1,22 @@
-import { StyleSheet, View } from 'react-native';
+import { Linking, StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
 import { ConstantConfig } from '../../configs';
-import { Box } from '..';
+import { typographyStyles } from '../../styles';
+import { TouchableBox } from '..';
 
 const { MAIN_LAYOUT } = ConstantConfig;
 
 const Support = () => {
+	const onPressSupport = () => {
+		Linking.openURL('mailto:lechinhtue292001@gmail.com?subject=CM-[App] Support');
+	};
 	return (
 		<View>
-			{[...Array(5)].map((_, index) => {
-				return (
-					<Box key={index} style={[styles.support]}>
-						<Text variant="labelSmall" style={[{ fontWeight: 'bold' }]}>
-							Huyền thoại Đấu Nhanh
-						</Text>
-					</Box>
-				);
-			})}
+			<TouchableBox onPress={onPressSupport} style={[styles.support]}>
+				<Text variant="labelSmall" style={[typographyStyles.bold]}>
+					App
+				</Text>
+			</TouchableBox>
 		</View>
 	);
 };

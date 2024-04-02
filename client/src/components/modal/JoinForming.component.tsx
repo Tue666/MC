@@ -111,7 +111,7 @@ const JoinForming = (props: JoinFormingProps) => {
 				<Button
 					mode="outlined"
 					onPress={onPressCancel}
-					style={[{ flex: 1, margin: SPACE_GAP }]}
+					style={[globalStyles.container, { margin: SPACE_GAP }]}
 					soundName="button_click.mp3"
 				>
 					Hủy
@@ -119,7 +119,7 @@ const JoinForming = (props: JoinFormingProps) => {
 				<Button
 					mode="contained"
 					onPress={onPressJoin}
-					style={[{ flex: 1, margin: SPACE_GAP }]}
+					style={[globalStyles.container, { margin: SPACE_GAP }]}
 					soundName="button_click.mp3"
 				>
 					Vào

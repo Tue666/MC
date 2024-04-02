@@ -4,10 +4,10 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import LottieView from 'lottie-react-native';
 import { ConstantConfig } from '../../configs';
-import { globalStyles, stackStyles } from '../../styles';
+import { globalStyles, stackStyles, typographyStyles } from '../../styles';
 import { ConquerStackList, ConquerStackListParams } from '../../types';
 import { closeModal } from '../../utils';
-import { Avatar } from '..';
+import { Avatar, Name } from '..';
 
 const { MODAL } = ConstantConfig;
 
@@ -37,14 +37,12 @@ const Winner = (props: WinnerProps) => {
 					source={require('../../assets/animations/lottie/confetti.json')}
 					autoPlay
 					loop
-					style={[{ flex: 1 }]}
+					style={[globalStyles.container]}
 				/>
 			</TouchableRipple>
 			<View style={[styles.container, globalStyles.paper, globalStyles.shadow, stackStyles.center]}>
 				<Avatar avatar={client?.avatar} size={MODAL.WINNER.AVATAR.ICON_SIZE} style={[styles.avatar]} />
-				<Text variant="labelSmall" numberOfLines={1} style={[{ fontWeight: 'bold' }]}>
-					{client?.name}
-				</Text>
+				<Name>{client?.name}</Name>
 				<LottieView
 					source={require('../../assets/animations/lottie/trophy.json')}
 					autoPlay
@@ -54,7 +52,7 @@ const Winner = (props: WinnerProps) => {
 				<Text variant="headlineSmall" style={[{ textTransform: 'uppercase' }]}>
 					Chiến Thắng
 				</Text>
-				<Text variant="labelSmall" style={[{ marginTop: MODAL.WINNER.PADDING, fontStyle: 'italic' }]}>
+				<Text variant="labelSmall" style={[typographyStyles.italic, { marginTop: MODAL.WINNER.PADDING }]}>
 					Nhấn bất kỳ để tiếp tục
 				</Text>
 			</View>

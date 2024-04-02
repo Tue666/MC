@@ -2,7 +2,7 @@ import { Dimensions, StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
 import { SegmentRenderProps } from '../Segment.component';
 import { ConstantConfig } from '../../../configs';
-import { stackStyles } from '../../../styles';
+import { stackStyles, typographyStyles } from '../../../styles';
 import { Box } from '../..';
 
 const { MAIN_LAYOUT } = ConstantConfig;
@@ -25,17 +25,17 @@ const Statistics = (props: StatisticsProps) => {
 
 	return (
 		<View>
-			<Text variant="titleMedium" style={[{ fontWeight: 'bold' }]}>
+			<Text variant="titleMedium" style={[typographyStyles.bold]}>
 				{label}
 			</Text>
 			<View style={[stackStyles.rowWrap]}>
 				{[...Array(5)].map((_, index) => {
 					return (
 						<Box key={index} style={[styles.statistics, { width: ITEM_WIDTH }]}>
-							<Text variant="labelSmall" style={[{ fontWeight: 'bold' }]}>
+							<Text variant="labelSmall" style={[typographyStyles.bold]}>
 								???
 							</Text>
-							<Text variant="labelSmall" style={[{ fontStyle: 'italic' }]}>
+							<Text variant="labelSmall" style={[typographyStyles.italic]}>
 								Ngày ???
 							</Text>
 						</Box>

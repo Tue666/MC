@@ -32,6 +32,21 @@ export interface StudentSchema extends AccountSchema {}
 export interface AdministratorSchema extends AccountSchema {}
 
 // =========================================================================================
+// ===================================== CONVERSATION SCHEMA ===============================
+
+export interface ConversationSchema {
+	_id: string;
+	title: string;
+	clients: ClientSchema[];
+}
+
+export interface MessageSchema {
+	_id: string;
+	sender: ClientSchema;
+	content: string;
+}
+
+// =========================================================================================
 // ===================================== MATCH SCHEMA ======================================
 
 export interface Point {

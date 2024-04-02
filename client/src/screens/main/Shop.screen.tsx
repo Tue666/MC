@@ -1,9 +1,10 @@
 import { Dimensions, FlatList, Image, StyleSheet, View } from 'react-native';
 import { Divider, useTheme } from 'react-native-paper';
 import { Box, ShopItem } from '../../components';
-import { ConstantConfig } from '../../configs';
+import { APIConfig, ConstantConfig } from '../../configs';
 import { globalStyles, stackStyles } from '../../styles';
 
+const { APP } = APIConfig;
 const { MAIN_LAYOUT } = ConstantConfig;
 
 const WIDTH_SIZE = Dimensions.get('window').width;
@@ -25,7 +26,7 @@ export interface IShopItem {
 const SHOP_ITEMS = Array.from({ length: 20 }, (_, index) => ({
 	_id: (index + 1).toString(),
 	title: `Cuộn x${index + 1} Vàng`,
-	image: 'https://res.cloudinary.com/tipegallery/image/upload/app/scroll.png',
+	image: `${APP.image_storage.host}/${APP.image_storage.path}/app/scroll.png`,
 	requirement: `Cần đạt LV.999999 để sử dụng`,
 	maxPurchase: index + 1,
 	price: 999999,

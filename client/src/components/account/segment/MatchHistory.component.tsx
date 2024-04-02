@@ -5,7 +5,7 @@ import { SegmentRenderProps } from '../Segment.component';
 import { ConstantConfig } from '../../../configs';
 import { useAppSelector } from '../../../redux/hooks';
 import { selectAccount } from '../../../redux/slices/account.slice';
-import { stackStyles } from '../../../styles';
+import { stackStyles, typographyStyles } from '../../../styles';
 import { ISchema } from '../../../types';
 import { NumberUtil, openModal } from '../../../utils';
 import { Point, TouchableBox } from '../..';
@@ -41,7 +41,7 @@ const MatchHistory = (props: MatchHistoryProps) => {
 	};
 	return (
 		<View>
-			<Text variant="titleMedium" style={[{ fontWeight: 'bold' }]}>
+			<Text variant="titleMedium" style={[typographyStyles.bold]}>
 				{label}
 			</Text>
 			{profile.matches.length > 0 && (
@@ -62,18 +62,18 @@ const MatchHistory = (props: MatchHistoryProps) => {
 							>
 								<Text
 									variant="labelLarge"
-									style={[{ fontWeight: 'bold', color: isWinner ? theme.colors.secondary : theme.colors.error }]}
+									style={[typographyStyles.bold, { color: isWinner ? theme.colors.secondary : theme.colors.error }]}
 								>
 									{isWinner ? 'CHIẾN THẮNG' : 'THẤT BẠI'}
 								</Text>
-								<Text variant="labelSmall" style={[{ fontWeight: 'bold' }]}>
+								<Text variant="labelSmall" style={[typographyStyles.bold]}>
 									{resources[resource].name}
 								</Text>
-								<Text variant="labelSmall" style={[{ fontWeight: 'bold' }]}>
+								<Text variant="labelSmall" style={[typographyStyles.bold]}>
 									Thời gian chơi: {time}
 								</Text>
 								<View style={[{ alignSelf: 'flex-end' }]}>
-									<Text variant="labelSmall" style={[{ fontStyle: 'italic' }]}>
+									<Text variant="labelSmall" style={[typographyStyles.italic]}>
 										{created_at}
 									</Text>
 								</View>
