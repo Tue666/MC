@@ -3,17 +3,23 @@ import { Text, useTheme } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { ConstantConfig } from '../../configs';
 import { stackStyles, typographyStyles } from '../../styles';
+import { IQuestion } from '../../types';
 
 const { MAIN_LAYOUT } = ConstantConfig;
 
-const Instruction = () => {
+interface InstructionProps {
+	description: IQuestion.Question['description'];
+}
+
+const Instruction = (props: InstructionProps) => {
+	const { description } = props;
 	const theme = useTheme();
 
 	return (
 		<View style={[styles.container, stackStyles.center, { borderColor: theme.colors.onSurface }]}>
 			<Icon name="emoji-objects" size={50} color={theme.colors.tertiary} />
 			<Text variant="labelMedium" style={[typographyStyles.bold, styles.text]}>
-				Chọn 1 câu trả lời đúng trong các đáp án dưới nhé!
+				{description}
 			</Text>
 		</View>
 	);

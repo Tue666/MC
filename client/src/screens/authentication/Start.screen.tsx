@@ -5,7 +5,7 @@ import { ConstantConfig } from '../../configs';
 import { typographyStyles } from '../../styles';
 import { AuthenticationStartProps } from '../../types';
 
-const { SPACE_GAP } = ConstantConfig;
+const { APP_NAME, APP_DESCRIPTION, SPACE_GAP } = ConstantConfig;
 
 const Start = (props: AuthenticationStartProps) => {
 	const { navigation } = props;
@@ -19,11 +19,9 @@ const Start = (props: AuthenticationStartProps) => {
 	return (
 		<View style={[styles.container]}>
 			<Text variant="headlineMedium" style={[styles.gap, typographyStyles.highlight]}>
-				Conquer Math
+				{APP_NAME}
 			</Text>
-			<Text style={[styles.gap, { textAlign: 'center' }]}>
-				The easiest way to start with your amazing application.
-			</Text>
+			<Text style={[styles.gap, { textAlign: 'center' }]}>{APP_DESCRIPTION}</Text>
 			<Button mode="contained" onPress={onPressSignIn} soundName="button_click.mp3">
 				Đăng nhập
 			</Button>

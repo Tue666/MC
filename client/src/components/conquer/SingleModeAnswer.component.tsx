@@ -217,7 +217,7 @@ const SingleModeAnswer = forwardRef<SingleModeAnswerHandleRef, SingleModeAnswerP
 		return (
 			<View>
 				<View pointerEvents={isAllowedAnswer ? 'auto' : 'none'} style={[stackStyles.rowWrap]}>
-					{description && <Instruction />}
+					{description && <Instruction description={description} />}
 					{answers.map((answer) => {
 						const { _id, value, content } = answer;
 						const { bgColor, textColor } = buildColorAnswer(value);

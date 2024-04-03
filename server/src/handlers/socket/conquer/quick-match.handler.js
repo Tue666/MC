@@ -13,6 +13,12 @@ const handleLoadingQuestion = async (io, socket, informRoomChanged, data) => {
     questionQueryParams
   );
 
+  io.in(roomWithMatch._id).emit(
+    "conquer[quick-match]:server-client(loading-question)",
+    roomWithMatch,
+    questions
+  );
+
   if (questions.length <= 0) {
     const resetRoom = roomService.resetPlay(roomWithMatch._id);
 
@@ -28,12 +34,6 @@ const handleLoadingQuestion = async (io, socket, informRoomChanged, data) => {
       socket.leave(roomWithMatch._id);
     }
   }
-
-  io.in(roomWithMatch._id).emit(
-    "conquer[quick-match]:server-client(loading-question)",
-    roomWithMatch,
-    questions
-  );
 };
 const onLoadingQuestion = (io, socket, informRoomChanged) => {
   socket.on(

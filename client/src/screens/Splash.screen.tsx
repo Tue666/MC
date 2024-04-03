@@ -1,6 +1,9 @@
 import { View } from 'react-native';
 import { Text, useTheme } from 'react-native-paper';
+import { ConstantConfig } from '../configs';
 import { globalStyles, stackStyles, typographyStyles } from '../styles';
+
+const { APP_NAME } = ConstantConfig;
 
 const Splash = () => {
 	const theme = useTheme();
@@ -13,7 +16,7 @@ const Splash = () => {
 				variant="headlineMedium"
 				style={[typographyStyles.highlight, { color: theme.colors.onPrimary }]}
 			>
-				Conquer Math
+				{APP_NAME}
 			</Text>
 		</View>
 	);

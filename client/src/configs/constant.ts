@@ -28,6 +28,10 @@ export const ROOM: RoomCons = {
 	},
 };
 
+export const APP_NAME = 'EduQuiz';
+export const APP_DESCRIPTION =
+	'Hãy thách thức kiến thức của bạn với hàng ngàn câu hỏi từ các môn học khác nhau.';
+
 export const SPACE_GAP = 8;
 
 export const TOOLTIP = {
