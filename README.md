@@ -1,6 +1,6 @@
 [Short demo](https://www.youtube.com/watch?v=KAmxfnd3Eik)
 <br />
-[Download app](https://drive.google.com/file/d/1JiuQarQroe7p0f1MzZLzAtQ9H94IH1yE/view?usp=drive_link)
+[Download app](https://drive.google.com/file/d/1twcSfWcwb3zEyueTXmPXLQmOvqU2zfc7/view?usp=drive_link)
 <br />
 <br />
 Shortcuts
