@@ -41,6 +41,25 @@ const informRoomChanged = (io, mode, resource) => {
   io.emit("conquer:server-client(forming)", Object.values(rooms));
 };
 
+const resetGamePlay = (io, socket, mode, resource, room, resetRoom) => {
+  if (resetRoom) {
+    // Inform all client that rooms have changed
+    informRoomChanged(io, mode, resource);
+
+    io.in(resetRoom._id).emit(
+      "conquer:server-client(in-room-forming)",
+      resetRoom
+    );
+  } else {
+    io.in(room.conversationId).emit(
+      "conversation:server-client(clear-conversation)",
+      room.conversationId
+    );
+    socket.leave(room.conversationId);
+    socket.leave(room._id);
+  }
+};
+
 const joinConversation = (joinedRoom, client) => {
   const { _id, name, conversationId } = joinedRoom;
 
@@ -414,12 +433,7 @@ const handleTimeoutPreparing = (io, socket, data) => {
 
   const resetRoom = roomService.prepareTimeout(room._id);
 
-  if (resetRoom) {
-    io.in(resetRoom._id).emit(
-      "conquer:server-client(in-room-forming)",
-      resetRoom
-    );
-  }
+  resetGamePlay(io, socket, mode, resource, room, resetRoom);
 };
 const onTimeoutPreparing = (io, socket) => {
   socket.on("conquer:client-server(timeout-preparing)", (data) => {
@@ -459,5 +473,5 @@ module.exports = (io, socket) => {
 
   onTimeoutPreparing(io, socket);
 
-  quickMatchHandler(io, socket, informRoomChanged);
+  quickMatchHandler(io, socket, { resetGamePlay });
 };

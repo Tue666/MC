@@ -1,7 +1,8 @@
 const { roomBuilder } = require("../../../app/services/room/room.service");
 const ValidateUtil = require("../../../utils/validate.util");
 
-const handleLoadingQuestion = async (io, socket, informRoomChanged, data) => {
+const handleLoadingQuestion = async (io, socket, methods, data) => {
+  const { resetGamePlay } = methods;
   const { mode, resource, room, questionQueryParams = {} } = data;
   const roomService = roomBuilder(mode, resource);
   const resourceInstance = roomService.getResourceInstance();
@@ -22,25 +23,15 @@ const handleLoadingQuestion = async (io, socket, informRoomChanged, data) => {
   if (questions.length <= 0) {
     const resetRoom = roomService.resetPlay(roomWithMatch._id);
 
-    if (resetRoom) {
-      // Inform all client that rooms have changed
-      informRoomChanged(io, mode, resource);
-
-      io.in(resetRoom._id).emit(
-        "conquer:server-client(in-room-forming)",
-        resetRoom
-      );
-    } else {
-      socket.leave(roomWithMatch._id);
-    }
+    resetGamePlay(io, socket, mode, resource, roomWithMatch, resetRoom);
   }
 };
-const onLoadingQuestion = (io, socket, informRoomChanged) => {
+const onLoadingQuestion = (io, socket, methods) => {
   socket.on(
     "conquer[quick-match]:client-server(loading-question)",
     async (data) => {
       try {
-        await handleLoadingQuestion(io, socket, informRoomChanged, data);
+        await handleLoadingQuestion(io, socket, methods, data);
       } catch (error) {
         socket.emit(
           "[ERROR]conquer[quick-match]:server-client(loading-question)",
@@ -105,9 +96,15 @@ const onSelectedAnswer = (io, socket) => {
   });
 };
 
-const handleSubmitAnswers = async (io, socket, informRoomChanged, data) => {
+const handleSubmitAnswers = async (io, socket, methods, data) => {
+  const { resetGamePlay } = methods;
   const { mode, resource, room, answered, raisedHandId } = data;
   const roomService = roomBuilder(mode, resource);
+
+  // Immediately stop the countdown answer
+  io.in(room._id).emit(
+    "conquer[quick-match]:server-client(stop-countdown-answer)"
+  );
 
   const match = await roomService.endPlay(room, answered, raisedHandId);
 
@@ -118,24 +115,14 @@ const handleSubmitAnswers = async (io, socket, informRoomChanged, data) => {
 
   const resetRoom = roomService.resetPlay(room._id);
 
-  if (resetRoom) {
-    // Inform all client that rooms have changed
-    informRoomChanged(io, mode, resource);
-
-    io.in(resetRoom._id).emit(
-      "conquer:server-client(in-room-forming)",
-      resetRoom
-    );
-  } else {
-    socket.leave(room._id);
-  }
+  resetGamePlay(io, socket, mode, resource, room, resetRoom);
 };
-const onSubmitAnswers = (io, socket, informRoomChanged) => {
+const onSubmitAnswers = (io, socket, methods) => {
   socket.on(
     "conquer[quick-match]:client-server(submit-answers)",
     async (data) => {
       try {
-        await handleSubmitAnswers(io, socket, informRoomChanged, data);
+        await handleSubmitAnswers(io, socket, methods, data);
       } catch (error) {
         socket.emit(
           "[ERROR]conquer[quick-match]:server-client(submit-answers)",
@@ -146,12 +133,12 @@ const onSubmitAnswers = (io, socket, informRoomChanged) => {
   );
 };
 
-module.exports = (io, socket, informRoomChanged) => {
-  onLoadingQuestion(io, socket, informRoomChanged);
+module.exports = (io, socket, methods) => {
+  onLoadingQuestion(io, socket, methods);
 
   onClientRaiseHand(io, socket);
 
   onSelectedAnswer(io, socket);
 
-  onSubmitAnswers(io, socket, informRoomChanged);
+  onSubmitAnswers(io, socket, methods);
 };

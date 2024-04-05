@@ -1,6 +1,7 @@
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useTheme } from 'react-native-paper';
+import { SoundManager } from '../audios';
 import { ConstantConfig } from '../configs';
 import { useSetting } from '../hooks';
 import { useAppSelector } from '../redux/hooks';
@@ -17,10 +18,15 @@ const MainHeader = () => {
 	const { themeMode, onChangeTheme } = useSetting();
 
 	const onPressConversation = () => {
+		SoundManager.playSound('button_click.mp3');
 		openModal<'CONVERSATION'>({
 			component: 'CONVERSATION',
 			params: {},
 		});
+	};
+	const onPressChangeTheme = () => {
+		SoundManager.playSound('button_click.mp3');
+		onChangeTheme();
 	};
 	return (
 		<View style={[styles.header, globalStyles.paper, globalStyles.shadow, stackStyles.row]}>
@@ -41,7 +47,7 @@ const MainHeader = () => {
 						name={themeMode === 'light' ? 'dark-mode' : 'light-mode'}
 						size={MAIN_LAYOUT.HEADER.ICON_SIZE}
 						color={theme.colors.tertiary}
-						onPress={onChangeTheme}
+						onPress={onPressChangeTheme}
 						style={[styles.icon]}
 					/>
 				</TouchableOpacity>

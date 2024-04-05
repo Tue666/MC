@@ -19,11 +19,15 @@ const Conversation = (props: ConversationProps) => {
 	const { conversations } = useAppSelector(selectConversation);
 	const { profile } = useAppSelector(selectAccount);
 	const messagesRef = useRef<FlatList | null>(null);
-	const [conversationId, setConversationId] = useState<Conversations[number]['_id'] | null>(
-		Object.values(conversations)[0]?._id ?? null
+	const [selectedConversation, setSelectedConversation] = useState<Conversations[number] | undefined>(
+		Object.values(conversations)[0]
 	);
 	const theme = useTheme();
 
+	useEffect(() => {
+		const firstConversation = Object.values(conversations)[0];
+		setSelectedConversation(firstConversation);
+	}, [conversations]);
 	useEffect(() => {
 		const timeout = setTimeout(() => {
 			onMessagesChange();
@@ -46,16 +50,19 @@ const Conversation = (props: ConversationProps) => {
 		<View style={[styles.container, globalStyles.paper, globalStyles.shadow]}>
 			<View>
 				<View style={[stackStyles.row, styles.header]}>
-					<Text
-						variant="labelMedium"
-						style={[
-							globalStyles.container,
-							typographyStyles.bold,
-							{ marginRight: MODAL.CONVERSATION.MARGIN / 2 },
-						]}
-					>
-						{conversationId ? `Trò chuyện: ${conversations[conversationId].title}` : ''}
-					</Text>
+					{selectedConversation && (
+						<Text
+							variant="labelMedium"
+							style={[
+								globalStyles.container,
+								typographyStyles.bold,
+								{ marginRight: MODAL.CONVERSATION.MARGIN / 2 },
+							]}
+						>
+							Trò chuyện: {selectedConversation.title}
+						</Text>
+					)}
+					{!selectedConversation && <Text>{''}</Text>}
 					<Icon
 						name="close"
 						size={MODAL.ICON_SIZE}
@@ -67,11 +74,11 @@ const Conversation = (props: ConversationProps) => {
 					Các tin nhắn là tạm thời, không được lưu trữ và chỉ khả dụng khi online
 				</Text>
 			</View>
-			{conversationId && (
+			{selectedConversation && (
 				<>
 					<FlatList
 						ref={messagesRef}
-						data={conversations[conversationId].messages}
+						data={selectedConversation.messages}
 						renderItem={({ item: message }) => (
 							<Message key={message._id} message={message} clientId={profile._id} />
 						)}
@@ -85,7 +92,7 @@ const Conversation = (props: ConversationProps) => {
 							},
 						]}
 					/>
-					<Input conversationId={conversationId} profile={profile} />
+					<Input conversationId={selectedConversation._id} profile={profile} />
 				</>
 			)}
 			{Object.keys(conversations).length <= 0 && (

@@ -109,6 +109,14 @@ const SingleModeAnswer = forwardRef<SingleModeAnswerHandleRef, SingleModeAnswerP
 			},
 		}));
 		useEffect(() => {
+			const onStopCountdownAnswerEvent = () => {
+				onChangePlayingCountdown(false);
+			};
+			socketClient?.on(
+				'conquer[quick-match]:server-client(stop-countdown-answer)',
+				onStopCountdownAnswerEvent
+			);
+
 			const onSubmitAnswersEvent = async (match: IMatch.Match) => {
 				const { clients } = match;
 
@@ -153,6 +161,10 @@ const SingleModeAnswer = forwardRef<SingleModeAnswerHandleRef, SingleModeAnswerP
 			);
 
 			return () => {
+				socketClient?.off(
+					'conquer[quick-match]:server-client(stop-countdown-answer)',
+					onStopCountdownAnswerEvent
+				);
 				socketClient?.off('conquer[quick-match]:server-client(submit-answers)', onSubmitAnswersEvent);
 				socketClient?.off(
 					'[ERROR]conquer[quick-match]:server-client(submit-answers)',
@@ -204,8 +216,6 @@ const SingleModeAnswer = forwardRef<SingleModeAnswerHandleRef, SingleModeAnswerP
 			if (confirmedAnswer.current) return;
 
 			confirmedAnswer.current = true;
-			onChangePlayingCountdown(false);
-
 			socketClient?.emit('conquer[quick-match]:client-server(submit-answers)', {
 				mode: roomMode,
 				resource: resource._id,

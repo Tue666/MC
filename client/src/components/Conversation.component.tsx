@@ -46,6 +46,11 @@ const Conversation = () => {
 		};
 		socketClient?.on('conversation:server-client(leave-conversation)', onLeaveConversationEvent);
 
+		const onClearConversationEvent = (conversationId: IConversation.Conversation['_id']) => {
+			dispatch(leaveConversation(conversationId));
+		};
+		socketClient?.on('conversation:server-client(clear-conversation)', onClearConversationEvent);
+
 		const onMessageConversation = (
 			conversationId: IConversation.Conversation['_id'],
 			message: IConversation.Message
@@ -69,6 +74,7 @@ const Conversation = () => {
 		return () => {
 			socketClient?.off('conversation:server-client(join-conversation)', onJoinConversationEvent);
 			socketClient?.off('conversation:server-client(leave-conversation)', onLeaveConversationEvent);
+			socketClient?.off('conversation:server-client(clear-conversation)', onClearConversationEvent);
 			socketClient?.off('conversation:server-client(message-conversation)', onMessageConversation);
 			socketClient?.off(
 				'[ERROR]conversation:server-client(message-conversation)',
