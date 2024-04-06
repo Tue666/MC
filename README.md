@@ -1,3 +1,5 @@
+The server takes about 1-2 minutes to warm up after a period of inactivity, please be patient <3
+<br />
 [Short demo](https://www.youtube.com/watch?v=KAmxfnd3Eik)
 <br />
 [Download app](https://drive.google.com/file/d/1twcSfWcwb3zEyueTXmPXLQmOvqU2zfc7/view?usp=drive_link)
